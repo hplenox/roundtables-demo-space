@@ -17,26 +17,91 @@ import {
   ChevronLeft,
   HelpCircle,
   MessageSquare,
+  LayoutDashboard,
 } from "lucide-react";
 
-type NavItem = { label: string; href: string; icon: React.ComponentType<{ size?: number; className?: string; strokeWidth?: number }>; muted?: boolean; accent?: boolean };
+type NavItem = {
+  label: string;
+  href: string;
+  icon: React.ComponentType<{ size?: number; className?: string; strokeWidth?: number }>;
+  muted?: boolean;
+  accent?: boolean;
+};
 
-const NAV_ITEMS: NavItem[] = [
-  { label: "Home", href: "/", icon: Home },
-  { label: "Surveys", href: "/surveys", icon: ClipboardList },
-  { label: "PODs", href: "/pods", icon: Users },
-  { label: "Exchange", href: "/exchange", icon: ArrowLeftRight, muted: true },
-  { label: "My Organization", href: "/organization", icon: Building2 },
-  { label: "My Portfolio", href: "/portfolio", icon: Briefcase, muted: true },
-  { label: "Calendar", href: "/calendar", icon: Calendar, muted: true },
-  { label: "Community", href: "/community", icon: Globe, muted: true },
-  { label: "Administrator", href: "/admin", icon: UserCog },
+type NavSection = {
+  label: string;
+  items: NavItem[];
+};
+
+const NAV_SECTIONS: NavSection[] = [
+  {
+    label: "My Workspace",
+    items: [
+      { label: "Home", href: "/", icon: Home },
+      { label: "My Surveys", href: "/my-surveys", icon: ClipboardList },
+      { label: "My Organization", href: "/organization", icon: Building2 },
+      { label: "Portfolio", href: "/portfolio", icon: Briefcase, muted: true },
+      { label: "Calendar", href: "/calendar", icon: Calendar, muted: true },
+      { label: "Community", href: "/community", icon: Globe, muted: true },
+    ],
+  },
+  {
+    label: "Admin",
+    items: [
+      { label: "Survey Admin", href: "/surveys", icon: LayoutDashboard },
+      { label: "PODs", href: "/pods", icon: Users },
+      { label: "Exchange", href: "/exchange", icon: ArrowLeftRight, muted: true },
+      { label: "Administrator", href: "/admin", icon: UserCog },
+    ],
+  },
 ];
 
 const BOTTOM_ITEMS: NavItem[] = [
   { label: "Help Center", href: "/help", icon: HelpCircle },
   { label: "Contact Support", href: "/support", icon: MessageSquare, accent: true },
 ];
+
+function NavLink({
+  item,
+  collapsed,
+  active,
+}: {
+  item: NavItem;
+  collapsed: boolean;
+  active: boolean;
+}) {
+  const { label, href, icon: Icon, muted } = item;
+  return (
+    <li>
+      <Link
+        href={href}
+        title={collapsed ? label : undefined}
+        className={`
+          relative flex items-center gap-3 px-2.5 py-2 rounded-lg
+          text-[13px] font-medium whitespace-nowrap
+          transition-all duration-150
+          ${
+            active
+              ? "bg-[#00b8a9]/15 text-[#00b8a9]"
+              : muted
+              ? "text-white/30 hover:text-white/50 hover:bg-white/[0.04]"
+              : "text-white/65 hover:text-white hover:bg-white/[0.06]"
+          }
+        `}
+      >
+        {active && (
+          <span className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 rounded-r-full bg-[#00b8a9]" />
+        )}
+        <Icon
+          size={16}
+          className={`shrink-0 ${active ? "text-[#00b8a9]" : ""}`}
+          strokeWidth={active ? 2 : 1.75}
+        />
+        {!collapsed && <span>{label}</span>}
+      </Link>
+    </li>
+  );
+}
 
 export default function Sidebar() {
   const pathname = usePathname();
@@ -53,7 +118,6 @@ export default function Sidebar() {
     >
       {/* Logo */}
       <div className="flex items-center gap-2.5 px-4 py-5 border-b border-white/[0.06]">
-        {/* Icon mark */}
         <div className="shrink-0 w-7 h-7 rounded-lg bg-[#00b8a9] flex items-center justify-center">
           <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
             <circle cx="7" cy="7" r="3" fill="white" />
@@ -85,42 +149,36 @@ export default function Sidebar() {
         />
       </button>
 
-      {/* Main nav */}
+      {/* Sectioned nav */}
       <nav className="flex-1 py-3 overflow-y-auto overflow-x-hidden">
-        <ul className="space-y-0.5 px-2">
-          {NAV_ITEMS.map(({ label, href, icon: Icon, muted, accent }) => {
-            const active = pathname === href || (href !== "/" && pathname.startsWith(href));
-            return (
-              <li key={href}>
-                <Link
-                  href={href}
-                  title={collapsed ? label : undefined}
-                  className={`
-                    relative flex items-center gap-3 px-2.5 py-2 rounded-lg
-                    text-[13px] font-medium whitespace-nowrap
-                    transition-all duration-150 group
-                    ${active
-                      ? "bg-[#00b8a9]/15 text-[#00b8a9]"
-                      : muted
-                        ? "text-white/30 hover:text-white/50 hover:bg-white/[0.04]"
-                        : "text-white/65 hover:text-white hover:bg-white/[0.06]"
-                    }
-                  `}
-                >
-                  {active && (
-                    <span className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 rounded-r-full bg-[#00b8a9]" />
-                  )}
-                  <Icon
-                    size={16}
-                    className={`shrink-0 ${active ? "text-[#00b8a9]" : ""}`}
-                    strokeWidth={active ? 2 : 1.75}
+        {NAV_SECTIONS.map((section, si) => (
+          <div key={section.label} className={si > 0 ? "mt-4" : ""}>
+            {/* Section label */}
+            {!collapsed && (
+              <p className="px-4 mb-1 text-[10px] font-semibold tracking-widest uppercase text-white/25 whitespace-nowrap">
+                {section.label}
+              </p>
+            )}
+            {collapsed && si > 0 && (
+              <div className="mx-3 mb-2 border-t border-white/[0.08]" />
+            )}
+            <ul className="space-y-0.5 px-2">
+              {section.items.map((item) => {
+                const active =
+                  pathname === item.href ||
+                  (item.href !== "/" && pathname.startsWith(item.href));
+                return (
+                  <NavLink
+                    key={item.href}
+                    item={item}
+                    collapsed={collapsed}
+                    active={active}
                   />
-                  {!collapsed && <span>{label}</span>}
-                </Link>
-              </li>
-            );
-          })}
-        </ul>
+                );
+              })}
+            </ul>
+          </div>
+        ))}
       </nav>
 
       {/* Bottom items */}
@@ -135,9 +193,10 @@ export default function Sidebar() {
                   flex items-center gap-3 px-2.5 py-2 rounded-lg
                   text-[13px] font-medium whitespace-nowrap
                   transition-all duration-150
-                  ${accent
-                    ? "bg-[#00b8a9] text-white hover:bg-[#00a99b]"
-                    : "text-white/50 hover:text-white/80 hover:bg-white/[0.06]"
+                  ${
+                    accent
+                      ? "bg-[#00b8a9] text-white hover:bg-[#00a99b]"
+                      : "text-white/50 hover:text-white/80 hover:bg-white/[0.06]"
                   }
                 `}
               >
