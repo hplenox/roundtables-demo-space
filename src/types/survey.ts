@@ -116,4 +116,30 @@ export interface InvitedOrg {
   lpiVersion: string;
   lpiSubComponents: LpiSubComponents | null;
   benchmarks: LpiBenchmarks | null;
+  genderDemographics: GenderDemographics | null;
+  racialDemographics: RacialDemographics | null;
+}
+
+export interface GenderDemographics {
+  ownership:  { men: number; women: number };
+  leadership: { men: number; women: number };
+  workforce:  { men: number; women: number };
+}
+
+export interface RacialBreakdown {
+  indigenous_na: number;
+  asian:         number;
+  black:         number;
+  latino:        number;
+  mena:          number;
+  indigenous_out: number;
+  white:         number;
+  other:         number;
+  multiracial:   number;
+}
+
+export interface RacialDemographics {
+  ownership:  RacialBreakdown;
+  leadership: RacialBreakdown;
+  workforce:  RacialBreakdown;
 }

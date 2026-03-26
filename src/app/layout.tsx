@@ -9,6 +9,9 @@ const geist = Geist({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: "Roundtables — Demo Space",
   description: "Diversity, equity & inclusion survey platform for LPs and GPs",
+  icons: {
+    icon: "/icons/rt-icon.png",
+  },
 };
 
 export default function RootLayout({

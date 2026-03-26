@@ -6,6 +6,9 @@ import { getOrgById, getSurveyById } from "@/lib/mock-data";
 import LpiGaugeBar from "@/components/report/LpiGaugeBar";
 import BenchmarkDistributionChart from "@/components/report/BenchmarkDistributionChart";
 import LpiSubComponentsSection from "@/components/report/LpiSubComponentsSection";
+import WorkplacePoliciesCard from "@/components/report/WorkplacePoliciesCard";
+import GenderDemographicsSection from "@/components/report/GenderDemographicsSection";
+import RacialDemographicsSection from "@/components/report/RacialDemographicsSection";
 
 import {
   ArrowLeft, Printer, Download, Building2, User, Mail,
@@ -267,13 +270,34 @@ export default function ManagerReportPage() {
           </ReportSection>
         )}
 
-        {/* Placeholder sections 4–6 */}
-        <div className="bg-white rounded-2xl border border-dashed border-slate-300 p-8 text-center">
-          <p className="text-[13px] font-semibold text-slate-500">Sections 4–6</p>
-          <p className="text-[12px] text-slate-400 mt-1">
-            Demographic data tables, trend analysis &amp; appendix — coming next session.
-          </p>
-        </div>
+        <ReportSection>
+          <SectionLabel>Section 4 · Workplace Policies</SectionLabel>
+          <div className="p-6">
+            <WorkplacePoliciesCard />
+          </div>
+        </ReportSection>
+
+        {org.genderDemographics && (
+          <ReportSection>
+            <SectionLabel>Section 5 · Gender Diversity Demographics</SectionLabel>
+            <div className="p-6">
+              <GenderDemographicsSection
+                ownership={org.genderDemographics.ownership}
+                leadership={org.genderDemographics.leadership}
+                workforce={org.genderDemographics.workforce}
+              />
+            </div>
+          </ReportSection>
+        )}
+
+        {org.racialDemographics && (
+          <ReportSection>
+            <SectionLabel>Section 6 · Racial Diversity Demographics</SectionLabel>
+            <div className="p-6">
+              <RacialDemographicsSection data={org.racialDemographics} />
+            </div>
+          </ReportSection>
+        )}
 
       </div>
     </div>

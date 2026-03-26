@@ -125,7 +125,7 @@ export const MOCK_ORGS: InvitedOrg[] = [
     // ── Sub-components: exactly matching the reference image ──────────────
     lpiSubComponents: {
       overall: {
-        ownership:  { label: "Ownership Score",  rawScore: 0.44, maxScore: 6.00, percentile: 30 },
+        ownership:  { label: "Ownership Score",  rawScore: 0.44, maxScore: 6.00, percentile: 60 },
         leadership: { label: "Leadership Score",  rawScore: 0.00, maxScore: 2.00, percentile: null },
         workforce:  { label: "Workforce Score",   rawScore: 0.33, maxScore: 2.00, percentile: 11 },
       },
@@ -172,6 +172,46 @@ export const MOCK_ORGS: InvitedOrg[] = [
         comingSoon: true,
       },
     },
+    genderDemographics: {
+      ownership:  { men: 13, women: 4 },
+      leadership: { men: 9,  women: 0 },
+      workforce:  { men: 12, women: 6 },
+    },
+    racialDemographics: {
+      ownership: {
+        indigenous_na:  0,
+        asian:          2,
+        black:          1,
+        latino:         0,
+        mena:           0,
+        indigenous_out: 0,
+        white:          13,
+        other:          1,
+        multiracial:    0,
+      },
+      leadership: {
+        indigenous_na:  0,
+        asian:          1,
+        black:          0,
+        latino:         1,
+        mena:           0,
+        indigenous_out: 0,
+        white:          7,
+        other:          0,
+        multiracial:    0,
+      },
+      workforce: {
+        indigenous_na:  0,
+        asian:          3,
+        black:          2,
+        latino:         1,
+        mena:           1,
+        indigenous_out: 0,
+        white:          10,
+        other:          1,
+        multiracial:    0,
+      },
+    },
   },
 
   {
@@ -198,6 +238,8 @@ export const MOCK_ORGS: InvitedOrg[] = [
     lpiVersion: "v3.1",
     lpiSubComponents: null,
     benchmarks: null,
+    genderDemographics: null,
+    racialDemographics: null,
   },
 
   {
@@ -224,6 +266,8 @@ export const MOCK_ORGS: InvitedOrg[] = [
     lpiVersion: "v3.1",
     lpiSubComponents: null,
     benchmarks: null,
+    genderDemographics: null,
+    racialDemographics: null,
   },
 
   {
@@ -250,6 +294,8 @@ export const MOCK_ORGS: InvitedOrg[] = [
     lpiVersion: "v3.1",
     lpiSubComponents: null,
     benchmarks: null,
+    genderDemographics: null,
+    racialDemographics: null,
   },
 
   {
@@ -276,6 +322,8 @@ export const MOCK_ORGS: InvitedOrg[] = [
     lpiVersion: "v3.1",
     lpiSubComponents: null,
     benchmarks: null,
+    genderDemographics: null,
+    racialDemographics: null,
   },
 
   {
@@ -302,6 +350,8 @@ export const MOCK_ORGS: InvitedOrg[] = [
     lpiVersion: "v3.1",
     lpiSubComponents: null,
     benchmarks: null,
+    genderDemographics: null,
+    racialDemographics: null,
   },
 
   {
@@ -328,6 +378,8 @@ export const MOCK_ORGS: InvitedOrg[] = [
     lpiVersion: "v3.1",
     lpiSubComponents: null,
     benchmarks: null,
+    genderDemographics: null,
+    racialDemographics: null,
   },
 
   {
@@ -354,6 +406,8 @@ export const MOCK_ORGS: InvitedOrg[] = [
     lpiVersion: "v3.1",
     lpiSubComponents: null,
     benchmarks: null,
+    genderDemographics: null,
+    racialDemographics: null,
   },
 ];
 
@@ -368,3 +422,10 @@ export function getOrgsBySurveyId(surveyId: string): InvitedOrg[] {
 export function getOrgById(id: string): InvitedOrg | undefined {
   return MOCK_ORGS.find((o) => o.id === id);
 }
+
+// Gender demographics are exported separately for Blackstone
+export const BLACKSTONE_GENDER_DEMOGRAPHICS = {
+  ownership: { men: 13, women: 4 },
+  leadership: { men: 9, women: 0 },
+  workforce: { men: 12, women: 6 },
+};

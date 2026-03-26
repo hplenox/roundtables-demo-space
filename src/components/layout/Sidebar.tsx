@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
@@ -18,7 +19,9 @@ import {
   MessageSquare,
 } from "lucide-react";
 
-const NAV_ITEMS = [
+type NavItem = { label: string; href: string; icon: React.ComponentType<{ size?: number; className?: string; strokeWidth?: number }>; muted?: boolean; accent?: boolean };
+
+const NAV_ITEMS: NavItem[] = [
   { label: "Home", href: "/", icon: Home },
   { label: "Surveys", href: "/surveys", icon: ClipboardList },
   { label: "PODs", href: "/pods", icon: Users },
@@ -30,7 +33,7 @@ const NAV_ITEMS = [
   { label: "Administrator", href: "/admin", icon: UserCog },
 ];
 
-const BOTTOM_ITEMS = [
+const BOTTOM_ITEMS: NavItem[] = [
   { label: "Help Center", href: "/help", icon: HelpCircle },
   { label: "Contact Support", href: "/support", icon: MessageSquare, accent: true },
 ];
