@@ -16,8 +16,8 @@ import {
   UserCog,
   ChevronLeft,
   HelpCircle,
-  MessageSquare,
   LayoutDashboard,
+  LifeBuoy,
 } from "lucide-react";
 
 type NavItem = {
@@ -40,7 +40,7 @@ const NAV_SECTIONS: NavSection[] = [
       { label: "Home", href: "/", icon: Home },
       { label: "My Surveys", href: "/my-surveys", icon: ClipboardList },
       { label: "My Organization", href: "/organization", icon: Building2 },
-      { label: "Portfolio", href: "/portfolio", icon: Briefcase, muted: true },
+      { label: "Portfolio", href: "/portfolio", icon: Briefcase },
       { label: "Calendar", href: "/calendar", icon: Calendar, muted: true },
       { label: "Community", href: "/community", icon: Globe, muted: true },
     ],
@@ -49,6 +49,7 @@ const NAV_SECTIONS: NavSection[] = [
     label: "Admin",
     items: [
       { label: "Survey Admin", href: "/surveys", icon: LayoutDashboard },
+      { label: "Support", href: "/support", icon: LifeBuoy },
       { label: "PODs", href: "/pods", icon: Users },
       { label: "Exchange", href: "/exchange", icon: ArrowLeftRight, muted: true },
       { label: "Administrator", href: "/admin", icon: UserCog },
@@ -58,7 +59,6 @@ const NAV_SECTIONS: NavSection[] = [
 
 const BOTTOM_ITEMS: NavItem[] = [
   { label: "Help Center", href: "/help", icon: HelpCircle },
-  { label: "Contact Support", href: "/support", icon: MessageSquare, accent: true },
 ];
 
 function NavLink({
