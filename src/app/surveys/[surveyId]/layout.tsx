@@ -3,7 +3,7 @@
 import { useParams, usePathname } from "next/navigation";
 import Link from "next/link";
 import { getSurveyById } from "@/lib/mock-data";
-import { ArrowLeft, Download } from "lucide-react";
+import { ChevronRight, Download, ShieldCheck, LayoutDashboard } from "lucide-react";
 
 const SUB_TABS = [
   { key: "overview",       label: "Overview",              href: "" },
@@ -43,19 +43,23 @@ export default function SurveyLayout({ children }: { children: React.ReactNode }
 
   return (
     <div className="min-h-full bg-slate-50">
-      {/* Survey header */}
-      <div className="bg-white border-b border-slate-200">
-        <div className="max-w-6xl mx-auto px-6 pt-6 pb-0">
+      {/* Survey command header */}
+      <div className="bg-white border-b border-slate-200 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
+        {/* Premium accent bar */}
+        <div className="h-[3px] bg-gradient-to-r from-[#00b8a9] via-[#00b8a9]/70 to-transparent" />
+
+        <div className="max-w-6xl mx-auto px-6 pt-5 pb-0">
           {/* Breadcrumb */}
-          <div className="flex items-center gap-2 text-[11.5px] text-slate-400 mb-4">
-            <Link href="/surveys" className="flex items-center gap-1 hover:text-slate-700 transition-colors">
-              <ArrowLeft size={11} />
-              Surveys
+          <div className="flex items-center gap-1.5 text-[11.5px] mb-4">
+            <Link
+              href="/surveys"
+              className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-[#0f1923] text-[#00b8a9] hover:bg-[#1a2d3d] transition-colors font-semibold text-[10.5px] tracking-wide"
+            >
+              <LayoutDashboard size={10} strokeWidth={2} />
+              Survey Admin
             </Link>
-            <span>/</span>
-            <span className="text-slate-600">Hosting</span>
-            <span>/</span>
-            <span className="text-slate-800 font-medium truncate max-w-xs">
+            <ChevronRight size={12} className="text-slate-300 shrink-0" />
+            <span className="text-slate-700 font-medium truncate max-w-xs">
               {survey.year} {survey.name}
             </span>
           </div>
@@ -64,22 +68,26 @@ export default function SurveyLayout({ children }: { children: React.ReactNode }
           <div className="flex items-start justify-between gap-4 mb-5">
             <div className="flex items-center gap-3 min-w-0">
               {/* Icon */}
-              <div className="shrink-0 w-9 h-9 rounded-xl bg-[#0f1923] flex items-center justify-center">
+              <div className="shrink-0 w-10 h-10 rounded-xl bg-[#0f1923] flex items-center justify-center shadow-sm">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00b8a9" strokeWidth="1.75">
                   <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
                 </svg>
               </div>
               <div className="min-w-0">
                 <div className="flex items-center gap-2.5 flex-wrap">
-                  <h1 className="text-[18px] font-semibold text-slate-900 leading-tight">
+                  <h1 className="text-[18px] font-bold text-slate-900 leading-tight">
                     {survey.year} {survey.name}
                   </h1>
-                  <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10.5px] font-medium border ${statusColors[survey.status]}`}>
+                  <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10.5px] font-semibold border ${statusColors[survey.status]}`}>
                     {survey.status.charAt(0).toUpperCase() + survey.status.slice(1)}
                   </span>
                 </div>
-                <p className="text-[12.5px] text-slate-400 mt-0.5">
-                  {survey.hostOrg} · Host: {survey.hostContact} · Closes {survey.targetCloseDate}
+                <p className="text-[12px] text-slate-400 mt-0.5">
+                  {survey.hostOrg}
+                  <span className="mx-1.5 text-slate-200">·</span>
+                  Hosted by {survey.hostContact}
+                  <span className="mx-1.5 text-slate-200">·</span>
+                  Closes {survey.targetCloseDate}
                 </p>
               </div>
             </div>
@@ -90,9 +98,11 @@ export default function SurveyLayout({ children }: { children: React.ReactNode }
                 <Download size={13} />
                 Weekly Report
               </button>
-              <button className="px-3 py-1.5 rounded-lg bg-slate-100 text-[12px] font-medium text-slate-500 border border-slate-200">
-                Administrator Access Granted
-              </button>
+              {/* Premium admin access badge */}
+              <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#00b8a9]/8 border border-[#00b8a9]/25 text-[#00897b]">
+                <ShieldCheck size={13} strokeWidth={2} />
+                <span className="text-[11.5px] font-semibold">Admin Access</span>
+              </div>
             </div>
           </div>
 

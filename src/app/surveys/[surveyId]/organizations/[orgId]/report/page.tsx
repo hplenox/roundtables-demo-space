@@ -11,8 +11,8 @@ import GenderDemographicsSection from "@/components/report/GenderDemographicsSec
 import RacialDemographicsSection from "@/components/report/RacialDemographicsSection";
 
 import {
-  ArrowLeft, Printer, Download, Building2, User, Mail,
-  Calendar, Clock, MapPin, TrendingUp, BadgeCheck, Lock,
+  ChevronRight, Printer, Download, Building2, User, Mail,
+  Calendar, Clock, MapPin, TrendingUp, BadgeCheck, Lock, LayoutDashboard,
 } from "lucide-react";
 
 function ReportSection({ children, className = "" }: { children: React.ReactNode; className?: string }) {
@@ -84,16 +84,45 @@ export default function ManagerReportPage() {
     <div className="min-h-screen bg-slate-50">
       {/* Sticky report top bar */}
       <div className="sticky top-0 z-30 bg-white border-b border-slate-200 shadow-sm print:hidden">
-        <div className="max-w-5xl mx-auto px-6 h-12 flex items-center justify-between">
-          <Link
-            href={`/surveys/${surveyId}/organizations/${orgId}`}
-            className="flex items-center gap-1.5 text-[12px] text-slate-500 hover:text-slate-800 transition-colors"
-          >
-            <ArrowLeft size={13} />
-            Back to {org.name}
-          </Link>
-          <div className="flex items-center gap-1.5">
-            <span className="text-[11px] text-slate-400 mr-2">Manager Report · {org.lpiVersion}</span>
+        {/* Premium accent bar */}
+        <div className="h-[3px] bg-gradient-to-r from-[#00b8a9] via-[#00b8a9]/70 to-transparent" />
+        <div className="max-w-5xl mx-auto px-6 h-11 flex items-center justify-between gap-4">
+          {/* Full breadcrumb chain */}
+          <nav className="flex items-center gap-1.5 text-[11px] min-w-0 overflow-hidden">
+            <Link
+              href="/surveys"
+              className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-[#0f1923] text-[#00b8a9] hover:bg-[#1a2d3d] transition-colors font-semibold text-[9.5px] tracking-wide shrink-0"
+            >
+              <LayoutDashboard size={9} strokeWidth={2} />
+              Survey Admin
+            </Link>
+            <ChevronRight size={11} className="text-slate-300 shrink-0" />
+            <Link
+              href={`/surveys/${surveyId}`}
+              className="text-slate-400 hover:text-slate-700 transition-colors font-medium truncate max-w-[120px] hidden sm:block"
+            >
+              {survey.year} {survey.name}
+            </Link>
+            <ChevronRight size={11} className="text-slate-300 shrink-0 hidden sm:block" />
+            <Link
+              href={`/surveys/${surveyId}/organizations`}
+              className="text-slate-400 hover:text-slate-700 transition-colors font-medium hidden md:block"
+            >
+              Invited Organizations
+            </Link>
+            <ChevronRight size={11} className="text-slate-300 shrink-0 hidden md:block" />
+            <Link
+              href={`/surveys/${surveyId}/organizations/${orgId}`}
+              className="text-slate-400 hover:text-slate-700 transition-colors font-medium truncate max-w-[100px]"
+            >
+              {org.name}
+            </Link>
+            <ChevronRight size={11} className="text-slate-300 shrink-0" />
+            <span className="text-slate-700 font-semibold shrink-0">Manager Report</span>
+          </nav>
+
+          <div className="flex items-center gap-1.5 shrink-0">
+            <span className="text-[10.5px] text-slate-400 mr-1 hidden lg:block">{org.lpiVersion}</span>
             <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 text-[12px] text-slate-600 hover:bg-slate-50 transition-colors">
               <Printer size={13} />
               Print

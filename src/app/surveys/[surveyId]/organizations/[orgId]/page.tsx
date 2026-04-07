@@ -3,7 +3,7 @@
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import { getOrgById, getSurveyById } from "@/lib/mock-data";
-import { ArrowLeft, ArrowRight, FileText, ExternalLink, MapPin, TrendingUp, CheckCircle2, Clock, AlertCircle } from "lucide-react";
+import { ChevronRight, ArrowRight, FileText, ExternalLink, MapPin, CheckCircle2, Clock, AlertCircle, LayoutDashboard } from "lucide-react";
 
 const STATUS_CONFIG = {
   submitted:   { label: "Submitted",   badge: "bg-emerald-50 border-emerald-200 text-emerald-700", icon: CheckCircle2, iconColor: "text-emerald-500" },
@@ -34,15 +34,33 @@ export default function OrgDetailPage() {
 
   return (
     <div className="space-y-5">
-      {/* Back breadcrumb (within the survey layout) */}
+      {/* Inline breadcrumb — extends the layout header's Survey Admin > Survey chain */}
       <div>
-        <Link
-          href={`/surveys/${surveyId}/organizations`}
-          className="flex items-center gap-1.5 text-[12px] text-slate-500 hover:text-slate-800 transition-colors mb-5"
-        >
-          <ArrowLeft size={13} />
-          Back to Organizations
-        </Link>
+        <nav className="flex items-center gap-1.5 text-[11.5px] mb-5">
+          <Link
+            href="/surveys"
+            className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-[#0f1923] text-[#00b8a9] hover:bg-[#1a2d3d] transition-colors font-semibold text-[10.5px] tracking-wide"
+          >
+            <LayoutDashboard size={10} strokeWidth={2} />
+            Survey Admin
+          </Link>
+          <ChevronRight size={12} className="text-slate-300 shrink-0" />
+          <Link
+            href={`/surveys/${surveyId}`}
+            className="text-slate-500 hover:text-slate-800 transition-colors font-medium truncate max-w-[160px]"
+          >
+            {survey.year} {survey.name}
+          </Link>
+          <ChevronRight size={12} className="text-slate-300 shrink-0" />
+          <Link
+            href={`/surveys/${surveyId}/organizations`}
+            className="text-slate-500 hover:text-slate-800 transition-colors font-medium"
+          >
+            Invited Organizations
+          </Link>
+          <ChevronRight size={12} className="text-slate-300 shrink-0" />
+          <span className="text-slate-800 font-semibold truncate max-w-[140px]">{org.name}</span>
+        </nav>
 
         {/* Org hero */}
         <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-sm">
