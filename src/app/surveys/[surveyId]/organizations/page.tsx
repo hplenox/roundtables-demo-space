@@ -1,8 +1,8 @@
 "use client";
 
-import { useParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { getOrgsBySurveyId } from "@/lib/mock-data";
 import { InvitedOrg } from "@/types/survey";
 import { ArrowRight, Search, SlidersHorizontal, Mail, X, Send, CheckCircle, BellRing } from "lucide-react";
@@ -301,10 +301,26 @@ function OrgRow({
 
 export default function OrganizationsPage() {
   const { surveyId } = useParams<{ surveyId: string }>();
+  const searchParams = useSearchParams();
   const allOrgs = getOrgsBySurveyId(surveyId);
 
-  const [filter, setFilter] = useState<StatusFilter>("all");
+  const initialStatus = searchParams.get("status") as StatusFilter | null;
+  const [filter, setFilter] = useState<StatusFilter>(
+    initialStatus && ["submitted", "in_progress", "not_started"].includes(initialStatus)
+      ? initialStatus
+      : "all"
+  );
   const [search, setSearch] = useState("");
+
+  // Sync if the URL param changes (e.g., back/forward navigation)
+  useEffect(() => {
+    const s = searchParams.get("status") as StatusFilter | null;
+    if (s && ["submitted", "in_progress", "not_started"].includes(s)) {
+      setFilter(s);
+    } else {
+      setFilter("all");
+    }
+  }, [searchParams]);
   const [nudgeOrgs, setNudgeOrgs] = useState<InvitedOrg[] | null>(null);
 
   const filtered = allOrgs.filter((o) => {

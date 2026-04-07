@@ -6,11 +6,10 @@ import { getSurveyById } from "@/lib/mock-data";
 import { ArrowLeft, Download } from "lucide-react";
 
 const SUB_TABS = [
-  { key: "response-rates", label: "Response Rates", href: "" },
-  { key: "organizations",  label: "Organizations",  href: "/organizations" },
-  { key: "invitations",    label: "Invitations",    href: "/invitations" },
-  { key: "asset-classes",  label: "Asset Classes",  href: "/asset-classes" },
-  { key: "analytics",      label: "Analytics",      href: "/analytics" },
+  { key: "overview",       label: "Overview",              href: "" },
+  { key: "organizations",  label: "Invited Organizations", href: "/organizations" },
+  { key: "analytics",      label: "Analytics",             href: "/analytics" },
+  { key: "reports",        label: "Reports",               href: "/reports" },
 ];
 
 export default function SurveyLayout({ children }: { children: React.ReactNode }) {
@@ -31,10 +30,9 @@ export default function SurveyLayout({ children }: { children: React.ReactNode }
   // Determine active sub-tab from pathname
   const activeSub = (() => {
     if (pathname.includes("/organizations")) return "organizations";
-    if (pathname.includes("/invitations"))   return "invitations";
-    if (pathname.includes("/asset-classes")) return "asset-classes";
     if (pathname.includes("/analytics"))     return "analytics";
-    return "response-rates";
+    if (pathname.includes("/reports"))       return "reports";
+    return "overview";
   })();
 
   const statusColors: Record<string, string> = {
@@ -58,7 +56,7 @@ export default function SurveyLayout({ children }: { children: React.ReactNode }
             <span className="text-slate-600">Hosting</span>
             <span>/</span>
             <span className="text-slate-800 font-medium truncate max-w-xs">
-              {SUB_TABS.find((t) => t.key === activeSub)?.label}
+              {survey.year} {survey.name}
             </span>
           </div>
 
