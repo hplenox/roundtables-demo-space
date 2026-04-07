@@ -144,10 +144,28 @@ export default function Sidebar() {
               <NavLink key={item.href} item={item} collapsed={collapsed} active={active} />
             );
           })}
+          {/* What's Coming — sits right under Administrator */}
+          <li>
+            <Link
+              href="/roadmap"
+              title={collapsed ? "What's Coming" : undefined}
+              className={`
+                relative flex items-center gap-3 px-2.5 py-2 rounded-lg
+                text-[13px] font-medium whitespace-nowrap transition-all duration-150
+                ${pathname === "/roadmap" ? "bg-[#00b8a9]/15 text-[#00b8a9]" : "text-white/40 hover:text-white/80 hover:bg-white/[0.06]"}
+              `}
+            >
+              {pathname === "/roadmap" && (
+                <span className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 rounded-r-full bg-[#00b8a9]" />
+              )}
+              <Sparkles size={15} className="shrink-0" strokeWidth={1.75} />
+              {!collapsed && <span>What&rsquo;s Coming</span>}
+            </Link>
+          </li>
         </ul>
       </nav>
 
-      {/* Bottom: Help + What's Coming */}
+      {/* Bottom: Help + Support */}
       <div className="border-t border-white/[0.06] py-3 px-2 space-y-0.5">
         <Link
           href="/help"
@@ -165,28 +183,6 @@ export default function Sidebar() {
           <HeadphonesIcon size={16} className="shrink-0" strokeWidth={1.75} />
           {!collapsed && <span>Contact Support</span>}
         </Link>
-
-        {/* What's Coming — subtle teaser */}
-        {!collapsed && (
-          <div className="pt-2 px-1">
-            <Link
-              href="/roadmap"
-              className="flex items-center gap-1.5 text-[11px] text-white/25 hover:text-[#00b8a9] transition-colors duration-150 group"
-            >
-              <Sparkles size={11} className="shrink-0 group-hover:text-[#00b8a9]" />
-              <span>What&rsquo;s coming</span>
-            </Link>
-          </div>
-        )}
-        {collapsed && (
-          <Link
-            href="/roadmap"
-            title="What's coming"
-            className="flex items-center justify-center w-full py-2 text-white/20 hover:text-[#00b8a9] transition-colors duration-150"
-          >
-            <Sparkles size={13} />
-          </Link>
-        )}
       </div>
     </aside>
   );
