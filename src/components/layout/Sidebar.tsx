@@ -18,6 +18,7 @@ import {
   HelpCircle,
   LayoutDashboard,
   LifeBuoy,
+  Bell,
 } from "lucide-react";
 
 type NavItem = {
@@ -49,6 +50,7 @@ const NAV_SECTIONS: NavSection[] = [
     label: "Admin",
     items: [
       { label: "Survey Admin", href: "/surveys", icon: LayoutDashboard },
+      { label: "Notifications", href: "/notifications", icon: Bell },
       { label: "Support", href: "/support", icon: LifeBuoy },
       { label: "PODs", href: "/pods", icon: Users },
       { label: "Exchange", href: "/exchange", icon: ArrowLeftRight, muted: true },

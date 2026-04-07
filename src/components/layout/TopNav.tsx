@@ -1,7 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { Bell, MessageSquare, ChevronDown, Search, Check } from "lucide-react";
+import Link from "next/link";
+import { Bell, MessageSquare, ChevronDown, Search } from "lucide-react";
+import { getUnreadCount } from "@/lib/mock-notifications";
 
 const USER = {
   name: "Heran Patel",
@@ -10,16 +12,9 @@ const USER = {
   org: "Lenox Park Solutions",
 };
 
-const NOTIFICATIONS = [
-  { id: 1, text: "Survey response submitted by Blackstone GP", time: "2m ago", unread: true },
-  { id: 2, text: "New POD member joined your roundtable", time: "1h ago", unread: true },
-  { id: 3, text: "Weekly report is ready for download", time: "3h ago", unread: false },
-];
-
 export default function TopNav() {
-  const [notifOpen, setNotifOpen] = useState(false);
   const [userOpen, setUserOpen] = useState(false);
-  const unreadCount = NOTIFICATIONS.filter((n) => n.unread).length;
+  const unreadCount = getUnreadCount();
 
   return (
     <header className="h-14 shrink-0 flex items-center justify-between px-5 bg-white border-b border-slate-200/80 z-20">
@@ -51,55 +46,19 @@ export default function TopNav() {
           <MessageSquare size={16} strokeWidth={1.75} />
         </button>
 
-        {/* Notifications */}
-        <div className="relative">
-          <button
-            onClick={() => { setNotifOpen(!notifOpen); setUserOpen(false); }}
-            className="relative w-8 h-8 rounded-lg flex items-center justify-center text-slate-500 hover:bg-slate-100 hover:text-slate-700 transition-colors"
-          >
-            <Bell size={16} strokeWidth={1.75} />
-            {unreadCount > 0 && (
-              <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-[#00b8a9] ring-2 ring-white" />
-            )}
-          </button>
-
-          {notifOpen && (
-            <>
-              <div className="fixed inset-0 z-10" onClick={() => setNotifOpen(false)} />
-              <div className="absolute right-0 top-10 z-20 w-80 rounded-xl bg-white shadow-xl border border-slate-200/80 overflow-hidden">
-                <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100">
-                  <span className="text-[13px] font-semibold text-slate-800">Notifications</span>
-                  <button className="text-[11px] text-[#00b8a9] font-medium hover:underline flex items-center gap-1">
-                    <Check size={11} /> Mark all read
-                  </button>
-                </div>
-                <ul>
-                  {NOTIFICATIONS.map((n) => (
-                    <li
-                      key={n.id}
-                      className={`px-4 py-3 border-b border-slate-50 last:border-0 hover:bg-slate-50 transition-colors cursor-pointer ${n.unread ? "bg-[#00b8a9]/[0.04]" : ""}`}
-                    >
-                      <div className="flex items-start gap-2.5">
-                        {n.unread && (
-                          <span className="mt-1.5 shrink-0 w-1.5 h-1.5 rounded-full bg-[#00b8a9]" />
-                        )}
-                        <div className={n.unread ? "" : "pl-4"}>
-                          <p className="text-[12.5px] text-slate-700 leading-snug">{n.text}</p>
-                          <p className="text-[11px] text-slate-400 mt-0.5">{n.time}</p>
-                        </div>
-                      </div>
-                    </li>
-                  ))}
-                </ul>
-                <div className="px-4 py-2.5 border-t border-slate-100">
-                  <button className="text-[12px] text-[#00b8a9] font-medium hover:underline">
-                    View all notifications
-                  </button>
-                </div>
-              </div>
-            </>
+        {/* Notifications bell → /notifications */}
+        <Link
+          href="/notifications"
+          className="relative w-8 h-8 rounded-lg flex items-center justify-center text-slate-500 hover:bg-slate-100 hover:text-slate-700 transition-colors"
+          title="Notifications"
+        >
+          <Bell size={16} strokeWidth={1.75} />
+          {unreadCount > 0 && (
+            <span className="absolute -top-0.5 -right-0.5 min-w-[16px] h-4 px-0.5 rounded-full bg-red-500 ring-2 ring-white flex items-center justify-center">
+              <span className="text-[9px] font-bold text-white leading-none">{unreadCount}</span>
+            </span>
           )}
-        </div>
+        </Link>
 
         {/* Divider */}
         <div className="w-px h-5 bg-slate-200 mx-1" />
@@ -107,7 +66,7 @@ export default function TopNav() {
         {/* User menu */}
         <div className="relative">
           <button
-            onClick={() => { setUserOpen(!userOpen); setNotifOpen(false); }}
+            onClick={() => setUserOpen(!userOpen)}
             className="flex items-center gap-2.5 pl-1 pr-2 py-1 rounded-lg hover:bg-slate-100 transition-colors"
           >
             {/* Avatar */}
