@@ -236,10 +236,76 @@ export const MOCK_ORGS: InvitedOrg[] = [
     location: "New York, NY",
     lpiScore: 7.8,
     lpiVersion: "v3.1",
-    lpiSubComponents: null,
-    benchmarks: null,
-    genderDemographics: null,
-    racialDemographics: null,
+
+    lpiSubComponents: {
+      overall: {
+        ownership:  { label: "Ownership Score",  rawScore: 0.67, maxScore: 6.00, percentile: 71 },
+        leadership: { label: "Leadership Score",  rawScore: 0.25, maxScore: 2.00, percentile: 44 },
+        workforce:  { label: "Workforce Score",   rawScore: 0.58, maxScore: 2.00, percentile: 38 },
+      },
+      dimensions: [
+        {
+          dimension: "Gender",
+          color: "#6366f1",
+          ownership:  { label: "Gender Ownership Score",  rawScore: 0.50, maxScore: 3.00, percentile: 74 },
+          leadership: { label: "Gender Leadership Score", rawScore: 0.25, maxScore: 1.00, percentile: 55 },
+          workforce:  { label: "Gender Workforce Score",  rawScore: 0.42, maxScore: 1.00, percentile: 48 },
+        },
+        {
+          dimension: "Racial",
+          color: "#f59e0b",
+          ownership:  { label: "Racial Ownership Score",  rawScore: 0.17, maxScore: 3.00, percentile: 30 },
+          leadership: { label: "Racial Leadership Score", rawScore: 0.00, maxScore: 1.00, percentile: null },
+          workforce:  { label: "Racial Workforce Score",  rawScore: 0.16, maxScore: 1.00, percentile: 22 },
+        },
+      ],
+      peerGroups: [
+        { label: "$AUM",      sublabel: "$250B–$750B",  percentile: 58 },
+        { label: "HQ Region", sublabel: "Northeast US", percentile: 61 },
+      ],
+    },
+
+    benchmarks: {
+      universe: {
+        label: "Roundtables Universe",
+        p10: 4.2, q1: 5.8, median: 6.9, q3: 8.0, p90: 9.1,
+        min: 2.1, max: 10.0,
+        managerValue: 7.8, managerPercentile: 58, n: 312,
+      },
+      portfolio: {
+        label: "My Portfolio",
+        p10: 5.1, q1: 6.4, median: 7.2, q3: 8.3, p90: 9.3,
+        min: 3.8, max: 9.8,
+        managerValue: 7.8, managerPercentile: 44, n: 47,
+      },
+      assetClass: {
+        label: "Asset Class (Private Equity)",
+        p10: 4.8, q1: 6.1, median: 7.0, q3: 8.1, p90: 9.2,
+        min: 2.9, max: 10.0,
+        managerValue: 7.8, managerPercentile: 54, n: 89,
+        comingSoon: true,
+      },
+    },
+
+    genderDemographics: {
+      ownership:  { men: 8,  women: 4 },
+      leadership: { men: 11, women: 3 },
+      workforce:  { men: 19, women: 14 },
+    },
+    racialDemographics: {
+      ownership: {
+        indigenous_na: 0, asian: 2, black: 1, latino: 1, mena: 0,
+        indigenous_out: 0, white: 8, other: 0, multiracial: 0,
+      },
+      leadership: {
+        indigenous_na: 0, asian: 2, black: 0, latino: 0, mena: 1,
+        indigenous_out: 0, white: 11, other: 0, multiracial: 0,
+      },
+      workforce: {
+        indigenous_na: 0, asian: 5, black: 3, latino: 2, mena: 1,
+        indigenous_out: 0, white: 19, other: 2, multiracial: 1,
+      },
+    },
   },
 
   {
@@ -376,10 +442,76 @@ export const MOCK_ORGS: InvitedOrg[] = [
     location: "Boston, MA",
     lpiScore: 7.1,
     lpiVersion: "v3.1",
-    lpiSubComponents: null,
-    benchmarks: null,
-    genderDemographics: null,
-    racialDemographics: null,
+
+    lpiSubComponents: {
+      overall: {
+        ownership:  { label: "Ownership Score",  rawScore: 0.22, maxScore: 6.00, percentile: 31 },
+        leadership: { label: "Leadership Score",  rawScore: 0.11, maxScore: 2.00, percentile: 18 },
+        workforce:  { label: "Workforce Score",   rawScore: 0.44, maxScore: 2.00, percentile: 29 },
+      },
+      dimensions: [
+        {
+          dimension: "Gender",
+          color: "#6366f1",
+          ownership:  { label: "Gender Ownership Score",  rawScore: 0.22, maxScore: 3.00, percentile: 40 },
+          leadership: { label: "Gender Leadership Score", rawScore: 0.11, maxScore: 1.00, percentile: 24 },
+          workforce:  { label: "Gender Workforce Score",  rawScore: 0.33, maxScore: 1.00, percentile: 35 },
+        },
+        {
+          dimension: "Racial",
+          color: "#f59e0b",
+          ownership:  { label: "Racial Ownership Score",  rawScore: 0.00, maxScore: 3.00, percentile: null },
+          leadership: { label: "Racial Leadership Score", rawScore: 0.00, maxScore: 1.00, percentile: null },
+          workforce:  { label: "Racial Workforce Score",  rawScore: 0.11, maxScore: 1.00, percentile: 15 },
+        },
+      ],
+      peerGroups: [
+        { label: "$AUM",      sublabel: "$100B–$250B",  percentile: 42 },
+        { label: "HQ Region", sublabel: "Northeast US", percentile: 38 },
+      ],
+    },
+
+    benchmarks: {
+      universe: {
+        label: "Roundtables Universe",
+        p10: 4.2, q1: 5.8, median: 6.9, q3: 8.0, p90: 9.1,
+        min: 2.1, max: 10.0,
+        managerValue: 7.1, managerPercentile: 43, n: 312,
+      },
+      portfolio: {
+        label: "My Portfolio",
+        p10: 5.1, q1: 6.4, median: 7.2, q3: 8.3, p90: 9.3,
+        min: 3.8, max: 9.8,
+        managerValue: 7.1, managerPercentile: 31, n: 47,
+      },
+      assetClass: {
+        label: "Asset Class (Private Equity)",
+        p10: 4.8, q1: 6.1, median: 7.0, q3: 8.1, p90: 9.2,
+        min: 2.9, max: 10.0,
+        managerValue: 7.1, managerPercentile: 37, n: 89,
+        comingSoon: true,
+      },
+    },
+
+    genderDemographics: {
+      ownership:  { men: 14, women: 3 },
+      leadership: { men: 10, women: 2 },
+      workforce:  { men: 22, women: 11 },
+    },
+    racialDemographics: {
+      ownership: {
+        indigenous_na: 0, asian: 1, black: 0, latino: 0, mena: 0,
+        indigenous_out: 0, white: 16, other: 0, multiracial: 0,
+      },
+      leadership: {
+        indigenous_na: 0, asian: 1, black: 1, latino: 0, mena: 0,
+        indigenous_out: 0, white: 10, other: 0, multiracial: 0,
+      },
+      workforce: {
+        indigenous_na: 0, asian: 4, black: 2, latino: 1, mena: 0,
+        indigenous_out: 0, white: 24, other: 1, multiracial: 1,
+      },
+    },
   },
 
   {
