@@ -1,8 +1,9 @@
 "use client";
 
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import { getOrgById, getSurveyById } from "@/lib/mock-data";
+import { useState, useEffect, useRef } from "react";
+import { getOrgById, getSurveyById, getOrgsBySurveyId } from "@/lib/mock-data";
 import LpiGaugeBar from "@/components/report/LpiGaugeBar";
 import BenchmarkDistributionChart from "@/components/report/BenchmarkDistributionChart";
 import LpiSubComponentsSection from "@/components/report/LpiSubComponentsSection";
@@ -11,8 +12,9 @@ import GenderDemographicsSection from "@/components/report/GenderDemographicsSec
 import RacialDemographicsSection from "@/components/report/RacialDemographicsSection";
 
 import {
-  ChevronRight, Printer, Download, Building2, User, Mail,
-  Calendar, Clock, MapPin, TrendingUp, BadgeCheck, Lock, LayoutDashboard,
+  ChevronRight, ChevronLeft, ChevronDown, Printer, Download,
+  User, Mail, Calendar, Clock, MapPin, TrendingUp, BadgeCheck,
+  Lock, LayoutDashboard, Search, Lightbulb, Building2,
 } from "lucide-react";
 
 function ReportSection({ children, className = "" }: { children: React.ReactNode; className?: string }) {
@@ -45,10 +47,221 @@ function InfoPill({ icon: Icon, label, value }: { icon: React.ElementType; label
   );
 }
 
+// ─── Manager Switcher ─────────────────────────────────────────────────────────
+
+function ManagerSwitcher({
+  surveyId,
+  currentOrgId,
+  submittedOrgs,
+}: {
+  surveyId: string;
+  currentOrgId: string;
+  submittedOrgs: Array<{ id: string; name: string; lpiScore: number | null; assetClass: string }>;
+}) {
+  const router = useRouter();
+  const [open, setOpen] = useState(false);
+  const [search, setSearch] = useState("");
+  const [showHint, setShowHint] = useState(true);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const searchRef = useRef<HTMLInputElement>(null);
+
+  const currentIdx = submittedOrgs.findIndex((o) => o.id === currentOrgId);
+  const prevOrg = currentIdx > 0 ? submittedOrgs[currentIdx - 1] : null;
+  const nextOrg = currentIdx < submittedOrgs.length - 1 ? submittedOrgs[currentIdx + 1] : null;
+
+  // Fade hint out after 4 s
+  useEffect(() => {
+    const t = setTimeout(() => setShowHint(false), 4000);
+    return () => clearTimeout(t);
+  }, []);
+
+  // Close on outside click
+  useEffect(() => {
+    function handler(e: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setOpen(false);
+        setSearch("");
+      }
+    }
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
+
+  // Focus search when opened
+  useEffect(() => {
+    if (open) setTimeout(() => searchRef.current?.focus(), 50);
+  }, [open]);
+
+  // Keyboard: ← → to jump prev/next
+  useEffect(() => {
+    function handler(e: KeyboardEvent) {
+      if (open) return; // let dropdown handle its own keys
+      if (e.altKey && e.key === "ArrowLeft" && prevOrg) {
+        router.push(`/surveys/${surveyId}/organizations/${prevOrg.id}/report`);
+      }
+      if (e.altKey && e.key === "ArrowRight" && nextOrg) {
+        router.push(`/surveys/${surveyId}/organizations/${nextOrg.id}/report`);
+      }
+    }
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [open, prevOrg, nextOrg, router, surveyId]);
+
+  const filtered = submittedOrgs.filter((o) =>
+    o.name.toLowerCase().includes(search.toLowerCase())
+  );
+
+  function navigate(id: string) {
+    setOpen(false);
+    setSearch("");
+    router.push(`/surveys/${surveyId}/organizations/${id}/report`);
+  }
+
+  const lpiColor = (score: number | null) =>
+    score === null ? "text-slate-400" :
+    score >= 8 ? "text-emerald-600" :
+    score >= 6.5 ? "text-amber-600" : "text-red-500";
+
+  return (
+    <div className="flex items-center gap-0 shrink-0 relative" ref={dropdownRef}>
+      {/* Prev button */}
+      <button
+        onClick={() => prevOrg && navigate(prevOrg.id)}
+        disabled={!prevOrg}
+        title={prevOrg ? `← ${prevOrg.name} (Alt+←)` : undefined}
+        className={`h-7 w-6 flex items-center justify-center rounded-l-lg border border-r-0 text-[12px] transition-all ${
+          prevOrg
+            ? "border-slate-300 text-slate-500 hover:bg-slate-100 hover:text-slate-800 hover:border-slate-400"
+            : "border-slate-200 text-slate-300 cursor-not-allowed"
+        }`}
+      >
+        <ChevronLeft size={12} strokeWidth={2.5} />
+      </button>
+
+      {/* Dropdown trigger */}
+      <button
+        onClick={() => setOpen(!open)}
+        className="h-7 flex items-center gap-1.5 px-3 border border-slate-300 bg-white hover:bg-slate-50 hover:border-slate-400 transition-all text-[12px] font-semibold text-slate-800 max-w-[180px]"
+      >
+        <span className="truncate">{submittedOrgs[currentIdx]?.name ?? "Select manager"}</span>
+        <span className="shrink-0 text-[10px] font-normal text-slate-400 hidden sm:inline">
+          {currentIdx + 1}/{submittedOrgs.length}
+        </span>
+        <ChevronDown size={11} className={`shrink-0 text-slate-400 transition-transform duration-150 ${open ? "rotate-180" : ""}`} />
+      </button>
+
+      {/* Next button */}
+      <button
+        onClick={() => nextOrg && navigate(nextOrg.id)}
+        disabled={!nextOrg}
+        title={nextOrg ? `→ ${nextOrg.name} (Alt+→)` : undefined}
+        className={`h-7 w-6 flex items-center justify-center rounded-r-lg border border-l-0 text-[12px] transition-all ${
+          nextOrg
+            ? "border-slate-300 text-slate-500 hover:bg-slate-100 hover:text-slate-800 hover:border-slate-400"
+            : "border-slate-200 text-slate-300 cursor-not-allowed"
+        }`}
+      >
+        <ChevronRight size={12} strokeWidth={2.5} />
+      </button>
+
+      {/* First-visit hint bubble */}
+      {showHint && (
+        <div
+          className="absolute -bottom-9 left-1/2 -translate-x-1/2 flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-[#0f1923] text-white text-[10.5px] font-medium whitespace-nowrap shadow-lg pointer-events-none z-50 animate-fade-in"
+          style={{ animation: "fadeInUp 0.3s ease, fadeOut 0.5s ease 3.5s forwards" }}
+        >
+          <Lightbulb size={10} className="text-[#00b8a9] shrink-0" />
+          Switch managers · Alt+← →
+          <span className="absolute -top-1.5 left-1/2 -translate-x-1/2 w-3 h-1.5 overflow-hidden">
+            <span className="block w-2 h-2 bg-[#0f1923] rotate-45 translate-y-1 mx-auto" />
+          </span>
+        </div>
+      )}
+
+      {/* Dropdown panel */}
+      {open && (
+        <>
+          <div className="fixed inset-0 z-40" onClick={() => { setOpen(false); setSearch(""); }} />
+          <div className="absolute top-9 left-1/2 -translate-x-1/2 z-50 w-72 bg-white rounded-xl shadow-2xl border border-slate-200/80 overflow-hidden">
+            {/* Search */}
+            <div className="flex items-center gap-2 px-3 py-2.5 border-b border-slate-100">
+              <Search size={13} className="text-slate-400 shrink-0" />
+              <input
+                ref={searchRef}
+                type="text"
+                placeholder="Search managers…"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="flex-1 text-[12.5px] text-slate-700 placeholder:text-slate-400 focus:outline-none bg-transparent"
+              />
+            </div>
+
+            {/* Org list */}
+            <ul className="max-h-64 overflow-y-auto py-1">
+              {filtered.length === 0 ? (
+                <li className="px-4 py-3 text-[12px] text-slate-400 text-center">No managers found</li>
+              ) : (
+                filtered.map((o, i) => {
+                  const isCurrent = o.id === currentOrgId;
+                  return (
+                    <li key={o.id}>
+                      <button
+                        onClick={() => !isCurrent && navigate(o.id)}
+                        className={`w-full flex items-center gap-3 px-3 py-2.5 text-left transition-colors ${
+                          isCurrent
+                            ? "bg-[#00b8a9]/8 cursor-default"
+                            : "hover:bg-slate-50"
+                        }`}
+                      >
+                        {/* Rank badge */}
+                        <span className="shrink-0 w-5 h-5 rounded-md bg-slate-100 flex items-center justify-center text-[9px] font-bold text-slate-500">
+                          {i + 1}
+                        </span>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-1.5">
+                            <p className={`text-[12.5px] font-semibold truncate ${isCurrent ? "text-[#00897b]" : "text-slate-800"}`}>
+                              {o.name}
+                            </p>
+                            {isCurrent && (
+                              <span className="shrink-0 text-[9px] font-bold text-[#00b8a9] uppercase tracking-wide">current</span>
+                            )}
+                          </div>
+                          <p className="text-[10.5px] text-slate-400 truncate">{o.assetClass}</p>
+                        </div>
+                        <span className={`shrink-0 text-[13px] font-bold tabular-nums ${lpiColor(o.lpiScore)}`}>
+                          {o.lpiScore ?? "—"}
+                        </span>
+                      </button>
+                    </li>
+                  );
+                })
+              )}
+            </ul>
+
+            {/* Footer */}
+            <div className="px-3 py-2 border-t border-slate-100 flex items-center gap-1.5 bg-slate-50/60">
+              <span className="text-[10px] text-slate-400">{submittedOrgs.length} submitted managers</span>
+              <span className="ml-auto text-[9.5px] text-slate-300 font-mono">Alt+← →</span>
+            </div>
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
+// ─── Page ─────────────────────────────────────────────────────────────────────
+
 export default function ManagerReportPage() {
   const { surveyId, orgId } = useParams<{ surveyId: string; orgId: string }>();
   const org = getOrgById(orgId);
   const survey = getSurveyById(surveyId);
+
+  // All submitted orgs with reports available for the switcher
+  const allOrgs = getOrgsBySurveyId(surveyId ?? "");
+  const submittedOrgs = allOrgs
+    .filter((o) => o.status === "submitted" && o.lpiScore !== null && o.benchmarks !== null)
+    .map((o) => ({ id: o.id, name: o.name, lpiScore: o.lpiScore, assetClass: o.assetClass }));
 
   if (!org || !survey) {
     return (
@@ -84,11 +297,11 @@ export default function ManagerReportPage() {
     <div className="min-h-screen bg-slate-50">
       {/* Sticky report top bar */}
       <div className="sticky top-0 z-30 bg-white border-b border-slate-200 shadow-sm print:hidden">
-        {/* Premium accent bar */}
         <div className="h-[3px] bg-gradient-to-r from-[#00b8a9] via-[#00b8a9]/70 to-transparent" />
-        <div className="max-w-5xl mx-auto px-6 h-11 flex items-center justify-between gap-4">
-          {/* Full breadcrumb chain */}
-          <nav className="flex items-center gap-1.5 text-[11px] min-w-0 overflow-hidden">
+        <div className="max-w-5xl mx-auto px-6 h-11 flex items-center gap-3">
+
+          {/* Breadcrumb — left */}
+          <nav className="flex items-center gap-1.5 text-[11px] min-w-0 overflow-hidden flex-1">
             <Link
               href="/surveys"
               className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-[#0f1923] text-[#00b8a9] hover:bg-[#1a2d3d] transition-colors font-semibold text-[9.5px] tracking-wide shrink-0"
@@ -99,30 +312,33 @@ export default function ManagerReportPage() {
             <ChevronRight size={11} className="text-slate-300 shrink-0" />
             <Link
               href={`/surveys/${surveyId}`}
-              className="text-slate-400 hover:text-slate-700 transition-colors font-medium truncate max-w-[120px] hidden sm:block"
+              className="text-slate-400 hover:text-slate-700 transition-colors font-medium truncate max-w-[110px] hidden sm:block"
             >
               {survey.year} {survey.name}
             </Link>
             <ChevronRight size={11} className="text-slate-300 shrink-0 hidden sm:block" />
             <Link
               href={`/surveys/${surveyId}/organizations`}
-              className="text-slate-400 hover:text-slate-700 transition-colors font-medium hidden md:block"
+              className="text-slate-400 hover:text-slate-700 transition-colors font-medium hidden lg:block"
             >
-              Invited Organizations
+              Managers
             </Link>
-            <ChevronRight size={11} className="text-slate-300 shrink-0 hidden md:block" />
-            <Link
-              href={`/surveys/${surveyId}/organizations/${orgId}`}
-              className="text-slate-400 hover:text-slate-700 transition-colors font-medium truncate max-w-[100px]"
-            >
-              {org.name}
-            </Link>
-            <ChevronRight size={11} className="text-slate-300 shrink-0" />
-            <span className="text-slate-700 font-semibold shrink-0">Manager Report</span>
+            <ChevronRight size={11} className="text-slate-300 shrink-0 hidden lg:block" />
+            <span className="text-slate-500 font-medium hidden lg:block shrink-0">2-Pager</span>
           </nav>
 
+          {/* Manager Switcher — center */}
+          {submittedOrgs.length > 1 && (
+            <ManagerSwitcher
+              surveyId={surveyId ?? ""}
+              currentOrgId={orgId ?? ""}
+              submittedOrgs={submittedOrgs}
+            />
+          )}
+
+          {/* Actions — right */}
           <div className="flex items-center gap-1.5 shrink-0">
-            <span className="text-[10.5px] text-slate-400 mr-1 hidden lg:block">{org.lpiVersion}</span>
+            <span className="text-[10px] text-slate-400 hidden xl:block">{org.lpiVersion}</span>
             <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 text-[12px] text-slate-600 hover:bg-slate-50 transition-colors">
               <Printer size={13} />
               Print
