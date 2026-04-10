@@ -14,8 +14,9 @@ import RacialDemographicsSection from "@/components/report/RacialDemographicsSec
 import {
   ChevronRight, ChevronLeft, ChevronDown, Printer, Download,
   User, Mail, Calendar, Clock, MapPin, TrendingUp, BadgeCheck,
-  Lock, LayoutDashboard, Search, Lightbulb, Building2,
+  Lock, LayoutDashboard, Search, Lightbulb, Building2, Sparkles,
 } from "lucide-react";
+import type { InvitedOrg } from "@/types/survey";
 
 function ReportSection({ children, className = "" }: { children: React.ReactNode; className?: string }) {
   return (
@@ -42,6 +43,152 @@ function InfoPill({ icon: Icon, label, value }: { icon: React.ElementType; label
       <div>
         <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">{label}</p>
         <p className="text-[13px] font-semibold text-slate-800 leading-snug mt-0.5">{value}</p>
+      </div>
+    </div>
+  );
+}
+
+// ─── Insights helpers ─────────────────────────────────────────────────────────
+
+function ordinal(n: number): string {
+  const r = n % 100;
+  if (r >= 11 && r <= 13) return `${n}th`;
+  switch (n % 10) {
+    case 1: return `${n}st`;
+    case 2: return `${n}nd`;
+    case 3: return `${n}rd`;
+    default: return `${n}th`;
+  }
+}
+
+function pct(value: number, total: number): string {
+  return total === 0 ? "0.0" : ((value / total) * 100).toFixed(1);
+}
+
+function buildInsightsText(org: InvitedOrg): string {
+  if (!org.lpiScore || !org.benchmarks) return "";
+
+  const univPct = org.benchmarks.universe.managerPercentile;
+  const univN = org.benchmarks.universe.n.toLocaleString();
+
+  const perfLabel =
+    univPct >= 90 ? "exceptional diversity performance" :
+    univPct >= 75 ? "strong diversity performance" :
+    univPct >= 50 ? "above-average diversity performance" :
+    "competitive diversity performance";
+
+  let para1 = `${org.name} demonstrates ${perfLabel} with an LPI score of ${org.lpiScore.toFixed(1)}, ranking in the ${ordinal(univPct)} percentile among ${univN} organizations in the Roundtables universe.`;
+
+  // Sub-components sentence
+  if (org.lpiSubComponents?.dimensions) {
+    const racial = org.lpiSubComponents.dimensions.find(d => d.dimension === "Racial");
+    const gender = org.lpiSubComponents.dimensions.find(d => d.dimension === "Gender");
+    const parts: string[] = [];
+    if (racial) {
+      const ownerPct = racial.ownership.percentile;
+      const workPct  = racial.workforce.percentile;
+      if (ownerPct !== null && workPct !== null) {
+        parts.push(`racial diversity ownership score of ${racial.ownership.rawScore.toFixed(2)} (${ordinal(ownerPct)} percentile) and workforce score of ${racial.workforce.rawScore.toFixed(2)} (${ordinal(workPct)} percentile)`);
+      }
+    }
+    if (gender) {
+      const ownerPct = gender.ownership.percentile;
+      const workPct  = gender.workforce.percentile;
+      if (ownerPct !== null && workPct !== null) {
+        parts.push(`gender diversity ownership score of ${gender.ownership.rawScore.toFixed(2)} (${ordinal(ownerPct)} percentile) and workforce score of ${gender.workforce.rawScore.toFixed(2)} (${ordinal(workPct)} percentile)`);
+      }
+    }
+    if (parts.length > 0) {
+      para1 += ` The organization shows a ${parts.join(", while recording a ")}.`;
+    }
+  }
+
+  // Workforce composition sentence
+  let para2 = "";
+  if (org.genderDemographics && org.racialDemographics) {
+    const wf = org.genderDemographics.workforce;
+    const total = wf.men + wf.women;
+    const menPct   = pct(wf.men, total);
+    const womenPct = pct(wf.women, total);
+
+    const raceLabels: Record<string, string> = {
+      white:          "White/European",
+      asian:          "Asian",
+      black:          "Black/African American",
+      latino:         "Hispanic/Latino/a/e/x",
+      mena:           "Middle Eastern/North African",
+      indigenous_na:  "Indigenous North American",
+      indigenous_out: "Indigenous (other)",
+      other:          "Other",
+      multiracial:    "Multiracial",
+    };
+    const rwf = org.racialDemographics.workforce;
+    const raceTotal = Object.values(rwf).reduce((s, v) => s + v, 0);
+    const raceParts = (Object.entries(rwf) as [string, number][])
+      .filter(([, v]) => v > 0)
+      .sort(([, a], [, b]) => b - a)
+      .map(([k, v]) => `${pct(v, raceTotal)}% ${raceLabels[k] ?? k}`)
+      .join(", ");
+
+    para2 = `The workforce of ${total} employees comprises ${menPct}% men and ${womenPct}% women, with racial composition of ${raceParts}.`;
+
+    // Notable ownership/leadership observations
+    const ro = org.racialDemographics.ownership;
+    const rl = org.racialDemographics.leadership;
+    const ownerTotal  = Object.values(ro).reduce((s, v) => s + v, 0);
+    const leaderTotal = Object.values(rl).reduce((s, v) => s + v, 0);
+    const ownerWhitePct  = ownerTotal  > 0 ? Math.round((ro.white / ownerTotal) * 100) : 0;
+    const leaderWhitePct = leaderTotal > 0 ? Math.round((rl.white / leaderTotal) * 100) : 0;
+
+    if (ownerWhitePct === 0 && leaderWhitePct === 0) {
+      para2 += " Notably, both ownership and leadership are 100% racially diverse with no White/European representation in either category.";
+    } else {
+      const ownerPOCPct  = 100 - ownerWhitePct;
+      const leaderPOCPct = 100 - leaderWhitePct;
+      if (ownerPOCPct > 0 || leaderPOCPct > 0) {
+        para2 += ` Racially diverse individuals represent ${ownerPOCPct}% of ownership and ${leaderPOCPct}% of leadership.`;
+      }
+    }
+  }
+
+  return [para1, para2].filter(Boolean).join(" ");
+}
+
+// ─── Insights Box ─────────────────────────────────────────────────────────────
+
+function InsightsBox({ org }: { org: InvitedOrg }) {
+  const [expanded, setExpanded] = useState(false);
+  const text = buildInsightsText(org);
+  if (!text) return null;
+
+  const preview = text.length > 180 ? text.slice(0, 180).trimEnd() + "…" : text;
+
+  return (
+    <div className="max-w-5xl mx-auto px-6 pt-5 print:hidden">
+      <div className="rounded-xl border border-[#00b8a9]/30 bg-[#00b8a9]/5 overflow-hidden">
+        <button
+          onClick={() => setExpanded((v) => !v)}
+          className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-[#00b8a9]/5 transition-colors group"
+        >
+          <div className="w-6 h-6 rounded-lg bg-[#00b8a9]/15 flex items-center justify-center shrink-0">
+            <Sparkles size={12} className="text-[#00897b]" strokeWidth={1.75} />
+          </div>
+          <div className="flex-1 min-w-0">
+            <span className="text-[10px] font-bold text-[#00897b] uppercase tracking-widest">AI Insights Summary</span>
+            {!expanded && (
+              <p className="text-[12px] text-slate-500 leading-snug mt-0.5 truncate">{preview}</p>
+            )}
+          </div>
+          <ChevronDown
+            size={14}
+            className={`shrink-0 text-[#00897b]/60 transition-transform duration-200 group-hover:text-[#00897b] ${expanded ? "rotate-180" : ""}`}
+          />
+        </button>
+        {expanded && (
+          <div className="px-4 pb-4 pt-1 border-t border-[#00b8a9]/20">
+            <p className="text-[12.5px] text-slate-600 leading-relaxed">{text}</p>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -350,6 +497,8 @@ export default function ManagerReportPage() {
           </div>
         </div>
       </div>
+
+      <InsightsBox org={org} />
 
       <div className="max-w-5xl mx-auto px-6 py-8 space-y-5">
 
