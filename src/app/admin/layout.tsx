@@ -2,18 +2,20 @@
 
 import { usePathname } from "next/navigation";
 import Link from "next/link";
-import { UserCog, Award, LayoutDashboard, ChevronRight } from "lucide-react";
+import { UserCog, Award, LayoutDashboard, ChevronRight, BarChart3 } from "lucide-react";
 
 const TABS = [
-  { key: "overview", label: "Overview", href: "/admin" },
-  { key: "badges",   label: "Badge Management", href: "/admin/badges" },
+  { key: "overview",   label: "Overview",        href: "/admin" },
+  { key: "benchmark",  label: "Benchmark",        href: "/admin/benchmark" },
+  { key: "badges",     label: "Badge Management", href: "/admin/badges" },
 ];
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
 
   const activeTab = (() => {
-    if (pathname.startsWith("/admin/badges")) return "badges";
+    if (pathname.startsWith("/admin/benchmark")) return "benchmark";
+    if (pathname.startsWith("/admin/badges"))    return "badges";
     return "overview";
   })();
 

@@ -9,6 +9,7 @@ const SUB_TABS = [
   { key: "overview",       label: "Overview",              href: "" },
   { key: "organizations",  label: "Invited Organizations", href: "/organizations" },
   { key: "analytics",      label: "Analytics",             href: "/analytics" },
+  { key: "data-control",   label: "Data Control",          href: "/data-control" },
   { key: "reports",        label: "Reports",               href: "/reports" },
 ];
 
@@ -31,6 +32,7 @@ export default function SurveyLayout({ children }: { children: React.ReactNode }
   const activeSub = (() => {
     if (pathname.includes("/organizations")) return "organizations";
     if (pathname.includes("/analytics"))     return "analytics";
+    if (pathname.includes("/data-control"))  return "data-control";
     if (pathname.includes("/reports"))       return "reports";
     return "overview";
   })();
