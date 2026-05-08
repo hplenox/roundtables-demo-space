@@ -1,122 +1,77 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import React, { useState, useMemo, useRef, useEffect } from "react";
 import {
-  BarChart3, ChevronDown, ChevronUp, Search, Filter,
-  EyeOff, Eye, CheckCircle2, X, Info, ArrowUpDown,
-  TrendingUp, Users, Layers,
+  BarChart3, ChevronDown, ChevronUp, Search,
+  EyeOff, Eye, CheckCircle2, X, Info,
+  TrendingUp, Users, Layers, ChevronRight,
+  History, ArrowUp, ArrowDown,
 } from "lucide-react";
 import {
-  BENCHMARK_ENTRIES,
+  BENCHMARK_ORGS,
   ASSET_CLASSES,
   AssetClass,
-  BenchmarkEntry,
+  OrgBenchmarkEntry,
   DistStats,
   computeDistStats,
 } from "@/lib/mock-benchmark";
 
-// ── Distribution bar (matches 2-pager visual language exactly) ───────────────
-function DistBar({
-  stats,
-  size = "md",
-}: {
-  stats: DistStats;
-  size?: "sm" | "md" | "lg";
-}) {
+// ── Distribution bar ──────────────────────────────────────────────────────────
+function DistBar({ stats, size = "md" }: { stats: DistStats; size?: "sm" | "md" | "lg" }) {
   const pos = (v: number) => `${(v / 10) * 100}%`;
   const wid = (a: number, b: number) => `${Math.max(0, (b - a) / 10) * 100}%`;
   const trackH = size === "sm" ? "h-2" : size === "lg" ? "h-6" : "h-4";
-
   return (
     <div>
-      {/* Q1 / Median / Q3 labels */}
       <div className="relative h-[18px] mb-1">
         {[
-          { v: stats.q1,     label: stats.q1.toFixed(1),                cls: "text-[9px] text-slate-500" },
+          { v: stats.q1,     label: stats.q1.toFixed(1),                 cls: "text-[9px] text-slate-500" },
           { v: stats.median, label: `Median ${stats.median.toFixed(2)}`, cls: "text-[9.5px] font-semibold text-blue-700" },
-          { v: stats.q3,     label: stats.q3.toFixed(1),                cls: "text-[9px] text-slate-500" },
+          { v: stats.q3,     label: stats.q3.toFixed(1),                 cls: "text-[9px] text-slate-500" },
         ].map(({ v, label, cls }) => (
-          <span
-            key={v}
-            className={`absolute leading-none -translate-x-1/2 ${cls}`}
-            style={{ left: pos(v) }}
-          >
+          <span key={v} className={`absolute leading-none -translate-x-1/2 ${cls}`} style={{ left: pos(v) }}>
             {label}
           </span>
         ))}
       </div>
-
-      {/* Bar layers */}
       <div className={`relative w-full ${trackH} rounded bg-[#e2e8f0] overflow-visible`}>
-        {/* P10–P90 band */}
-        <div
-          className={`absolute top-0 bottom-0 bg-[#bfdbfe] rounded`}
-          style={{ left: pos(stats.p10), width: wid(stats.p10, stats.p90) }}
-        />
-        {/* IQR Q1–Q3 */}
-        <div
-          className={`absolute top-0 bottom-0 bg-[#3b82f6] rounded`}
-          style={{ left: pos(stats.q1), width: wid(stats.q1, stats.q3) }}
-        />
-        {/* Median line */}
-        <div
-          className="absolute top-0 bottom-0 w-[2.5px] bg-[#1d4ed8]"
-          style={{ left: pos(stats.median), transform: "translateX(-50%)" }}
-        />
-        {/* P10/P90 tick caps */}
+        <div className="absolute top-0 bottom-0 bg-[#bfdbfe] rounded" style={{ left: pos(stats.p10), width: wid(stats.p10, stats.p90) }} />
+        <div className="absolute top-0 bottom-0 bg-[#3b82f6] rounded" style={{ left: pos(stats.q1), width: wid(stats.q1, stats.q3) }} />
+        <div className="absolute top-0 bottom-0 w-[2.5px] bg-[#1d4ed8]" style={{ left: pos(stats.median), transform: "translateX(-50%)" }} />
         {[stats.p10, stats.p90].map((v) => (
-          <div
-            key={v}
-            className="absolute top-0 bottom-0 w-px bg-slate-400/60"
-            style={{ left: pos(v) }}
-          />
+          <div key={v} className="absolute top-0 bottom-0 w-px bg-slate-400/60" style={{ left: pos(v) }} />
         ))}
       </div>
-
-      {/* Bracket ticks at Q1 / Q3 */}
       <div className="relative h-1.5">
         {[stats.q1, stats.median, stats.q3].map((v) => (
-          <div
-            key={v}
-            className={`absolute w-px h-1.5 -translate-x-1/2 ${
-              v === stats.median ? "bg-[#1d4ed8]" : "bg-slate-400"
-            }`}
-            style={{ left: pos(v) }}
-          />
+          <div key={v} className={`absolute w-px h-1.5 -translate-x-1/2 ${v === stats.median ? "bg-[#1d4ed8]" : "bg-slate-400"}`} style={{ left: pos(v) }} />
         ))}
       </div>
-
-      {/* Axis: Low / High */}
       <div className="flex justify-between text-[9px] text-slate-300 mt-0.5">
-        <span>Low · 0</span>
-        <span>5</span>
-        <span>10 · High</span>
+        <span>Low · 0</span><span>5</span><span>10 · High</span>
       </div>
     </div>
   );
 }
 
-// ── Mini score badge ──────────────────────────────────────────────────────────
 function ScoreBadge({ score }: { score: number }) {
   const color =
+    score === 0  ? "bg-slate-50 text-slate-400 border-slate-200" :
     score >= 8   ? "bg-emerald-50 text-emerald-700 border-emerald-200" :
     score >= 6.5 ? "bg-[#00b8a9]/8 text-[#00897b] border-[#00b8a9]/25" :
     score >= 5   ? "bg-amber-50 text-amber-700 border-amber-200" :
                    "bg-red-50 text-red-600 border-red-200";
   return (
     <span className={`inline-flex items-center text-[12px] font-bold px-2 py-0.5 rounded-lg border font-mono ${color}`}>
-      {score.toFixed(1)}
+      {score === 0 ? "—" : score.toFixed(1)}
     </span>
   );
 }
 
-// ── Inline score bar (for table) ──────────────────────────────────────────────
 function MiniBar({ score }: { score: number }) {
+  if (score === 0) return <ScoreBadge score={0} />;
   const pct = `${(score / 10) * 100}%`;
-  const bg =
-    score >= 8   ? "#10b981" :
-    score >= 6.5 ? "#00b8a9" :
-    score >= 5   ? "#f59e0b" : "#ef4444";
+  const bg = score >= 8 ? "#10b981" : score >= 6.5 ? "#00b8a9" : score >= 5 ? "#f59e0b" : "#ef4444";
   return (
     <div className="flex items-center gap-2">
       <ScoreBadge score={score} />
@@ -127,15 +82,14 @@ function MiniBar({ score }: { score: number }) {
   );
 }
 
-// ── Legend ────────────────────────────────────────────────────────────────────
 function ChartLegend() {
   return (
     <div className="flex items-center gap-4 flex-wrap text-[10.5px] text-slate-500">
       {[
-        { color: "bg-[#e2e8f0]",  label: "Full range (min–max)" },
-        { color: "bg-[#bfdbfe]",  label: "10th–90th pct." },
-        { color: "bg-[#3b82f6]",  label: "IQR (25th–75th)" },
-        { color: "bg-[#1d4ed8] w-0.5 h-3", label: "Median" },
+        { color: "bg-[#e2e8f0]",             label: "Full range (min–max)" },
+        { color: "bg-[#bfdbfe]",             label: "10th–90th pct." },
+        { color: "bg-[#3b82f6]",             label: "IQR (25th–75th)" },
+        { color: "bg-[#1d4ed8] w-0.5 h-3",  label: "Median" },
       ].map(({ color, label }) => (
         <div key={label} className="flex items-center gap-1.5">
           <div className={`${color} h-3 w-6 rounded-sm`} />
@@ -146,41 +100,29 @@ function ChartLegend() {
   );
 }
 
-// ── Asset Class card (By Asset Class tab) ────────────────────────────────────
-function AssetClassCard({
-  cls,
-  entries,
-}: {
-  cls: string;
-  entries: BenchmarkEntry[];
-}) {
+function AssetClassCard({ cls, entries }: { cls: string; entries: OrgBenchmarkEntry[] }) {
   const active = entries.filter((e) => !e.excludedFromBenchmark);
-  const scores = active.map((e) => e.lpiScore);
+  const scores = active.map((e) => e.lpiScore).filter((s) => s > 0);
   const stats = computeDistStats(scores);
   const medianColor =
-    !stats ? "text-slate-300" :
+    !stats        ? "text-slate-300"  :
     stats.median >= 8   ? "text-emerald-600" :
-    stats.median >= 6.5 ? "text-[#00897b]" :
-    stats.median >= 5   ? "text-amber-600" : "text-red-500";
+    stats.median >= 6.5 ? "text-[#00897b]"   :
+    stats.median >= 5   ? "text-amber-600"   : "text-red-500";
 
   return (
     <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
       <div className="px-4 py-3 border-b border-slate-100 flex items-center justify-between gap-2">
         <p className="text-[12.5px] font-bold text-slate-800 leading-tight">{cls}</p>
         <div className="flex items-center gap-1.5 shrink-0">
-          {stats ? (
-            <span className={`text-[18px] font-bold leading-none ${medianColor}`}>
-              {stats.median.toFixed(1)}
-            </span>
-          ) : (
-            <span className="text-[13px] font-bold text-slate-300">—</span>
-          )}
+          {stats
+            ? <span className={`text-[18px] font-bold leading-none ${medianColor}`}>{stats.median.toFixed(1)}</span>
+            : <span className="text-[13px] font-bold text-slate-300">—</span>}
           <span className="text-[10px] text-slate-400 font-medium">
             {active.length > 0 ? `n=${active.length}` : "no data"}
           </span>
         </div>
       </div>
-
       <div className="px-4 py-3">
         {stats && active.length >= 3 ? (
           <DistBar stats={stats} size="sm" />
@@ -197,14 +139,11 @@ function AssetClassCard({
             )}
           </div>
         ) : (
-          <div className="py-3 text-center text-[11px] text-slate-300">
-            No submissions in this class
-          </div>
+          <div className="py-3 text-center text-[11px] text-slate-300">No submissions in this class</div>
         )}
       </div>
-
       {stats && (
-        <div className="px-4 py-2 bg-slate-50/60 border-t border-slate-100 grid grid-cols-3 text-center gap-0 divide-x divide-slate-100">
+        <div className="px-4 py-2 bg-slate-50/60 border-t border-slate-100 grid grid-cols-3 text-center divide-x divide-slate-100">
           {[
             { label: "25th",   val: stats.q1 },
             { label: "Median", val: stats.median },
@@ -221,115 +160,230 @@ function AssetClassCard({
   );
 }
 
-// ── Page ─────────────────────────────────────────────────────────────────────
+// ── Excel-style column filter dropdown ───────────────────────────────────────
+interface ColFilterDropdownProps {
+  column: string;
+  label: string;
+  options: string[];
+  selected: string[];
+  onSelect: (values: string[]) => void;
+  onSort: (dir: "asc" | "desc") => void;
+  onClose: () => void;
+  anchorRect: DOMRect;
+}
+
+function ColFilterDropdown({
+  label, options, selected, onSelect, onSort, onClose, anchorRect,
+}: ColFilterDropdownProps) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [search, setSearch] = useState("");
+
+  useEffect(() => {
+    function handle(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) onClose();
+    }
+    document.addEventListener("mousedown", handle);
+    return () => document.removeEventListener("mousedown", handle);
+  }, [onClose]);
+
+  const filtered = options.filter((o) =>
+    (o === "__unassigned__" ? "(Unassigned)" : o).toLowerCase().includes(search.toLowerCase())
+  );
+  const allSelected = selected.length === 0;
+
+  function toggle(val: string) {
+    const next = selected.includes(val)
+      ? selected.filter((v) => v !== val)
+      : [...selected, val];
+    onSelect(next.length === options.length ? [] : next);
+  }
+
+  const top  = Math.min(anchorRect.bottom + 4, window.innerHeight - 300);
+  const left = Math.min(anchorRect.left, window.innerWidth - 260);
+
+  return (
+    <div
+      ref={ref}
+      className="fixed z-50 bg-white border border-slate-200 rounded-xl shadow-xl w-[230px] overflow-hidden"
+      style={{ top, left }}
+    >
+      <div className="px-3 py-2 border-b border-slate-100 space-y-0.5">
+        <button
+          onClick={() => { onSort("asc"); onClose(); }}
+          className="flex items-center gap-2 w-full text-[12px] text-slate-600 hover:text-slate-900 hover:bg-slate-50 rounded-lg px-2 py-1 transition-colors"
+        >
+          <ArrowUp size={11} className="text-slate-400" /> Sort Ascending
+        </button>
+        <button
+          onClick={() => { onSort("desc"); onClose(); }}
+          className="flex items-center gap-2 w-full text-[12px] text-slate-600 hover:text-slate-900 hover:bg-slate-50 rounded-lg px-2 py-1 transition-colors"
+        >
+          <ArrowDown size={11} className="text-slate-400" /> Sort Descending
+        </button>
+      </div>
+
+      {options.length > 0 && (
+        <div className="max-h-[240px] overflow-y-auto">
+          {options.length > 6 && (
+            <div className="px-3 pt-2 pb-1">
+              <div className="relative">
+                <Search size={10} className="absolute left-2 top-1/2 -translate-y-1/2 text-slate-400" />
+                <input
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  placeholder={`Filter ${label}…`}
+                  className="w-full pl-6 pr-2 py-1 text-[11px] border border-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#00b8a9]/30"
+                />
+              </div>
+            </div>
+          )}
+          <div className="px-2 py-1.5 space-y-0.5">
+            <label className="flex items-center gap-2 px-2 py-1 rounded-lg hover:bg-slate-50 cursor-pointer text-[11.5px] text-slate-700 font-medium">
+              <input
+                type="checkbox"
+                checked={allSelected}
+                onChange={() => onSelect([])}
+                className="accent-[#00b8a9] w-3.5 h-3.5"
+              />
+              (Select All)
+            </label>
+            {filtered.map((opt) => (
+              <label key={opt} className="flex items-center gap-2 px-2 py-1 rounded-lg hover:bg-slate-50 cursor-pointer text-[11.5px] text-slate-600">
+                <input
+                  type="checkbox"
+                  checked={allSelected || selected.includes(opt)}
+                  onChange={() => toggle(opt)}
+                  className="accent-[#00b8a9] w-3.5 h-3.5"
+                />
+                {opt === "__unassigned__" ? "(Unassigned)" : opt}
+              </label>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── Score range labels for filter ─────────────────────────────────────────────
+const SCORE_RANGES = ["Zero", "Low (<5)", "Mid (5–6.5)", "Good (6.5–8)", "High (≥8)"] as const;
+
+function scoreInRange(score: number, range: string): boolean {
+  if (range === "Zero")          return score === 0;
+  if (range === "Low (<5)")      return score > 0 && score < 5;
+  if (range === "Mid (5–6.5)")   return score >= 5 && score < 6.5;
+  if (range === "Good (6.5–8)")  return score >= 6.5 && score < 8;
+  if (range === "High (≥8)")     return score >= 8;
+  return false;
+}
+
+// ── Page ──────────────────────────────────────────────────────────────────────
 type SubTab = "overview" | "by-class";
-type SortKey = "org" | "score" | "survey" | "class";
+type SortKey = "org" | "score" | "aum" | "class" | "state" | "country";
+type ColFilterState = Record<string, string[]>;
 
 export default function BenchmarkPage() {
-  const [entries, setEntries] = useState<BenchmarkEntry[]>(
-    BENCHMARK_ENTRIES.map((e) => ({ ...e }))
-  );
-  const [subTab, setSubTab] = useState<SubTab>("overview");
-  const [search, setSearch]         = useState("");
-  const [filterSurvey, setFilterSurvey] = useState("All");
-  const [filterClass, setFilterClass]   = useState("All");
-  const [sortKey, setSortKey]       = useState<SortKey>("score");
-  const [sortAsc, setSortAsc]       = useState(false);
+  const [orgs, setOrgs]           = useState<OrgBenchmarkEntry[]>(() => BENCHMARK_ORGS.map((e) => ({ ...e })));
+  const [subTab, setSubTab]       = useState<SubTab>("overview");
+  const [search, setSearch]       = useState("");
+  const [sortKey, setSortKey]     = useState<SortKey>("score");
+  const [sortAsc, setSortAsc]     = useState(false);
   const [editingClass, setEditingClass] = useState<string | null>(null);
-  const [toast, setToast]           = useState<string | null>(null);
+  const [toast, setToast]         = useState<string | null>(null);
+  const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
+  const [selectedIds, setSelectedIds]   = useState<Set<string>>(new Set());
+  const [colFilters, setColFilters]     = useState<ColFilterState>({});
+  const [openFilter, setOpenFilter]     = useState<string | null>(null);
+  const [filterAnchor, setFilterAnchor] = useState<DOMRect | null>(null);
 
   // ── Derived ────────────────────────────────────────────────────────────────
-  const surveys = useMemo(() => {
-    const s = new Set(entries.map((e) => e.surveyLabel));
-    return ["All", ...Array.from(s)];
-  }, [entries]);
-
-  const activeEntries = useMemo(
-    () => entries.filter((e) => !e.excludedFromBenchmark),
-    [entries]
+  const activeOrgs = useMemo(
+    () => orgs.filter((e) => !e.excludedFromBenchmark && e.lpiScore > 0),
+    [orgs]
   );
+  const overallStats   = useMemo(() => computeDistStats(activeOrgs.map((e) => e.lpiScore)), [activeOrgs]);
+  const unassignedCount = useMemo(() => orgs.filter((e) => !e.assetClass).length, [orgs]);
 
-  const overallStats = useMemo(
-    () => computeDistStats(activeEntries.map((e) => e.lpiScore)),
-    [activeEntries]
-  );
+  const allStates = useMemo(() => {
+    const s = new Set(orgs.map((e) => e.state).filter((v) => v !== "—"));
+    return Array.from(s).sort();
+  }, [orgs]);
 
-  const unassignedCount = useMemo(
-    () => entries.filter((e) => !e.assetClass).length,
-    [entries]
-  );
+  const allCountries = useMemo(() => {
+    const s = new Set(orgs.map((e) => e.country));
+    return Array.from(s).sort();
+  }, [orgs]);
 
-  const filteredEntries = useMemo(() => {
-    let res = [...entries];
-    if (filterSurvey !== "All") res = res.filter((e) => e.surveyLabel === filterSurvey);
-    if (filterClass  !== "All") {
-      if (filterClass === "__unassigned__") res = res.filter((e) => !e.assetClass);
-      else res = res.filter((e) => e.assetClass === filterClass);
-    }
+  const filteredOrgs = useMemo(() => {
+    let res = [...orgs];
+
     if (search) {
       const q = search.toLowerCase();
       res = res.filter(
         (e) => e.orgName.toLowerCase().includes(q) || (e.assetClass ?? "").toLowerCase().includes(q)
       );
     }
+
+    const cf = colFilters;
+    if ((cf["score"]?.length ?? 0) > 0)
+      res = res.filter((e) => cf["score"].some((r) => scoreInRange(e.lpiScore, r)));
+    if ((cf["class"]?.length ?? 0) > 0)
+      res = res.filter((e) => cf["class"].includes(e.assetClass ?? "__unassigned__"));
+    if ((cf["state"]?.length ?? 0) > 0)
+      res = res.filter((e) => cf["state"].includes(e.state));
+    if ((cf["country"]?.length ?? 0) > 0)
+      res = res.filter((e) => cf["country"].includes(e.country));
+
     res.sort((a, b) => {
       let diff = 0;
-      if (sortKey === "score")  diff = a.lpiScore - b.lpiScore;
-      if (sortKey === "org")    diff = a.orgName.localeCompare(b.orgName);
-      if (sortKey === "survey") diff = a.surveyLabel.localeCompare(b.surveyLabel);
-      if (sortKey === "class")  diff = (a.assetClass ?? "").localeCompare(b.assetClass ?? "");
+      if (sortKey === "score")   diff = a.lpiScore - b.lpiScore;
+      if (sortKey === "org")     diff = a.orgName.localeCompare(b.orgName);
+      if (sortKey === "aum")     diff = a.aumRaw - b.aumRaw;
+      if (sortKey === "class")   diff = (a.assetClass ?? "").localeCompare(b.assetClass ?? "");
+      if (sortKey === "state")   diff = a.state.localeCompare(b.state);
+      if (sortKey === "country") diff = a.country.localeCompare(b.country);
       return sortAsc ? diff : -diff;
     });
     return res;
-  }, [entries, filterSurvey, filterClass, search, sortKey, sortAsc]);
+  }, [orgs, search, colFilters, sortKey, sortAsc]);
 
-  // ── By-class data ──────────────────────────────────────────────────────────
-  const classData = useMemo(() => {
-    return ASSET_CLASSES.map((cls) => ({
+  const classData = useMemo(() =>
+    ASSET_CLASSES.map((cls) => ({
       cls,
-      entries: entries.filter((e) => e.assetClass === cls),
+      entries: orgs.filter((e) => e.assetClass === cls),
     })).sort((a, b) => {
       const na = a.entries.filter((e) => !e.excludedFromBenchmark).length;
       const nb = b.entries.filter((e) => !e.excludedFromBenchmark).length;
       return nb - na;
-    });
-  }, [entries]);
+    }),
+    [orgs]
+  );
 
-  // ── Class rankings for overview ────────────────────────────────────────────
-  const classRankings = useMemo(() => {
-    return ASSET_CLASSES.map((cls) => {
-      const scores = entries
-        .filter((e) => e.assetClass === cls && !e.excludedFromBenchmark)
-        .map((e) => e.lpiScore);
-      const stats = computeDistStats(scores);
-      return { cls, n: scores.length, median: stats?.median ?? null };
-    })
-      .filter((r) => r.median !== null)
-      .sort((a, b) => (b.median ?? 0) - (a.median ?? 0));
-  }, [entries]);
+  const activeFiltersCount = Object.values(colFilters).filter((v) => v.length > 0).length;
 
   // ── Actions ────────────────────────────────────────────────────────────────
   function toggleExclude(id: string) {
-    setEntries((prev) =>
-      prev.map((e) =>
-        e.id === id ? { ...e, excludedFromBenchmark: !e.excludedFromBenchmark } : e
-      )
-    );
-    const entry = entries.find((e) => e.id === id);
-    if (entry) showToast(entry.excludedFromBenchmark ? `${entry.orgName} included in benchmark.` : `${entry.orgName} excluded from benchmark.`);
+    const entry = orgs.find((e) => e.id === id);
+    setOrgs((prev) => prev.map((e) => e.id === id ? { ...e, excludedFromBenchmark: !e.excludedFromBenchmark } : e));
+    if (entry) showToast(entry.excludedFromBenchmark ? `${entry.orgName} included.` : `${entry.orgName} excluded.`);
+  }
+
+  function bulkSetExclude(exclude: boolean) {
+    setOrgs((prev) => prev.map((e) => selectedIds.has(e.id) ? { ...e, excludedFromBenchmark: exclude } : e));
+    showToast(`${selectedIds.size} org${selectedIds.size !== 1 ? "s" : ""} ${exclude ? "excluded from" : "included in"} benchmark.`);
+    setSelectedIds(new Set());
   }
 
   function assignClass(id: string, cls: AssetClass) {
-    setEntries((prev) =>
-      prev.map((e) => (e.id === id ? { ...e, assetClass: cls } : e))
-    );
+    const entry = orgs.find((e) => e.id === id);
+    setOrgs((prev) => prev.map((e) => e.id === id ? { ...e, assetClass: cls } : e));
     setEditingClass(null);
-    const entry = entries.find((e) => e.id === id);
     if (entry) showToast(`${entry.orgName} → ${cls}`);
   }
 
-  function handleSort(key: SortKey) {
-    if (sortKey === key) setSortAsc((a) => !a);
+  function handleSort(key: SortKey, dir?: "asc" | "desc") {
+    if (dir) { setSortKey(key); setSortAsc(dir === "asc"); }
+    else if (sortKey === key) setSortAsc((a) => !a);
     else { setSortKey(key); setSortAsc(false); }
   }
 
@@ -338,25 +392,111 @@ export default function BenchmarkPage() {
     setTimeout(() => setToast(null), 3000);
   }
 
-  const SortBtn = ({ k, label }: { k: SortKey; label: string }) => (
-    <button
-      onClick={() => handleSort(k)}
-      className="flex items-center gap-0.5 hover:text-slate-700 transition-colors group"
-    >
-      {label}
-      <ArrowUpDown size={10} className={`transition-colors ${sortKey === k ? "text-[#00b8a9]" : "text-slate-300 group-hover:text-slate-400"}`} />
-    </button>
-  );
+  function toggleRow(id: string) {
+    setExpandedRows((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      return next;
+    });
+  }
+
+  function toggleSelect(id: string) {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      return next;
+    });
+  }
+
+  function toggleSelectAll() {
+    if (selectedIds.size === filteredOrgs.length) setSelectedIds(new Set());
+    else setSelectedIds(new Set(filteredOrgs.map((e) => e.id)));
+  }
+
+  function openColFilter(col: string, e: React.MouseEvent<HTMLButtonElement>) {
+    e.stopPropagation();
+    const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+    if (openFilter === col) { setOpenFilter(null); return; }
+    setFilterAnchor(rect);
+    setOpenFilter(col);
+  }
+
+  function setColFilter(col: string, values: string[]) {
+    setColFilters((prev) => ({ ...prev, [col]: values }));
+  }
+
+  // ── Column header renderer ─────────────────────────────────────────────────
+  function ColH({
+    col,
+    label,
+    filterOpts,
+  }: {
+    col: SortKey;
+    label: string;
+    filterOpts?: string[];
+  }) {
+    const isActive  = sortKey === col;
+    const hasFilter = (colFilters[col]?.length ?? 0) > 0;
+    return (
+      <div className="flex items-center gap-1 group">
+        <button
+          onClick={() => handleSort(col)}
+          className="flex items-center gap-0.5 hover:text-slate-700 transition-colors"
+        >
+          {label}
+          {isActive
+            ? (sortAsc ? <ArrowUp size={9} className="text-[#00b8a9]" /> : <ArrowDown size={9} className="text-[#00b8a9]" />)
+            : <ChevronDown size={9} className="text-slate-300 group-hover:text-slate-400" />}
+        </button>
+        {filterOpts && (
+          <button
+            onClick={(e) => openColFilter(col, e)}
+            className={`p-0.5 rounded transition-colors ${
+              hasFilter
+                ? "text-[#00897b] bg-[#00b8a9]/10"
+                : "text-slate-300 hover:text-slate-500 opacity-0 group-hover:opacity-100"
+            }`}
+          >
+            <ChevronDown size={9} />
+          </button>
+        )}
+        {hasFilter && <span className="w-1.5 h-1.5 rounded-full bg-[#00b8a9] shrink-0" />}
+      </div>
+    );
+  }
+
+  // ── Active filter dropdown options ─────────────────────────────────────────
+  const filterDropdownOpts: string[] =
+    openFilter === "score"   ? [...SCORE_RANGES] :
+    openFilter === "class"   ? [...(ASSET_CLASSES as readonly string[]), "__unassigned__"] :
+    openFilter === "state"   ? allStates :
+    openFilter === "country" ? allCountries :
+    [];
 
   // ── Render ─────────────────────────────────────────────────────────────────
   return (
     <div className="space-y-5">
+
       {/* Toast */}
       {toast && (
         <div className="fixed top-5 right-5 z-50 flex items-center gap-2.5 bg-[#0f1923] text-white px-4 py-2.5 rounded-xl shadow-xl border border-white/10 text-[13px] font-medium">
           <CheckCircle2 size={14} className="text-[#00b8a9]" />
           {toast}
         </div>
+      )}
+
+      {/* Column filter dropdown portal */}
+      {openFilter && filterAnchor && (
+        <ColFilterDropdown
+          column={openFilter}
+          label={openFilter}
+          options={filterDropdownOpts}
+          selected={colFilters[openFilter] ?? []}
+          onSelect={(v) => setColFilter(openFilter, v)}
+          onSort={(dir) => handleSort(openFilter as SortKey, dir)}
+          onClose={() => setOpenFilter(null)}
+          anchorRect={filterAnchor}
+        />
       )}
 
       {/* Page header */}
@@ -367,13 +507,12 @@ export default function BenchmarkPage() {
             LPI Benchmark
           </h2>
           <p className="text-sm text-slate-500 mt-0.5">
-            Platform-wide distribution of LPI scores across all surveys and asset classes. Manage which submissions are included in benchmark calculations.
+            Platform-wide LPI score distribution across all organizations and asset classes.
           </p>
         </div>
-
         {unassignedCount > 0 && (
           <button
-            onClick={() => { setSubTab("overview"); setFilterClass("__unassigned__"); }}
+            onClick={() => setColFilter("class", ["__unassigned__"])}
             className="shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-50 border border-amber-200 text-amber-700 text-[11.5px] font-semibold hover:bg-amber-100 transition-colors"
           >
             <Info size={11} />
@@ -382,11 +521,11 @@ export default function BenchmarkPage() {
         )}
       </div>
 
-      {/* Sub-tab row */}
+      {/* Sub-tabs */}
       <div className="flex items-end gap-0 border-b border-slate-200 -mb-1">
         {([
-          { key: "overview",  label: "All Surveys",    Icon: Users  },
-          { key: "by-class",  label: "By Asset Class", Icon: Layers },
+          { key: "overview",  label: "All Organizations", Icon: Users  },
+          { key: "by-class",  label: "By Asset Class",    Icon: Layers },
         ] as { key: SubTab; label: string; Icon: React.ElementType }[]).map(({ key, label, Icon }) => (
           <button
             key={key}
@@ -403,18 +542,18 @@ export default function BenchmarkPage() {
         ))}
       </div>
 
-      {/* ── ALL SURVEYS TAB ──────────────────────────────────────────────────── */}
+      {/* ── ALL ORGANIZATIONS TAB ─────────────────────────────────────────── */}
       {subTab === "overview" && (
         <div className="space-y-5">
 
-          {/* Summary stat cards */}
+          {/* Stat cards */}
           <div className="grid grid-cols-5 gap-3">
             {[
-              { label: "Total Submitted",  value: entries.length,       sub: "across all surveys" },
-              { label: "In Benchmark",     value: activeEntries.length, sub: `${entries.length - activeEntries.length} excluded` },
-              { label: "25th Percentile",  value: overallStats ? overallStats.q1.toFixed(2)     : "—", sub: "Q1 (LPI score)" },
-              { label: "Median (50th)",    value: overallStats ? overallStats.median.toFixed(2) : "—", sub: "LPI score" },
-              { label: "75th Percentile",  value: overallStats ? overallStats.q3.toFixed(2)     : "—", sub: "Q3 (LPI score)" },
+              { label: "Total Organizations", value: orgs.length,            sub: "across all asset classes" },
+              { label: "In Benchmark",         value: activeOrgs.length,      sub: `${orgs.length - activeOrgs.length} excluded` },
+              { label: "25th Percentile",      value: overallStats?.q1.toFixed(2)     ?? "—", sub: "Q1 (LPI score)" },
+              { label: "Median (50th)",         value: overallStats?.median.toFixed(2) ?? "—", sub: "LPI score" },
+              { label: "75th Percentile",       value: overallStats?.q3.toFixed(2)     ?? "—", sub: "Q3 (LPI score)" },
             ].map(({ label, value, sub }) => (
               <div key={label} className="bg-white rounded-xl border border-slate-200 shadow-sm p-4 text-center">
                 <p className="text-[22px] font-bold text-slate-800 leading-none">{value}</p>
@@ -424,29 +563,26 @@ export default function BenchmarkPage() {
             ))}
           </div>
 
-          {/* Main distribution chart */}
+          {/* Distribution chart */}
           {overallStats && (
             <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-5">
               <div className="flex items-center justify-between gap-4 mb-4">
                 <div>
                   <p className="text-[13px] font-bold text-slate-800">Platform LPI Distribution</p>
                   <p className="text-[11.5px] text-slate-400 mt-0.5">
-                    All {activeEntries.length} active submissions · LPI score 0–10
+                    {activeOrgs.length} active organizations · LPI score 0–10
                   </p>
                 </div>
                 <div className="flex items-center gap-2 text-[11px]">
-                  {[
-                    { label: "P10",    val: overallStats.p10 },
-                    { label: "Q1",     val: overallStats.q1 },
-                    { label: "Median", val: overallStats.median },
-                    { label: "Q3",     val: overallStats.q3 },
-                    { label: "P90",    val: overallStats.p90 },
-                  ].map(({ label, val }) => (
-                    <div key={label} className="text-center px-2 py-1 bg-slate-50 rounded-lg border border-slate-200">
-                      <p className="text-[9.5px] text-slate-400">{label}</p>
-                      <p className="text-[12px] font-bold text-slate-700 font-mono">{val.toFixed(2)}</p>
-                    </div>
-                  ))}
+                  {(["P10","Q1","Median","Q3","P90"] as const).map((l) => {
+                    const val = l === "P10" ? overallStats.p10 : l === "Q1" ? overallStats.q1 : l === "Median" ? overallStats.median : l === "Q3" ? overallStats.q3 : overallStats.p90;
+                    return (
+                      <div key={l} className="text-center px-2 py-1 bg-slate-50 rounded-lg border border-slate-200">
+                        <p className="text-[9.5px] text-slate-400">{l}</p>
+                        <p className="text-[12px] font-bold text-slate-700 font-mono">{val.toFixed(2)}</p>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
               <div className="px-2">
@@ -454,46 +590,6 @@ export default function BenchmarkPage() {
               </div>
               <div className="mt-4 pt-3 border-t border-slate-100">
                 <ChartLegend />
-              </div>
-            </div>
-          )}
-
-          {/* Class rankings bar chart */}
-          {classRankings.length > 0 && (
-            <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-5">
-              <div className="flex items-center justify-between mb-4">
-                <div>
-                  <p className="text-[13px] font-bold text-slate-800">Median Score by Asset Class</p>
-                  <p className="text-[11.5px] text-slate-400 mt-0.5">Ranked highest to lowest — active submissions only</p>
-                </div>
-                <span className="text-[11px] text-slate-400 bg-slate-50 border border-slate-200 px-2.5 py-1 rounded-lg">
-                  {classRankings.length} classes with data
-                </span>
-              </div>
-              <div className="space-y-2">
-                {classRankings.map(({ cls, n, median }) => (
-                  <div key={cls} className="flex items-center gap-3">
-                    <span className="text-[11.5px] text-slate-600 w-40 shrink-0 text-right">{cls}</span>
-                    <div className="flex-1 h-5 bg-slate-100 rounded-full overflow-hidden relative">
-                      <div
-                        className="h-full rounded-full transition-all duration-300"
-                        style={{
-                          width: `${((median ?? 0) / 10) * 100}%`,
-                          background:
-                            (median ?? 0) >= 8   ? "#10b981" :
-                            (median ?? 0) >= 6.5 ? "#00b8a9" :
-                            (median ?? 0) >= 5   ? "#f59e0b" : "#ef4444",
-                        }}
-                      />
-                      <span
-                        className="absolute right-2 top-0 bottom-0 flex items-center text-[9.5px] font-semibold text-white mix-blend-difference"
-                      >
-                        {(median ?? 0).toFixed(2)}
-                      </span>
-                    </div>
-                    <span className="text-[10.5px] text-slate-400 w-12 shrink-0">n={n}</span>
-                  </div>
-                ))}
               </div>
             </div>
           )}
@@ -511,163 +607,246 @@ export default function BenchmarkPage() {
               />
             </div>
 
-            <select
-              value={filterSurvey}
-              onChange={(e) => setFilterSurvey(e.target.value)}
-              className="text-[12px] border border-slate-200 rounded-lg px-2.5 py-1.5 bg-white text-slate-700 focus:outline-none focus:ring-2 focus:ring-[#00b8a9]/30"
-            >
-              {surveys.map((s) => <option key={s} value={s}>{s}</option>)}
-            </select>
-
-            <select
-              value={filterClass}
-              onChange={(e) => setFilterClass(e.target.value)}
-              className="text-[12px] border border-slate-200 rounded-lg px-2.5 py-1.5 bg-white text-slate-700 focus:outline-none focus:ring-2 focus:ring-[#00b8a9]/30"
-            >
-              <option value="All">All Asset Classes</option>
-              <option value="__unassigned__">⚠ Unassigned ({unassignedCount})</option>
-              {ASSET_CLASSES.map((c) => <option key={c} value={c}>{c}</option>)}
-            </select>
+            {activeFiltersCount > 0 && (
+              <button
+                onClick={() => setColFilters({})}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-50 border border-slate-200 text-[12px] text-slate-600 hover:bg-slate-100 transition-colors"
+              >
+                <X size={11} />
+                Clear filters ({activeFiltersCount})
+              </button>
+            )}
 
             <div className="ml-auto text-[11.5px] text-slate-400">
-              {filteredEntries.length} of {entries.length} shown
+              {filteredOrgs.length} of {orgs.length} shown
             </div>
           </div>
+
+          {/* Bulk action bar */}
+          {selectedIds.size > 0 && (
+            <div className="flex items-center gap-3 px-4 py-2.5 bg-[#0f1923] rounded-xl border border-white/10">
+              <span className="text-white text-[12.5px] font-medium">{selectedIds.size} selected</span>
+              <div className="flex items-center gap-2 ml-auto">
+                <button
+                  onClick={() => bulkSetExclude(false)}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#00b8a9]/20 border border-[#00b8a9]/30 text-[#00b8a9] text-[12px] hover:bg-[#00b8a9]/30 transition-colors"
+                >
+                  <Eye size={12} /> Include Selected
+                </button>
+                <button
+                  onClick={() => bulkSetExclude(true)}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-[12px] hover:bg-red-500/20 transition-colors"
+                >
+                  <EyeOff size={12} /> Exclude Selected
+                </button>
+                <button
+                  onClick={() => setSelectedIds(new Set())}
+                  className="text-slate-400 hover:text-white transition-colors ml-1"
+                >
+                  <X size={14} />
+                </button>
+              </div>
+            </div>
+          )}
 
           {/* Table */}
           <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
             <table className="w-full text-[12px]">
               <thead>
                 <tr className="border-b border-slate-100 bg-slate-50/60">
-                  <th className="text-left px-4 py-2.5 text-[11px] font-semibold text-slate-500 uppercase tracking-wide">
-                    <SortBtn k="org" label="Organization" />
+                  <th className="px-3 py-2.5 w-8">
+                    <input
+                      type="checkbox"
+                      checked={filteredOrgs.length > 0 && selectedIds.size === filteredOrgs.length}
+                      onChange={toggleSelectAll}
+                      className="accent-[#00b8a9] w-3.5 h-3.5"
+                    />
                   </th>
-                  <th className="text-left px-4 py-2.5 text-[11px] font-semibold text-slate-500 uppercase tracking-wide">
-                    <SortBtn k="survey" label="Survey" />
+                  <th className="w-6 px-1 py-2.5" />
+                  <th className="text-left px-3 py-2.5 text-[11px] font-semibold text-slate-500 uppercase tracking-wide">
+                    <ColH col="org" label="Organization" />
                   </th>
-                  <th className="text-left px-4 py-2.5 text-[11px] font-semibold text-slate-500 uppercase tracking-wide">
-                    <SortBtn k="score" label="LPI Score" />
+                  <th className="text-left px-3 py-2.5 text-[11px] font-semibold text-slate-500 uppercase tracking-wide">
+                    <ColH col="score" label="LPI Score" filterOpts={[...SCORE_RANGES]} />
                   </th>
-                  <th className="text-left px-4 py-2.5 text-[11px] font-semibold text-slate-500 uppercase tracking-wide">
-                    <SortBtn k="class" label="Asset Class" />
+                  <th className="text-left px-3 py-2.5 text-[11px] font-semibold text-slate-500 uppercase tracking-wide">
+                    <ColH col="aum" label="AUM" />
                   </th>
-                  <th className="text-center px-4 py-2.5 text-[11px] font-semibold text-slate-500 uppercase tracking-wide">
+                  <th className="text-left px-3 py-2.5 text-[11px] font-semibold text-slate-500 uppercase tracking-wide">
+                    <ColH col="class" label="Asset Class" filterOpts={[...(ASSET_CLASSES as readonly string[]), "__unassigned__"]} />
+                  </th>
+                  <th className="text-left px-3 py-2.5 text-[11px] font-semibold text-slate-500 uppercase tracking-wide">
+                    <div className="flex items-center gap-1.5">
+                      <ColH col="state" label="State" filterOpts={allStates} />
+                      <span className="text-slate-300">/</span>
+                      <ColH col="country" label="Country" filterOpts={allCountries} />
+                    </div>
+                  </th>
+                  <th className="text-center px-3 py-2.5 text-[11px] font-semibold text-slate-500 uppercase tracking-wide">
                     Benchmark
                   </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-50">
-                {filteredEntries.map((entry) => (
-                  <tr
-                    key={entry.id}
-                    className={`hover:bg-slate-50/60 transition-colors ${entry.excludedFromBenchmark ? "opacity-45" : ""}`}
-                  >
-                    {/* Org name */}
-                    <td className="px-4 py-3 font-medium text-slate-800">{entry.orgName}</td>
-
-                    {/* Survey */}
-                    <td className="px-4 py-3 text-slate-500">{entry.surveyLabel}</td>
-
-                    {/* Score */}
-                    <td className="px-4 py-3">
-                      <MiniBar score={entry.lpiScore} />
-                    </td>
-
-                    {/* Asset class */}
-                    <td className="px-4 py-3">
-                      {editingClass === entry.id ? (
-                        <div className="flex items-center gap-1.5">
-                          <select
-                            autoFocus
-                            defaultValue=""
-                            onChange={(e) => {
-                              if (e.target.value) assignClass(entry.id, e.target.value as AssetClass);
-                            }}
-                            className="text-[11px] border border-[#00b8a9]/40 rounded-lg px-2 py-1 bg-white focus:outline-none focus:ring-2 focus:ring-[#00b8a9]/30"
+                {filteredOrgs.flatMap((entry) => {
+                  const rows = [
+                    <tr
+                      key={entry.id}
+                      className={`hover:bg-slate-50/60 transition-colors ${entry.excludedFromBenchmark ? "opacity-45" : ""}`}
+                    >
+                      {/* Checkbox */}
+                      <td className="px-3 py-3">
+                        <input
+                          type="checkbox"
+                          checked={selectedIds.has(entry.id)}
+                          onChange={() => toggleSelect(entry.id)}
+                          className="accent-[#00b8a9] w-3.5 h-3.5"
+                        />
+                      </td>
+                      {/* Expand button */}
+                      <td className="px-1 py-3 w-6 text-center">
+                        {entry.historicalScores.length > 0 ? (
+                          <button
+                            onClick={() => toggleRow(entry.id)}
+                            className="text-slate-300 hover:text-[#00b8a9] transition-colors"
                           >
-                            <option value="" disabled>Select class…</option>
-                            {ASSET_CLASSES.map((c) => <option key={c} value={c}>{c}</option>)}
-                          </select>
-                          <button onClick={() => setEditingClass(null)} className="text-slate-300 hover:text-slate-500">
-                            <X size={12} />
+                            {expandedRows.has(entry.id)
+                              ? <ChevronUp size={13} />
+                              : <ChevronRight size={13} />}
                           </button>
+                        ) : null}
+                      </td>
+                      {/* Org name */}
+                      <td className="px-3 py-3 font-medium text-slate-800">{entry.orgName}</td>
+                      {/* LPI Score */}
+                      <td className="px-3 py-3"><MiniBar score={entry.lpiScore} /></td>
+                      {/* AUM */}
+                      <td className="px-3 py-3 text-slate-600 font-mono text-[11.5px]">{entry.aum}</td>
+                      {/* Asset class */}
+                      <td className="px-3 py-3">
+                        {editingClass === entry.id ? (
+                          <div className="flex items-center gap-1.5">
+                            <select
+                              autoFocus
+                              defaultValue=""
+                              onChange={(e) => { if (e.target.value) assignClass(entry.id, e.target.value as AssetClass); }}
+                              className="text-[11px] border border-[#00b8a9]/40 rounded-lg px-2 py-1 bg-white focus:outline-none focus:ring-2 focus:ring-[#00b8a9]/30"
+                            >
+                              <option value="" disabled>Select class…</option>
+                              {ASSET_CLASSES.map((c) => <option key={c} value={c}>{c}</option>)}
+                            </select>
+                            <button onClick={() => setEditingClass(null)} className="text-slate-300 hover:text-slate-500">
+                              <X size={12} />
+                            </button>
+                          </div>
+                        ) : entry.assetClass ? (
+                          <button
+                            onClick={() => setEditingClass(entry.id)}
+                            className="flex items-center gap-1 text-[11.5px] text-slate-600 bg-slate-50 border border-slate-200 px-2 py-1 rounded-lg hover:border-[#00b8a9]/40 hover:bg-[#00b8a9]/4 transition-colors group"
+                          >
+                            {entry.assetClass}
+                            <ChevronDown size={9} className="text-slate-300 group-hover:text-[#00b8a9] transition-colors" />
+                          </button>
+                        ) : (
+                          <button
+                            onClick={() => setEditingClass(entry.id)}
+                            className="flex items-center gap-1 text-[11.5px] text-amber-600 bg-amber-50 border border-amber-200 px-2 py-1 rounded-lg hover:bg-amber-100 transition-colors"
+                          >
+                            <Info size={10} /> Assign class <ChevronDown size={9} />
+                          </button>
+                        )}
+                      </td>
+                      {/* Location */}
+                      <td className="px-3 py-3 text-[11.5px]">
+                        <div className="text-slate-600">{entry.city}</div>
+                        <div className="text-[10.5px] text-slate-400">
+                          {entry.state !== "—" ? `${entry.state}, ` : ""}{entry.country}
                         </div>
-                      ) : entry.assetClass ? (
+                      </td>
+                      {/* Benchmark toggle */}
+                      <td className="px-3 py-3 text-center">
                         <button
-                          onClick={() => setEditingClass(entry.id)}
-                          className="flex items-center gap-1 text-[11.5px] text-slate-600 bg-slate-50 border border-slate-200 px-2 py-1 rounded-lg hover:border-[#00b8a9]/40 hover:bg-[#00b8a9]/4 transition-colors group"
+                          onClick={() => toggleExclude(entry.id)}
+                          className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-medium border transition-colors ${
+                            entry.excludedFromBenchmark
+                              ? "bg-slate-50 text-slate-400 border-slate-200 hover:bg-slate-100"
+                              : "bg-[#00b8a9]/8 text-[#00897b] border-[#00b8a9]/25 hover:bg-[#00b8a9]/15"
+                          }`}
                         >
-                          {entry.assetClass}
-                          <ChevronDown size={9} className="text-slate-300 group-hover:text-[#00b8a9] transition-colors" />
+                          {entry.excludedFromBenchmark
+                            ? <><EyeOff size={10} /> Excluded</>
+                            : <><Eye size={10} /> Included</>}
                         </button>
-                      ) : (
-                        <button
-                          onClick={() => setEditingClass(entry.id)}
-                          className="flex items-center gap-1 text-[11.5px] text-amber-600 bg-amber-50 border border-amber-200 px-2 py-1 rounded-lg hover:bg-amber-100 transition-colors"
-                        >
-                          <Info size={10} />
-                          Assign class
-                          <ChevronDown size={9} />
-                        </button>
-                      )}
-                    </td>
+                      </td>
+                    </tr>,
+                  ];
 
-                    {/* Exclude toggle */}
-                    <td className="px-4 py-3 text-center">
-                      <button
-                        onClick={() => toggleExclude(entry.id)}
-                        className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-medium border transition-colors ${
-                          entry.excludedFromBenchmark
-                            ? "bg-slate-50 text-slate-400 border-slate-200 hover:bg-slate-100"
-                            : "bg-[#00b8a9]/8 text-[#00897b] border-[#00b8a9]/25 hover:bg-[#00b8a9]/15"
-                        }`}
-                      >
-                        {entry.excludedFromBenchmark
-                          ? <><EyeOff size={10} /> Excluded</>
-                          : <><Eye size={10} /> Included</>}
-                      </button>
-                    </td>
-                  </tr>
-                ))}
+                  if (expandedRows.has(entry.id) && entry.historicalScores.length > 0) {
+                    rows.push(
+                      <tr key={`${entry.id}-history`} className="bg-slate-50/70 border-b border-slate-100">
+                        <td colSpan={8} className="px-12 py-3">
+                          <div className="flex items-center gap-2 mb-2.5">
+                            <History size={11} className="text-[#00b8a9]" />
+                            <span className="text-[11px] font-semibold text-slate-600">Historical LPI Scores</span>
+                          </div>
+                          <div className="flex items-start gap-5 flex-wrap">
+                            {entry.historicalScores.map((hs) => (
+                              <div key={hs.year} className="flex flex-col items-center gap-1">
+                                <ScoreBadge score={hs.lpiScore} />
+                                <span className="text-[10px] font-semibold text-slate-500">{hs.year}</span>
+                                <span className="text-[9px] text-slate-400 max-w-[90px] text-center leading-tight">{hs.surveyLabel}</span>
+                              </div>
+                            ))}
+                            <div className="flex flex-col items-center gap-1 border-l-2 border-[#00b8a9]/20 pl-5">
+                              <ScoreBadge score={entry.lpiScore} />
+                              <span className="text-[10px] font-semibold text-[#00897b]">2026 (current)</span>
+                            </div>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  }
+
+                  return rows;
+                })}
               </tbody>
             </table>
 
-            {filteredEntries.length === 0 && (
+            {filteredOrgs.length === 0 && (
               <div className="text-center py-10">
                 <BarChart3 size={24} className="text-slate-200 mx-auto mb-2" />
-                <p className="text-slate-400 text-sm">No entries match your filters.</p>
+                <p className="text-slate-400 text-sm">No organizations match your filters.</p>
               </div>
             )}
           </div>
         </div>
       )}
 
-      {/* ── BY ASSET CLASS TAB ──────────────────────────────────────────────── */}
+      {/* ── BY ASSET CLASS TAB ────────────────────────────────────────────── */}
       {subTab === "by-class" && (
         <div className="space-y-5">
-
-          {/* Summary */}
           <div className="flex items-center justify-between gap-4">
             <div className="flex items-center gap-3 text-[12px] text-slate-500">
               <span className="flex items-center gap-1.5 bg-white border border-slate-200 px-3 py-1.5 rounded-lg shadow-sm">
                 <TrendingUp size={11} className="text-[#00b8a9]" />
-                {classRankings.length} / {ASSET_CLASSES.length} classes have data
+                {classData.filter((c) => c.entries.length > 0).length} / {ASSET_CLASSES.length} classes with data
               </span>
               <span className="flex items-center gap-1.5 bg-white border border-slate-200 px-3 py-1.5 rounded-lg shadow-sm">
                 <Users size={11} className="text-slate-400" />
-                {activeEntries.length} active submissions
+                {activeOrgs.length} active organizations
               </span>
             </div>
-            <p className="text-[11px] text-slate-400">Cards sorted by number of submissions</p>
+            <p className="text-[11px] text-slate-400">Cards sorted by number of organizations</p>
           </div>
 
-          {/* Single large "universe" chart at top for reference */}
           {overallStats && (
             <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-5">
               <div className="flex items-center justify-between mb-3">
                 <div>
                   <p className="text-[13px] font-bold text-slate-800">Roundtables Universe</p>
-                  <p className="text-[11.5px] text-slate-400 mt-0.5">All {activeEntries.length} active submissions · reference benchmark</p>
+                  <p className="text-[11.5px] text-slate-400 mt-0.5">
+                    All {activeOrgs.length} active organizations · reference benchmark
+                  </p>
                 </div>
                 <div className="flex gap-3 text-center text-[11px]">
                   {[
@@ -689,7 +868,6 @@ export default function BenchmarkPage() {
             </div>
           )}
 
-          {/* Grid of 17 asset class cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {classData.map(({ cls, entries: clsEntries }) => (
               <AssetClassCard key={cls} cls={cls} entries={clsEntries} />
