@@ -676,11 +676,10 @@ export default function BenchmarkPage() {
                     <ColH col="class" label="Asset Class" filterOpts={[...(ASSET_CLASSES as readonly string[]), "__unassigned__"]} />
                   </th>
                   <th className="text-left px-3 py-2.5 text-[11px] font-semibold text-slate-500 uppercase tracking-wide">
-                    <div className="flex items-center gap-1.5">
-                      <ColH col="state" label="State" filterOpts={allStates} />
-                      <span className="text-slate-300">/</span>
-                      <ColH col="country" label="Country" filterOpts={allCountries} />
-                    </div>
+                    <ColH col="state" label="State" filterOpts={allStates} />
+                  </th>
+                  <th className="text-left px-3 py-2.5 text-[11px] font-semibold text-slate-500 uppercase tracking-wide">
+                    <ColH col="country" label="Country" filterOpts={allCountries} />
                   </th>
                   <th className="text-center px-3 py-2.5 text-[11px] font-semibold text-slate-500 uppercase tracking-wide">
                     Benchmark
@@ -756,13 +755,12 @@ export default function BenchmarkPage() {
                           </button>
                         )}
                       </td>
-                      {/* Location */}
-                      <td className="px-3 py-3 text-[11.5px]">
-                        <div className="text-slate-600">{entry.city}</div>
-                        <div className="text-[10.5px] text-slate-400">
-                          {entry.state !== "—" ? `${entry.state}, ` : ""}{entry.country}
-                        </div>
+                      {/* State */}
+                      <td className="px-3 py-3 text-[11.5px] text-slate-600">
+                        {entry.state !== "—" ? entry.state : <span className="text-slate-300">—</span>}
                       </td>
+                      {/* Country */}
+                      <td className="px-3 py-3 text-[11.5px] text-slate-600">{entry.country}</td>
                       {/* Benchmark toggle */}
                       <td className="px-3 py-3 text-center">
                         <button
@@ -784,7 +782,7 @@ export default function BenchmarkPage() {
                   if (expandedRows.has(entry.id) && entry.historicalScores.length > 0) {
                     rows.push(
                       <tr key={`${entry.id}-history`} className="bg-slate-50/70 border-b border-slate-100">
-                        <td colSpan={8} className="px-12 py-3">
+                        <td colSpan={9} className="px-12 py-3">
                           <div className="flex items-center gap-2 mb-2.5">
                             <History size={11} className="text-[#00b8a9]" />
                             <span className="text-[11px] font-semibold text-slate-600">Historical LPI Scores</span>
