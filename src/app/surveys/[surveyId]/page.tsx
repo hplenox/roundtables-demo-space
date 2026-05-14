@@ -3,7 +3,7 @@
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import { getSurveyById, getOrgsBySurveyId } from "@/lib/mock-data";
-import { ArrowRight, CheckCircle2, Clock, AlertCircle, TrendingUp } from "lucide-react";
+import { ArrowRight, CheckCircle2, Clock, AlertCircle, TrendingUp, Upload, Users } from "lucide-react";
 
 function SubmissionBar({ submitted, inProgress, notStarted, total }: {
   submitted: number; inProgress: number; notStarted: number; total: number;
@@ -72,8 +72,38 @@ export default function OverviewPage() {
     not_started: { label: "Not Started", dot: "bg-slate-300",   text: "text-slate-400" },
   };
 
+  const noContacts = survey.totalInvited === 0;
+
   return (
-    <div className="space-y-5">
+    <div className="space-y-5 relative">
+
+      {/* ── No-contacts blur overlay ───────────────────────────────── */}
+      {noContacts && (
+        <div className="absolute inset-0 z-20 flex items-start justify-center pt-24 pointer-events-none">
+          <div
+            className="bg-white rounded-2xl shadow-2xl border border-slate-200 p-8 max-w-sm w-full text-center pointer-events-auto mx-4"
+            style={{ boxShadow: "0 25px 60px -10px rgba(0,0,0,0.18)" }}
+          >
+            <div className="w-14 h-14 rounded-2xl bg-[#00b8a9]/10 flex items-center justify-center mx-auto mb-4">
+              <Upload size={24} className="text-[#00b8a9]" />
+            </div>
+            <h3 className="text-[15px] font-bold text-slate-800">Upload your contacts first</h3>
+            <p className="text-[12.5px] text-slate-500 mt-2 leading-relaxed">
+              This survey has no invited organizations yet. Upload your contact list to unlock the overview and start tracking responses.
+            </p>
+            <Link
+              href={`/surveys/${surveyId}/organizations`}
+              className="mt-5 inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#0f1923] text-white text-[13px] font-semibold hover:bg-[#1a2733] transition-colors"
+            >
+              <Users size={14} />
+              Go to Invited Organizations
+            </Link>
+          </div>
+        </div>
+      )}
+
+      {/* ── Content (blurred when no contacts) ────────────────────── */}
+      <div className={noContacts ? "blur-sm pointer-events-none select-none opacity-60" : ""}>
 
       {/* ── At-a-glance strip ─────────────────────────────────────── */}
       <div className="bg-white rounded-xl border border-slate-200 px-5 py-4 flex flex-wrap items-center gap-6">
@@ -228,6 +258,8 @@ export default function OverviewPage() {
         </div>
 
       </div>
+
+      </div>{/* end blurred wrapper */}
     </div>
   );
 }
