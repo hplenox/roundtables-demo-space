@@ -713,22 +713,77 @@ function StepPendingApproval({ count, onApprove }: { count: number; onApprove: (
 
 // ══ Step 6 — Launch ═══════════════════════════════════════════════════════════
 
-function StepLaunch({ count, surveyId }: { count: number; surveyId: string }) {
+function StepLaunch({ contacts, surveyId }: { contacts: UploadedContact[]; surveyId: string }) {
   return (
-    <div className="bg-white rounded-xl border border-slate-200 py-16 px-6 text-center">
-      <div className="w-16 h-16 rounded-full bg-emerald-100 flex items-center justify-center mx-auto mb-5">
-        <CheckCircle2 size={32} className="text-emerald-500" />
+    <div className="space-y-4">
+      {/* Success header */}
+      <div className="bg-white rounded-xl border border-slate-200 px-6 py-5">
+        <div className="flex items-center gap-4">
+          <div className="w-11 h-11 rounded-full bg-emerald-100 flex items-center justify-center shrink-0">
+            <CheckCircle2 size={22} className="text-emerald-500" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-[14px] font-bold text-slate-800">Survey launched!</p>
+            <p className="text-[12px] text-slate-500 mt-0.5">
+              Invitations have been sent to {contacts.length} organization{contacts.length !== 1 ? "s" : ""} below.
+            </p>
+          </div>
+          <Link
+            href={`/surveys/${surveyId}`}
+            className="shrink-0 flex items-center gap-1.5 px-4 py-2 rounded-lg bg-[#0f1923] text-white text-[12px] font-semibold hover:bg-[#1a2733] transition-colors"
+          >
+            View Overview <ArrowRight size={12} />
+          </Link>
+        </div>
       </div>
-      <h3 className="text-[18px] font-bold text-slate-800">Contacts submitted!</h3>
-      <p className="text-[12.5px] text-slate-500 mt-2.5 max-w-md mx-auto leading-relaxed">
-        Your {count} contacts have been submitted to the LPS team for review. You&apos;ll be notified once approved and the survey is ready to launch.
-      </p>
-      <Link
-        href={`/surveys/${surveyId}`}
-        className="mt-6 inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#0f1923] text-white text-[13px] font-semibold hover:bg-[#1a2733] transition-colors"
-      >
-        Return to Overview <ArrowRight size={13} />
-      </Link>
+
+      {/* Invited contacts table */}
+      <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
+        <div className="flex items-center justify-between px-5 py-3.5 border-b border-slate-100">
+          <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-widest">Invited Organizations</p>
+          <span className="text-[11px] font-medium text-slate-500 bg-slate-100 px-2 py-0.5 rounded-md">
+            {contacts.length} sent
+          </span>
+        </div>
+
+        {/* Column headers */}
+        <div
+          className="grid gap-4 px-5 py-2.5 border-b border-slate-100 bg-slate-50/60 text-[10.5px] font-semibold text-slate-400 uppercase tracking-wider"
+          style={{ gridTemplateColumns: "28px 1fr 1fr 1.6fr 80px" }}
+        >
+          <div>#</div>
+          <div>Organization</div>
+          <div>Contact</div>
+          <div>Email</div>
+          <div className="text-center">Status</div>
+        </div>
+
+        {contacts.map((c, i) => (
+          <div
+            key={c.id}
+            className="grid gap-4 px-5 py-3 border-b border-slate-50 last:border-0 items-center"
+            style={{ gridTemplateColumns: "28px 1fr 1fr 1.6fr 80px" }}
+          >
+            <span className="text-[11px] text-slate-400 tabular-nums">{i + 1}</span>
+            <div className="flex items-center gap-2 min-w-0">
+              <div className="w-6 h-6 rounded-md bg-slate-100 flex items-center justify-center shrink-0">
+                <span className="text-[8.5px] font-bold text-slate-500">
+                  {c.orgName.substring(0, 2).toUpperCase()}
+                </span>
+              </div>
+              <p className="text-[12.5px] font-semibold text-slate-700 truncate">{c.orgName}</p>
+            </div>
+            <p className="text-[12px] text-slate-600 truncate">{c.firstName} {c.lastName}</p>
+            <p className="text-[12px] text-slate-500 truncate">{c.email}</p>
+            <div className="flex justify-center">
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-emerald-50 border border-emerald-200 text-emerald-700">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                Invited
+              </span>
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
@@ -786,7 +841,7 @@ function ContactUploadFlow({ surveyId }: { surveyId: string }) {
         <StepPendingApproval count={contacts.length} onApprove={() => setStep(6)} />
       )}
 
-      {step === 6 && <StepLaunch count={contacts.length} surveyId={surveyId} />}
+      {step === 6 && <StepLaunch contacts={contacts} surveyId={surveyId} />}
     </div>
   );
 }
