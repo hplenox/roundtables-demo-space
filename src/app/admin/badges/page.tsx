@@ -3,18 +3,128 @@
 import { useState, useMemo } from "react";
 import {
   Award, Search, Plus, X, ChevronDown, ChevronUp,
-  Building2, CheckCircle2, Info,
+  Building2, CheckCircle2, Info, Calculator, GitCommitHorizontal,
 } from "lucide-react";
 import {
   BADGE_TYPES,
   ORG_BADGES,
   BadgeType,
   OrgBadge,
+  BADGE_CALCULATIONS,
+  BadgeCalculationSpec,
 } from "@/lib/mock-badges";
 import { MOCK_ORGS } from "@/lib/mock-data";
 import BadgeCard, { MiniBadgeIcon } from "@/components/BadgeCard";
 
 type LocalOrgBadge = OrgBadge & { isLocal?: boolean };
+
+function CalcPanel({ calc, badge }: { calc: BadgeCalculationSpec; badge: BadgeType }) {
+  return (
+    <div className="rounded-xl border border-slate-200 bg-white overflow-hidden">
+      {/* Header */}
+      <div className="flex items-center gap-2 px-3 py-2 border-b border-slate-100 bg-slate-50/80">
+        <Calculator size={11} className="text-slate-400" />
+        <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wide">
+          Calculation Criteria
+        </span>
+        {calc.multiYearRequired && (
+          <span className="ml-auto inline-flex items-center gap-1 text-[10px] font-semibold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200">
+            <GitCommitHorizontal size={9} />
+            Multi-year required ({calc.minYearsRequired}+ yrs)
+          </span>
+        )}
+      </div>
+
+      <div className="p-3 space-y-3">
+        {/* Eligible pool + award count */}
+        <div className="grid grid-cols-2 gap-2">
+          <div className="rounded-lg bg-slate-50 border border-slate-100 p-2">
+            <p className="text-[9px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">
+              Eligible Pool
+            </p>
+            <p className="text-[11px] text-slate-700 leading-snug">{calc.eligiblePool}</p>
+          </div>
+          <div className="rounded-lg bg-slate-50 border border-slate-100 p-2">
+            <p className="text-[9px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">
+              Award Count
+            </p>
+            <p className="text-[11px] text-slate-700 leading-snug">{calc.awardCount}</p>
+          </div>
+        </div>
+
+        {/* Formula steps */}
+        <div>
+          <p className="text-[9px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">
+            Formula
+          </p>
+          <div className="space-y-2">
+            {calc.formulaSteps.map((step, i) => (
+              <div key={i} className="flex gap-2 items-start">
+                <span
+                  className="shrink-0 mt-0.5 w-4 h-4 rounded-full text-[9px] font-bold flex items-center justify-center"
+                  style={{
+                    background: badge.categoryBg,
+                    color: badge.categoryText,
+                    border: `1px solid ${badge.categoryBorder}`,
+                  }}
+                >
+                  {i + 1}
+                </span>
+                <div className="flex-1 min-w-0">
+                  <p className="text-[10px] font-semibold text-slate-500 mb-0.5">{step.label}</p>
+                  <code className="block text-[10px] font-mono text-slate-700 bg-slate-50 border border-slate-200 rounded-md px-2 py-1 leading-relaxed break-all whitespace-pre-wrap">
+                    {step.formula}
+                  </code>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Data required + Thresholds */}
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <p className="text-[9px] font-bold text-slate-400 uppercase tracking-wider mb-1">
+              Data Required
+            </p>
+            <ul className="space-y-1">
+              {calc.dataRequired.map((d, i) => (
+                <li key={i} className="flex items-start gap-1 text-[10px] text-slate-600 leading-snug">
+                  <span className="text-emerald-500 mt-px shrink-0">✓</span>
+                  {d}
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div>
+            <p className="text-[9px] font-bold text-slate-400 uppercase tracking-wider mb-1">
+              Thresholds
+            </p>
+            <ul className="space-y-1">
+              {calc.thresholds.map((t, i) => (
+                <li key={i} className="text-[10px] text-slate-600 leading-snug">
+                  <span className="font-semibold text-slate-500">{t.label}: </span>
+                  {t.value}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+
+        {/* Tie-breaker */}
+        {calc.tieBreaker && (
+          <div className="flex items-start gap-1.5 text-[10px] text-slate-600 bg-blue-50 border border-blue-100 rounded-lg px-2.5 py-1.5">
+            <Info size={10} className="text-blue-400 mt-px shrink-0" />
+            <span>
+              <span className="font-semibold text-slate-600">Tie-breaker: </span>
+              {calc.tieBreaker}
+            </span>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
 
 export default function BadgeManagementPage() {
   const [orgBadges, setOrgBadges] = useState<LocalOrgBadge[]>(
@@ -272,6 +382,13 @@ export default function BadgeManagementPage() {
               {/* Expanded: full details */}
               {isExpanded && (
                 <div className="border-t border-slate-100 bg-slate-50/50">
+                  {/* Calculation criteria */}
+                  {BADGE_CALCULATIONS[badge.id] && (
+                    <div className="px-4 pt-4 pb-2">
+                      <CalcPanel calc={BADGE_CALCULATIONS[badge.id]} badge={badge} />
+                    </div>
+                  )}
+
                   {/* Full badge card preview */}
                   <div className="p-4">
                     <div className="max-w-[240px] mx-auto">

@@ -1,7 +1,7 @@
-import { Building2, MapPin, DollarSign, Calendar, TrendingUp, Award, CheckCircle2, BarChart3 } from "lucide-react";
+import { Building2, MapPin, DollarSign, Calendar, TrendingUp, Award } from "lucide-react";
 import { getOrgById } from "@/lib/mock-data";
-import { getBadgesForOrg, BADGE_TYPES, ORG_BADGES } from "@/lib/mock-badges";
-import BadgeCard, { MiniBadgeIcon } from "@/components/BadgeCard";
+import { getBadgesForOrg, BADGE_TYPES } from "@/lib/mock-badges";
+import { MiniBadgeIcon } from "@/components/BadgeCard";
 
 // Demo: show Blackstone as "My Organization" (GP perspective)
 const MY_ORG_ID = "org-blackstone";
@@ -76,72 +76,39 @@ export default function MyOrganizationPage() {
 
       <div className="max-w-5xl mx-auto px-6 py-6 space-y-6">
 
-        {/* Badges earned section */}
-        <section>
+        {/* Recognition badges — condensed */}
+        <section className="bg-white rounded-2xl border border-slate-200 p-5">
           <div className="flex items-center justify-between mb-4">
-            <div>
-              <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
-                <Award size={16} className="text-amber-500" />
-                Recognition Badges
-              </h2>
-              <p className="text-xs text-slate-400 mt-0.5">
-                Awarded for outstanding performance across the Roundtables LPI cohort
-              </p>
-            </div>
-            <span className="text-xs text-slate-400">
-              {totalBadgesEarned} of {totalBadgesAvailable} badges earned
+            <h2 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+              <Award size={14} className="text-amber-500" />
+              Recognition Badges
+            </h2>
+            <span className="text-[11px] font-medium text-slate-400">
+              {totalBadgesEarned} of {totalBadgesAvailable} earned
             </span>
           </div>
-
-          {earnedBadges.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {earnedBadges.map((badge) => (
-                <BadgeCard key={badge.id} badge={badge} />
-              ))}
-            </div>
-          ) : (
-            <div className="rounded-2xl border border-dashed border-slate-200 p-8 text-center">
-              <Award size={28} className="text-slate-200 mx-auto mb-2" />
-              <p className="text-slate-400 text-sm">No badges earned yet.</p>
-            </div>
-          )}
+          <div className="flex flex-wrap gap-5">
+            {BADGE_TYPES.map((badge) => {
+              const earned = earnedBadges.find((b) => b.id === badge.id);
+              return (
+                <div
+                  key={badge.id}
+                  className={`flex flex-col items-center gap-1.5 transition-all ${
+                    earned ? "opacity-100" : "opacity-25 grayscale"
+                  }`}
+                >
+                  <MiniBadgeIcon badge={badge} size={42} />
+                  <p className="text-[10px] font-semibold text-slate-700 text-center max-w-[68px] leading-tight">
+                    {badge.name}
+                  </p>
+                  <span className="text-[9px] text-slate-400">
+                    {earned ? earned.awardedDate : "—"}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
         </section>
-
-        {/* Progress toward more badges */}
-        {totalBadgesEarned < totalBadgesAvailable && (
-          <section className="bg-white rounded-2xl border border-slate-200 p-5">
-            <h3 className="text-sm font-bold text-slate-800 mb-3 flex items-center gap-2">
-              <BarChart3 size={14} className="text-[#00b8a9]" />
-              Badges Available in the Cohort
-            </h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              {BADGE_TYPES.map((badge) => {
-                const earned = earnedBadges.some((b) => b.id === badge.id);
-                return (
-                  <div
-                    key={badge.id}
-                    className={`flex items-center gap-3 p-3 rounded-xl border transition-colors ${
-                      earned
-                        ? "border-slate-200 bg-slate-50"
-                        : "border-dashed border-slate-150 bg-white opacity-50"
-                    }`}
-                  >
-                    <MiniBadgeIcon badge={badge} size={32} />
-                    <div className="min-w-0 flex-1">
-                      <p className={`text-[12px] font-semibold ${earned ? "text-slate-800" : "text-slate-400"}`}>
-                        {badge.name}
-                      </p>
-                      <p className="text-[11px] text-slate-400 truncate">{badge.category}</p>
-                    </div>
-                    {earned && (
-                      <CheckCircle2 size={14} className="text-emerald-500 shrink-0" />
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          </section>
-        )}
 
         {/* Org quick stats */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">

@@ -1,7 +1,7 @@
 import Link from "next/link";
 import {
   Award, ArrowRight, Building2, Users, TrendingUp,
-  ShieldCheck, BarChart3, CheckCircle2,
+  ShieldCheck, BarChart3, CheckCircle2, LayoutDashboard,
 } from "lucide-react";
 import { BADGE_TYPES, ORG_BADGES, getAllBadgeAwardees } from "@/lib/mock-badges";
 import { MOCK_ORGS, MOCK_SURVEYS } from "@/lib/mock-data";
@@ -133,12 +133,12 @@ export default function AdminPage() {
             <h3 className="text-sm font-semibold text-slate-900 mb-3">Quick Actions</h3>
             <div className="space-y-2">
               <Link
-                href="/admin/badges"
+                href="/"
                 className="flex items-center gap-3 p-3 rounded-lg bg-slate-50 hover:bg-[#00b8a9]/5 border border-slate-100 hover:border-[#00b8a9]/30 transition-colors group"
               >
-                <Award size={14} className="text-amber-500" />
+                <LayoutDashboard size={14} className="text-slate-500" />
                 <span className="text-[12px] font-medium text-slate-700 group-hover:text-[#00897b]">
-                  Manage Badges
+                  Dashboard
                 </span>
                 <ArrowRight size={11} className="ml-auto text-slate-300 group-hover:text-[#00b8a9]" />
               </Link>
@@ -187,7 +187,7 @@ export default function AdminPage() {
           </div>
         </div>
         <div className="divide-y divide-slate-50">
-          {awardees.map((award, i) => (
+          {awardees.slice(0, 2).map((award, i) => (
             <div key={i} className="flex items-center gap-4 px-5 py-3.5 hover:bg-slate-50/60 transition-colors">
               <MiniBadgeIcon badge={award.badge} size={34} />
               <div className="flex-1 min-w-0">

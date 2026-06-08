@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, Users, FileText, TrendingUp, Clock, CheckCircle2, AlertCircle, Award } from "lucide-react";
+import { ArrowRight, Users, FileText, TrendingUp, Clock, CheckCircle2, AlertCircle } from "lucide-react";
 import { MOCK_SURVEYS } from "@/lib/mock-data";
 import { ORG_BADGES, BADGE_TYPES } from "@/lib/mock-badges";
 import { MiniBadgeIcon } from "@/components/BadgeCard";
@@ -14,19 +14,18 @@ export default function HomePage() {
   const submissionRate = totalInvited > 0 ? Math.round((totalSubmitted / totalInvited) * 100) : 0;
 
   // Aggregate recent badge awards for the dashboard indicator
-  const recentBadges = ORG_BADGES.slice(0, 6).map((ob) => ({
+  const recentBadges = ORG_BADGES.slice(0, 2).map((ob) => ({
     ...ob,
     badge: BADGE_TYPES.find((bt) => bt.id === ob.badgeId)!,
   })).filter((ob) => ob.badge);
 
-  const uniqueBadgeOrgs = [...new Set(ORG_BADGES.map((ob) => ob.orgName))];
 
   return (
     <div className="p-6 max-w-5xl mx-auto space-y-5">
 
       {/* Hero banner */}
       <div className="relative rounded-2xl overflow-hidden bg-white border border-slate-200 shadow-sm p-7">
-        <div className="absolute right-6 top-1/2 -translate-y-1/2 opacity-[0.06]">
+        <div className="absolute right-6 top-1/2 -translate-y-1/2 opacity-[0.04]">
           <svg width="180" height="180" viewBox="0 0 180 180" fill="none">
             <circle cx="90" cy="90" r="80" stroke="#00b8a9" strokeWidth="1.5" />
             <circle cx="90" cy="90" r="55" stroke="#00b8a9" strokeWidth="1.5" />
@@ -36,7 +35,25 @@ export default function HomePage() {
         </div>
         {/* Teal accent bar */}
         <div className="absolute top-0 left-0 w-1 h-full bg-[#00b8a9] rounded-l-2xl" />
-        <div className="relative z-10 pl-2">
+        {/* Floating badge seals */}
+        <div className="absolute right-8 top-1/2 -translate-y-1/2 z-20 flex flex-col items-center gap-4">
+          {recentBadges.map((ob, i) => (
+            <Link
+              key={i}
+              href="/organization"
+              className="group flex flex-col items-center gap-1.5"
+              title={ob.badge.name}
+            >
+              <div className="drop-shadow-lg group-hover:drop-shadow-xl group-hover:-translate-y-0.5 transition-all duration-200">
+                <MiniBadgeIcon badge={ob.badge} size={58} />
+              </div>
+              <p className="text-[9px] font-semibold text-slate-400 text-center max-w-[72px] leading-tight group-hover:text-[#00897b] transition-colors">
+                {ob.badge.name}
+              </p>
+            </Link>
+          ))}
+        </div>
+        <div className="relative z-10 pl-2 pr-[160px]">
           <p className="text-[#00897b] text-xs font-semibold tracking-wide uppercase mb-1.5">
             Lenox Park Solutions, Inc.
           </p>
@@ -62,59 +79,6 @@ export default function HomePage() {
               </div>
             ))}
           </div>
-        </div>
-      </div>
-
-      {/* Badge highlights strip */}
-      <div className="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm">
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-2">
-            <Award size={15} className="text-amber-500" />
-            <p className="text-slate-900 text-sm font-semibold">2025 Recognition Badges</p>
-            <span className="bg-amber-50 text-amber-600 text-[10px] font-bold px-2 py-0.5 rounded-full border border-amber-200">
-              {ORG_BADGES.length} Awarded
-            </span>
-          </div>
-          <Link
-            href="/admin/badges"
-            className="flex items-center gap-1 text-[#00b8a9] text-xs font-semibold hover:underline"
-          >
-            Manage badges <ArrowRight size={11} />
-          </Link>
-        </div>
-        <div className="flex items-stretch gap-3 overflow-x-auto pb-1">
-          {recentBadges.map((ob, i) => (
-            <div
-              key={i}
-              className="shrink-0 flex flex-col items-center gap-2 rounded-xl px-4 py-3 min-w-[130px] bg-slate-50 border border-slate-100 hover:border-slate-200 transition-colors"
-            >
-              <MiniBadgeIcon badge={ob.badge} size={36} />
-              <div className="text-center">
-                <p className="text-slate-800 text-[11px] font-semibold leading-tight">{ob.badge.name}</p>
-                <p className="text-slate-400 text-[10px] mt-0.5">{ob.orgName}</p>
-              </div>
-            </div>
-          ))}
-          <Link
-            href="/admin/badges"
-            className="shrink-0 flex flex-col items-center justify-center gap-1.5 rounded-xl px-4 py-3 min-w-[100px] border border-dashed border-slate-200 hover:border-[#00b8a9]/40 hover:bg-[#00b8a9]/[0.02] transition-colors group"
-          >
-            <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center group-hover:bg-[#00b8a9]/10 transition-colors">
-              <ArrowRight size={14} className="text-slate-400 group-hover:text-[#00b8a9]" />
-            </div>
-            <p className="text-slate-400 text-[10px] text-center group-hover:text-[#00897b]">
-              View all badges
-            </p>
-          </Link>
-        </div>
-        <div className="mt-3 pt-3 border-t border-slate-100 flex items-center gap-4">
-          <p className="text-slate-400 text-[11px]">
-            {uniqueBadgeOrgs.length} organizations recognized ·{" "}
-            {BADGE_TYPES.length} badge types available
-          </p>
-          <Link href="/organization" className="ml-auto text-[#00b8a9] text-[11px] font-semibold hover:underline">
-            My org&apos;s badges →
-          </Link>
         </div>
       </div>
 
