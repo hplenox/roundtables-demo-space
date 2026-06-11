@@ -574,9 +574,9 @@ export default function OrgDetailPage() {
 
             {/* Reports panel */}
             <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
-              <SectionLabel>Reports</SectionLabel>
+              <SectionLabel>Dashboards</SectionLabel>
               <div className="space-y-2">
-                {/* Manager 2-Pager */}
+                {/* Organization Dashboard */}
                 {hasReport ? (
                   <Link
                     href={`/surveys/${surveyId}/organizations/${orgId}/report`}
@@ -586,7 +586,7 @@ export default function OrgDetailPage() {
                       <FileText size={14} className="text-[#00897b]" strokeWidth={1.75} />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-[12.5px] font-semibold text-slate-800">Manager 2-Pager</p>
+                      <p className="text-[12.5px] font-semibold text-slate-800">Organization Dashboard</p>
                       <p className="text-[11px] text-slate-400">LPI, benchmarks & overview</p>
                     </div>
                     <ChevronRight size={13} className="text-slate-300 group-hover:text-[#00b8a9] shrink-0 transition-colors" />
@@ -597,7 +597,7 @@ export default function OrgDetailPage() {
                       <Lock size={13} className="text-slate-400" />
                     </div>
                     <div>
-                      <p className="text-[12.5px] font-semibold text-slate-600">Manager 2-Pager</p>
+                      <p className="text-[12.5px] font-semibold text-slate-600">Organization Dashboard</p>
                       <p className="text-[11px] text-slate-400">Available after submission</p>
                     </div>
                   </div>

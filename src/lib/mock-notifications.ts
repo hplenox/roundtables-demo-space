@@ -1,178 +1,199 @@
 import type { Notification } from "@/types/notification";
 
-// Today = 2026-04-07
+// Reference: today = 2026-06-11. Survey deadline = June 18, 2026.
+// 7-day reminders fire today (Jun 11 = Jun 18 - 7 days).
+
 export const MOCK_NOTIFICATIONS: Notification[] = [
-  // --- TODAY ---
+
+  // ── Survey Host (Client) ─────────────────────────────────────────────────
+  // Notifications visible to the LP client administering their survey.
+
   {
-    id: "notif-01",
-    type: "incomplete",
-    title: "Low transparency score detected",
+    id: "host-01",
+    role: "host",
+    type: "csv_approved",
+    title: "Contacts List CSV Approved Successfully",
     description:
-      "Bridgewater Associates submitted the survey but received a transparency score of 42/100 — below the 60-point threshold. Consider reaching out for clarification.",
-    surveyName: "Q1 2026 ESG Survey",
+      "Your contacts list for the Q1 2026 DEI Survey has been reviewed and approved by the Lenox Park team. 27 contacts have been imported and are ready for invitation.",
+    surveyName: "Q1 2026 DEI Survey",
     surveyId: "survey-001",
     read: false,
-    timestamp: "2026-04-07T09:42:00Z",
-    priority: "high",
-    metadata: {
-      orgName: "Bridgewater Associates",
-      transparencyScore: 42,
-    },
+    timestamp: "2026-06-11T09:15:00Z",
+    metadata: { csvCount: 27 },
   },
   {
-    id: "notif-02",
-    type: "reminder",
-    title: "Survey closes in 24 hours",
+    id: "host-02",
+    role: "host",
+    type: "invitations_sent",
+    title: "Invitations Sent Successfully for Q1 2026 DEI Survey",
     description:
-      "8 organizations still haven't responded. The survey closes tomorrow at 11:59 PM ET. Send a final nudge to maximize participation.",
-    surveyName: "Q1 2026 ESG Survey",
+      "27 invitation emails have been successfully delivered to your invited organizations. You can monitor responses from your survey dashboard.",
+    surveyName: "Q1 2026 DEI Survey",
     surveyId: "survey-001",
     read: false,
-    timestamp: "2026-04-07T08:00:00Z",
-    priority: "high",
-    metadata: {
-      daysRemaining: 1,
-    },
+    timestamp: "2026-06-11T09:20:00Z",
+    metadata: { csvCount: 27 },
   },
   {
-    id: "notif-03",
-    type: "inactive",
-    title: "14 participants haven't started — 32 days since launch",
+    id: "host-03",
+    role: "host",
+    type: "email_bounce",
+    title: "3 Emails Bounced from Invitations",
     description:
-      "14 participants across 6 organizations have not opened the survey since it launched on March 6. Early outreach typically recovers 40% of stalled respondents.",
-    surveyName: "Q1 2026 ESG Survey",
+      "3 invitation emails could not be delivered. Please review and update the bounced addresses so affected organizations can receive their survey link.",
+    surveyName: "Q1 2026 DEI Survey",
     surveyId: "survey-001",
     read: false,
-    timestamp: "2026-04-07T07:00:00Z",
+    timestamp: "2026-06-11T09:22:00Z",
     priority: "high",
-    metadata: {
-      inactiveCount: 14,
-      orgCount: 6,
-      daysSinceLaunch: 32,
-    },
+    metadata: { bouncedCount: 3 },
   },
   {
-    id: "notif-04",
-    type: "progress",
-    title: "Daily progress digest — Day 32",
+    id: "host-04",
+    role: "host",
+    type: "survey_submitted",
+    title: "Survey Submitted by Marcus Johnson",
     description:
-      "18 of 27 organizations have submitted (67%). 5 are in progress and 4 haven't started. You're on track to close with at least 70% participation.",
-    surveyName: "Q1 2026 ESG Survey",
+      "Marcus Johnson at Carlyle Group has completed and submitted their survey. Their submission brings total participation to 14 of 27 organizations.",
+    surveyName: "Q1 2026 DEI Survey",
     surveyId: "survey-001",
     read: false,
-    timestamp: "2026-04-07T06:00:00Z",
+    timestamp: "2026-06-10T14:30:00Z",
     metadata: {
-      submitted: 18,
+      managerName: "Marcus Johnson",
+      orgName: "Carlyle Group",
+      submitted: 14,
       total: 27,
-      percentage: 67,
-    },
-  },
-  // --- YESTERDAY ---
-  {
-    id: "notif-05",
-    type: "submission",
-    title: "Michael Chen submitted on behalf of KKR & Co.",
-    description:
-      "KKR & Co. completed the survey with a transparency score of 88/100. Their submission brings total participation to 18 of 27 organizations.",
-    surveyName: "Q1 2026 ESG Survey",
-    surveyId: "survey-001",
-    read: false,
-    timestamp: "2026-04-06T14:23:00Z",
-    metadata: {
-      orgName: "KKR & Co.",
-      managerName: "Michael Chen",
-      transparencyScore: 88,
     },
   },
   {
-    id: "notif-06",
-    type: "progress",
-    title: "Daily progress digest — Day 31",
+    id: "host-05",
+    role: "host",
+    type: "weekly_update",
+    title: "Weekly Update: Q1 2026 DEI Survey — Week of Jun 2–8",
     description:
-      "15 of 27 organizations have submitted (56%). Up from 12 yesterday — strong momentum heading into the final stretch.",
-    surveyName: "Q1 2026 ESG Survey",
+      "Your survey received 14 of 27 submissions so far with 10 days left till the end of the survey for the week of Jun 2 to Jun 8.",
+    surveyName: "Q1 2026 DEI Survey",
     surveyId: "survey-001",
     read: true,
-    timestamp: "2026-04-06T06:00:00Z",
+    timestamp: "2026-06-08T08:00:00Z",
     metadata: {
-      submitted: 15,
+      submitted: 14,
       total: 27,
-      percentage: 56,
+      daysRemaining: 10,
+      weekStart: "Jun 2, 2026",
+      weekEnd: "Jun 8, 2026",
     },
   },
-  // --- 2 DAYS AGO ---
+
+  // ── Survey Taker (Manager) ────────────────────────────────────────────────
+  // Notifications visible to GP organizations completing the survey.
+
   {
-    id: "notif-07",
-    type: "forward",
-    title: "Survey forwarded to a new respondent",
+    id: "mgr-01",
+    role: "manager",
+    type: "survey_started",
+    title: "Survey Started on May 15, 2026",
     description:
-      "Sarah Williams at Apollo Global Management forwarded the survey to David Park, their new Head of ESG. David has been added as a co-respondent.",
-    surveyName: "Q1 2026 ESG Survey",
-    surveyId: "survey-001",
-    read: false,
-    timestamp: "2026-04-05T11:15:00Z",
-    metadata: {
-      fromManager: "Sarah Williams",
-      toManager: "David Park",
-      toOrg: "Apollo Global Management",
-    },
-  },
-  // --- 4 DAYS AGO ---
-  {
-    id: "notif-08",
-    type: "reminder",
-    title: "Survey closes in 3 days",
-    description:
-      "11 organizations haven't submitted yet. Automated reminders have been sent; manual outreach is recommended for high-priority accounts.",
-    surveyName: "Q1 2026 ESG Survey",
-    surveyId: "survey-001",
-    read: false,
-    timestamp: "2026-04-03T08:00:00Z",
-    metadata: {
-      daysRemaining: 3,
-    },
-  },
-  // --- 1 WEEK AGO ---
-  {
-    id: "notif-09",
-    type: "reminder",
-    title: "Survey closes in 7 days",
-    description:
-      "15 organizations have yet to respond. The survey closes on April 8. Outreach at this stage significantly improves final participation rates.",
-    surveyName: "Q1 2026 ESG Survey",
+      "The Q1 2026 DEI Survey is now open. You have been invited to complete your organization's submission. The deadline to respond is June 18, 2026.",
+    surveyName: "Q1 2026 DEI Survey",
     surveyId: "survey-001",
     read: true,
-    timestamp: "2026-03-31T08:00:00Z",
+    timestamp: "2026-05-15T08:00:00Z",
+    metadata: {
+      surveyStartDate: "May 15, 2026",
+      deadline: "June 18, 2026",
+    },
+  },
+  {
+    id: "mgr-02",
+    role: "manager",
+    type: "survey_reminder",
+    title: "Reminder: Survey Is About to Close",
+    description:
+      "The Q1 2026 DEI Survey closes in 7 days on June 18, 2026. You haven't completed your survey yet — please complete it before the deadline.",
+    surveyName: "Q1 2026 DEI Survey",
+    surveyId: "survey-001",
+    read: false,
+    timestamp: "2026-06-11T08:00:00Z",
+    priority: "high",
     metadata: {
       daysRemaining: 7,
+      deadline: "June 18, 2026",
     },
   },
+
+  // ── LPS Admin ─────────────────────────────────────────────────────────────
+  // Internal notifications for Lenox Park platform administrators.
+
   {
-    id: "notif-10",
-    type: "submission",
-    title: "Jessica Torres submitted on behalf of Blackstone",
+    id: "adm-01",
+    role: "admin",
+    type: "csv_review",
+    title: "Contacts List CSV Uploaded — Please Review",
     description:
-      "Blackstone Group LP completed the Annual DE&I Assessment with a transparency score of 94/100 — among the highest recorded this cycle.",
-    surveyName: "Annual DE&I Assessment 2025",
-    surveyId: "survey-002",
-    read: true,
-    timestamp: "2026-03-29T16:40:00Z",
+      "Lenox Park Solutions has uploaded their contacts list CSV for the Q1 2026 DEI Survey. Review and approve before invitations can be dispatched to GPs.",
+    surveyName: "Q1 2026 DEI Survey",
+    surveyId: "survey-001",
+    read: false,
+    timestamp: "2026-06-11T09:10:00Z",
+    priority: "high",
     metadata: {
-      orgName: "Blackstone Group LP",
-      managerName: "Jessica Torres",
-      transparencyScore: 94,
+      clientName: "Lenox Park Solutions",
+      csvCount: 27,
     },
   },
   {
-    id: "notif-11",
-    type: "closed",
-    title: "Annual DE&I Assessment 2025 has closed",
+    id: "adm-02",
+    role: "admin",
+    type: "email_bounce",
+    title: "3 Emails Bounced for Lenox Park Solutions' Survey",
     description:
-      "The survey officially closed with 23 of 25 organizations submitting (92% participation). A full summary report is available for download.",
-    surveyName: "Annual DE&I Assessment 2025",
-    surveyId: "survey-002",
-    read: true,
-    timestamp: "2026-03-28T23:59:00Z",
+      "3 invitation emails bounced and could not be delivered for Lenox Park Solutions' Q1 2026 DEI Survey. Review the affected addresses in the contacts panel.",
+    surveyName: "Q1 2026 DEI Survey",
+    surveyId: "survey-001",
+    read: false,
+    timestamp: "2026-06-11T09:22:00Z",
+    priority: "high",
+    metadata: {
+      clientName: "Lenox Park Solutions",
+      bouncedCount: 3,
+    },
+  },
+  {
+    id: "adm-03",
+    role: "admin",
+    type: "survey_submitted",
+    title: "Blackstone Submitted Their Survey for Lenox Park Solutions",
+    description:
+      "Jessica Torres at Blackstone Group LP has completed their survey submission for Lenox Park Solutions' Q1 2026 DEI Survey.",
+    surveyName: "Q1 2026 DEI Survey",
+    surveyId: "survey-001",
+    read: false,
+    timestamp: "2026-06-10T14:30:00Z",
+    metadata: {
+      managerName: "Jessica Torres",
+      orgName: "Blackstone Group LP",
+      clientName: "Lenox Park Solutions",
+    },
+  },
+  {
+    id: "adm-04",
+    role: "admin",
+    type: "survey_reminder",
+    title: "Reminder: Lenox Park Solutions' Survey Is About to End",
+    description:
+      "Lenox Park Solutions' Q1 2026 DEI Survey is about to end on June 18, 2026 — 7 days from today. 13 organizations have yet to respond.",
+    surveyName: "Q1 2026 DEI Survey",
+    surveyId: "survey-001",
+    read: false,
+    timestamp: "2026-06-11T08:00:00Z",
+    priority: "high",
+    metadata: {
+      clientName: "Lenox Park Solutions",
+      daysRemaining: 7,
+      deadline: "June 18, 2026",
+    },
   },
 ];
 

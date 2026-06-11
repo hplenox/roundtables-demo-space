@@ -1,35 +1,39 @@
+export type NotificationRole = "host" | "manager" | "admin";
+
 export type NotificationType =
-  | "submission"
-  | "reminder"
-  | "forward"
-  | "progress"
-  | "closed"
-  | "incomplete"
-  | "inactive";
+  | "csv_approved"
+  | "invitations_sent"
+  | "email_bounce"
+  | "survey_submitted"
+  | "weekly_update"
+  | "survey_started"
+  | "survey_reminder"
+  | "csv_review"
+  | "closed";
 
 export interface Notification {
   id: string;
+  role: NotificationRole;
   type: NotificationType;
   title: string;
   description: string;
   surveyName: string;
   surveyId: string;
   read: boolean;
-  timestamp: string; // ISO date string
+  timestamp: string;
   priority?: "high" | "normal";
   metadata?: {
     orgName?: string;
     managerName?: string;
-    fromManager?: string;
-    toManager?: string;
-    toOrg?: string;
-    daysRemaining?: number;
+    clientName?: string;
+    csvCount?: number;
+    bouncedCount?: number;
     submitted?: number;
     total?: number;
-    percentage?: number;
-    transparencyScore?: number;
-    inactiveCount?: number;
-    orgCount?: number;
-    daysSinceLaunch?: number;
+    daysRemaining?: number;
+    deadline?: string;
+    surveyStartDate?: string;
+    weekStart?: string;
+    weekEnd?: string;
   };
 }

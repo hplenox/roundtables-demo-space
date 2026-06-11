@@ -10,11 +10,12 @@ import LpiSubComponentsSection from "@/components/report/LpiSubComponentsSection
 import WorkplacePoliciesCard from "@/components/report/WorkplacePoliciesCard";
 import GenderDemographicsSection from "@/components/report/GenderDemographicsSection";
 import RacialDemographicsSection from "@/components/report/RacialDemographicsSection";
+import EvennessSection from "@/components/report/EvennessSection";
 
 import {
   ChevronRight, ChevronLeft, ChevronDown, Printer, Download,
   User, Mail, Calendar, Clock, MapPin, TrendingUp, BadgeCheck,
-  Lock, LayoutDashboard, Search, Lightbulb, Building2, Sparkles,
+  Lock, LayoutDashboard, Search, Lightbulb, Building2, Sparkles, Info,
 } from "lucide-react";
 import type { InvitedOrg } from "@/types/survey";
 
@@ -290,7 +291,7 @@ function ManagerSwitcher({
         onClick={() => setOpen(!open)}
         className="h-7 flex items-center gap-1.5 px-3 border border-slate-300 bg-white hover:bg-slate-50 hover:border-slate-400 transition-all text-[12px] font-semibold text-slate-800 max-w-[180px]"
       >
-        <span className="truncate">{submittedOrgs[currentIdx]?.name ?? "Select manager"}</span>
+        <span className="truncate">{submittedOrgs[currentIdx]?.name ?? "Select organization"}</span>
         <span className="shrink-0 text-[10px] font-normal text-slate-400 hidden sm:inline">
           {currentIdx + 1}/{submittedOrgs.length}
         </span>
@@ -318,7 +319,7 @@ function ManagerSwitcher({
           style={{ animation: "fadeInUp 0.3s ease, fadeOut 0.5s ease 3.5s forwards" }}
         >
           <Lightbulb size={10} className="text-[#00b8a9] shrink-0" />
-          Switch managers · Alt+← →
+          Switch organizations · Alt+← →
           <span className="absolute -top-1.5 left-1/2 -translate-x-1/2 w-3 h-1.5 overflow-hidden">
             <span className="block w-2 h-2 bg-[#0f1923] rotate-45 translate-y-1 mx-auto" />
           </span>
@@ -336,7 +337,7 @@ function ManagerSwitcher({
               <input
                 ref={searchRef}
                 type="text"
-                placeholder="Search managers…"
+                placeholder="Search organizations…"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 className="flex-1 text-[12.5px] text-slate-700 placeholder:text-slate-400 focus:outline-none bg-transparent"
@@ -346,7 +347,7 @@ function ManagerSwitcher({
             {/* Org list */}
             <ul className="max-h-64 overflow-y-auto py-1">
               {filtered.length === 0 ? (
-                <li className="px-4 py-3 text-[12px] text-slate-400 text-center">No managers found</li>
+                <li className="px-4 py-3 text-[12px] text-slate-400 text-center">No organizations found</li>
               ) : (
                 filtered.map((o, i) => {
                   const isCurrent = o.id === currentOrgId;
@@ -387,11 +388,80 @@ function ManagerSwitcher({
 
             {/* Footer */}
             <div className="px-3 py-2 border-t border-slate-100 flex items-center gap-1.5 bg-slate-50/60">
-              <span className="text-[10px] text-slate-400">{submittedOrgs.length} submitted managers</span>
+              <span className="text-[10px] text-slate-400">{submittedOrgs.length} submitted organizations</span>
               <span className="ml-auto text-[9.5px] text-slate-300 font-mono">Alt+← →</span>
             </div>
           </div>
         </>
+      )}
+    </div>
+  );
+}
+
+// ─── How-to-read dropdown ─────────────────────────────────────────────────────
+
+function HowToReadDropdown() {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+      <button
+        onClick={() => setOpen(!open)}
+        className="w-full flex items-center gap-2 px-5 py-3 text-left hover:bg-slate-50/70 transition-colors"
+      >
+        {open
+          ? <ChevronDown size={13} className="text-slate-500 shrink-0" />
+          : <ChevronRight size={13} className="text-slate-400 shrink-0" />
+        }
+        <span className="text-[12.5px] font-semibold text-slate-600">
+          Learn more about how to view this dashboard
+        </span>
+      </button>
+
+      {open && (
+        <div className="border-t border-slate-100 px-5 py-4">
+          <div className="border-l-4 border-blue-400 pl-4 space-y-3">
+            {/* Header */}
+            <div className="flex items-center gap-2.5">
+              <Info size={14} className="text-blue-500 shrink-0" />
+              <span className="text-[13px] font-bold text-slate-800">How to read this dashboard</span>
+              <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-orange-500 text-white tracking-wide">
+                RT-019
+              </span>
+            </div>
+
+            {/* Body */}
+            <div className="space-y-3 text-[12.5px] text-slate-600 leading-relaxed">
+              <p>
+                This is a <strong className="text-slate-800">human capital monitoring and benchmarking tool</strong>,
+                grounded in fiduciary risk management. It collects standardized data on the workforce composition,
+                leadership structure, and ownership profile of organizations — the same kind of organizational quality
+                data institutional investors routinely collect across other dimensions of due diligence.
+              </p>
+              <p>
+                The <strong className="text-slate-800">Lenox Park Impact (LPI) Score</strong> provides diagnostic signals
+                for three categories of risk in engaging with external counterparties:{" "}
+                <strong className="text-slate-800">key-person and succession risk</strong> (concentrated decision-making
+                authority, limited bench depth);{" "}
+                <strong className="text-slate-800">talent retention risk</strong> (gaps between workforce representation
+                and leadership advancement correlate with elevated attrition and replacement costs); and{" "}
+                <strong className="text-slate-800">decision-making quality risk</strong> (Empirical research, supported
+                by the findings of Lenox Park and Oxford University&apos;s SDG Impact Lab, indicates that
+                demographically homogeneous leadership teams are more susceptible to groupthink and narrower market
+                perspective).
+              </p>
+              <p>
+                The <strong className="text-slate-800">Evenness Score</strong> complements the LPI by measuring{" "}
+                <em>distributional balance</em> rather than absolute representation — how evenly an organization&apos;s
+                composition is spread across demographic categories at each layer (workforce, leadership, ownership).
+                Built on a normalized concentration measure, a higher Evenness score reflects lower demographic
+                concentration, used as a proxy for{" "}
+                <strong className="text-slate-800">cognitive diversity</strong> — which is associated with reduced
+                groupthink and broader market perspective at the decision-making level. Where the LPI asks{" "}
+                <em>how much</em> representation is present, Evenness asks <em>how balanced</em> it is.
+              </p>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
@@ -413,7 +483,7 @@ export default function ManagerReportPage() {
   if (!org || !survey) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-50">
-        <p className="text-slate-500">Report not found.</p>
+        <p className="text-slate-500">Dashboard not found.</p>
       </div>
     );
   }
@@ -422,7 +492,7 @@ export default function ManagerReportPage() {
     return (
       <div className="min-h-screen bg-slate-50 flex items-center justify-center">
         <div className="bg-white rounded-2xl border border-slate-200 p-10 text-center max-w-sm">
-          <p className="text-slate-700 font-semibold mb-2">Report Not Available</p>
+          <p className="text-slate-700 font-semibold mb-2">Dashboard Not Available</p>
           <p className="text-slate-400 text-sm">This organization has not yet completed the survey.</p>
         </div>
       </div>
@@ -430,7 +500,7 @@ export default function ManagerReportPage() {
   }
 
   const now = new Date();
-  const reportDate = now.toLocaleDateString("en-US", {
+  const dashboardDate = now.toLocaleDateString("en-US", {
     month: "long", day: "numeric", year: "numeric",
   }) + " at " + now.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" });
 
@@ -468,10 +538,10 @@ export default function ManagerReportPage() {
               href={`/surveys/${surveyId}/organizations`}
               className="text-slate-400 hover:text-slate-700 transition-colors font-medium hidden lg:block"
             >
-              Managers
+              Organizations
             </Link>
             <ChevronRight size={11} className="text-slate-300 shrink-0 hidden lg:block" />
-            <span className="text-slate-500 font-medium hidden lg:block shrink-0">2-Pager</span>
+            <span className="text-slate-500 font-medium hidden lg:block shrink-0">Dashboard</span>
           </nav>
 
           {/* Manager Switcher — center */}
@@ -501,6 +571,8 @@ export default function ManagerReportPage() {
       <InsightsBox org={org} />
 
       <div className="max-w-5xl mx-auto px-6 py-8 space-y-5">
+
+        <HowToReadDropdown />
 
         {/* SECTION 1 */}
         <ReportSection>
@@ -535,7 +607,7 @@ export default function ManagerReportPage() {
               <InfoPill icon={Mail}      label="Email"             value={org.contactEmail} />
               <InfoPill icon={TrendingUp} label="AUM"             value={org.aum} />
               <InfoPill icon={Calendar}  label="Survey Submission" value={org.submissionDate ?? "Pending"} />
-              <InfoPill icon={Clock}     label="Report Generated"  value={reportDate} />
+              <InfoPill icon={Clock}     label="Dashboard Generated"  value={dashboardDate} />
               <InfoPill icon={Calendar}  label="Survey Opens"      value={survey.startDate} />
               <InfoPill icon={Calendar}  label="Survey Closes"     value={survey.targetCloseDate} />
             </div>
@@ -550,11 +622,35 @@ export default function ManagerReportPage() {
           <SectionLabel>Section 2 · Primary Benchmarking Categories</SectionLabel>
           <div className="p-6">
             <div className="mb-5">
-              <h2 className="text-[15px] font-bold text-slate-800 mb-1">LPI Benchmark Comparison</h2>
+              <div className="flex items-center gap-2.5 mb-1">
+                <h2 className="text-[15px] font-bold text-slate-800">LPI Benchmark Comparison</h2>
+
+                {/* Info tooltip */}
+                <div className="relative group inline-flex items-center">
+                  <Info
+                    size={15}
+                    className="text-slate-400 hover:text-blue-500 cursor-pointer transition-colors"
+                  />
+                  <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 w-72 bg-[#0f1923] rounded-xl p-4 shadow-2xl opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-200 z-50">
+                    <p className="text-[12.5px] text-slate-200 leading-relaxed">
+                      <strong className="text-amber-400">LPI (Lenox Park Impact) Score</strong>
+                      {" "}— a composite 0–10 metric measuring how well an organization has optimized
+                      its human capital across three layers: equity ownership, leadership, and total
+                      workforce. Built from 10 sub-components, each worth up to 1.00 point.
+                    </p>
+                    <div className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-3 h-3 bg-[#0f1923] rotate-45 rounded-sm" />
+                  </div>
+                </div>
+
+                {/* RT badge */}
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-orange-500 text-white tracking-wide">
+                  ◆ RT-006
+                </span>
+              </div>
               <p className="text-[12.5px] text-slate-500 leading-relaxed max-w-2xl">
                 The charts below show where <strong>{org.name}</strong>'s LPI score of{" "}
                 <strong>{org.lpiScore.toFixed(1)}</strong> falls relative to three benchmark pools.
-                The orange marker indicates the manager's exact position within each distribution.
+                The orange marker indicates the organization's exact position within each distribution.
               </p>
             </div>
 
@@ -566,7 +662,7 @@ export default function ManagerReportPage() {
                 { color: "#bfdbfe",  label: "10th–90th percentile" },
                 { color: "#3b82f6",  label: "IQR (25th–75th)" },
                 { color: "#1d4ed8",  label: "Median",        isLine: true },
-                { color: "#f97316",  label: "This manager",  isSquare: true },
+                { color: "#f97316",  label: "This organization",  isSquare: true },
               ].map(({ color, label, isLine, isSquare }) => (
                 <div key={label} className="flex items-center gap-1.5">
                   {isLine   ? <div className="w-4 h-0.5 rounded" style={{ backgroundColor: color }} /> :
@@ -589,8 +685,42 @@ export default function ManagerReportPage() {
                     <div className="flex items-start justify-between px-4 pt-4 pb-3 border-b border-slate-100">
                       <div>
                         <p className="text-[9.5px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">Relative to</p>
-                        <p className="text-[13px] font-bold text-slate-800 leading-tight">{data.label}</p>
-                        <p className="text-[10.5px] text-slate-400 mt-0.5">n = {data.n.toLocaleString()} managers</p>
+
+                        {key === "universe" ? (
+                          <>
+                            <div className="flex items-center gap-1.5">
+                              <p className="text-[13px] font-bold text-slate-800 leading-tight">
+                                RoundTables{" "}
+                                <span className="bg-orange-500 text-white px-1 py-px rounded-sm">Universe</span>
+                              </p>
+                              <div className="relative group inline-flex items-center shrink-0">
+                                <div className="w-[17px] h-[17px] rounded-full bg-blue-500 hover:bg-blue-600 flex items-center justify-center cursor-pointer transition-colors">
+                                  <Info size={10} className="text-white" />
+                                </div>
+                                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 w-[280px] bg-[#0f1923] rounded-xl p-4 shadow-2xl opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-200 z-50">
+                                  <p className="text-[12.5px] text-slate-200 leading-relaxed">
+                                    <strong className="text-amber-400">RT (RoundTables)</strong>{" "}
+                                    <span className="bg-amber-400 text-[#0f1923] font-bold px-1 rounded-sm">Universe</span>
+                                    {" "}— the benchmark pool of organizations in the Lenox Park
+                                    RoundTables database with comparable data for this specific metric.
+                                  </p>
+                                  <div className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-3 h-3 bg-[#0f1923] rotate-45 rounded-sm" />
+                                </div>
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-2 mt-0.5">
+                              <p className="text-[10.5px] text-slate-400">n = {data.n.toLocaleString()} organizations</p>
+                              <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[9px] font-bold bg-orange-500 text-white">
+                                ◆ RT-004
+                              </span>
+                            </div>
+                          </>
+                        ) : (
+                          <>
+                            <p className="text-[13px] font-bold text-slate-800 leading-tight">{data.label}</p>
+                            <p className="text-[10.5px] text-slate-400 mt-0.5">n = {data.n.toLocaleString()} organizations</p>
+                          </>
+                        )}
                       </div>
                       {!data.comingSoon && (
                         <div className="text-right">
@@ -643,8 +773,8 @@ export default function ManagerReportPage() {
                 <strong>How to read this:</strong> An LPI score at the{" "}
                 <strong>{org.benchmarks.universe.managerPercentile}th percentile</strong> within the
                 Roundtables Universe means {org.name} scores higher than{" "}
-                {org.benchmarks.universe.managerPercentile}% of all managers in the database across all DEI
-                dimensions. The IQR band (dark blue) represents the middle 50% of managers — a score within or
+                {org.benchmarks.universe.managerPercentile}% of all organizations in the database across all DEI
+                dimensions. The IQR band (dark blue) represents the middle 50% of organizations — a score within or
                 above this range indicates above-average DEI practice.
               </p>
             </div>
@@ -660,6 +790,45 @@ export default function ManagerReportPage() {
                 data={org.lpiSubComponents}
                 orgName={org.name}
               />
+            </div>
+          </ReportSection>
+        )}
+
+        {/* SECTION 3b — Evenness Score */}
+        {org.lpiSubComponents && (
+          <ReportSection>
+            <SectionLabel>Evenness Score Sub-Components Benchmarking</SectionLabel>
+            <div className="p-6 space-y-5">
+
+              {/* Section heading + Evenness Sub-Components tooltip */}
+              <div>
+                <div className="flex items-center gap-2.5 mb-1">
+                  <h2 className="text-[15px] font-bold text-slate-800">Evenness Sub-Components</h2>
+                  <div className="relative group inline-flex items-center shrink-0">
+                    <div className="w-[18px] h-[18px] rounded-full bg-blue-500 hover:bg-blue-600 flex items-center justify-center cursor-pointer transition-colors">
+                      <Info size={10} className="text-white" />
+                    </div>
+                    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 w-[300px] bg-[#0f1923] rounded-xl p-4 shadow-2xl opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-200 z-50">
+                      <p className="text-[12.5px] text-slate-200 leading-relaxed">
+                        <strong className="text-amber-400">Evenness</strong>
+                        {" "}— a measure of distributional balance across the organization, used as a proxy for
+                        cognitive diversity. A higher Evenness score indicates a more even distribution of
+                        representation across measured categories — empirically associated with reduced
+                        groupthink and broader market perspective at the leadership level.
+                      </p>
+                      <div className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-3 h-3 bg-[#0f1923] rotate-45 rounded-sm" />
+                    </div>
+                  </div>
+                </div>
+                <p className="text-[12.5px] text-slate-500 leading-relaxed max-w-2xl">
+                  Distributional balance of {org.name}&apos;s composition across demographic categories
+                  at each organizational layer — a complement to the LPI&apos;s absolute representation
+                  scores.
+                </p>
+              </div>
+
+              <EvennessSection />
+
             </div>
           </ReportSection>
         )}
