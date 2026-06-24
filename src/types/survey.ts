@@ -33,12 +33,46 @@ export interface BenchmarkPool {
   managerPercentile: number;
   n: number;
   comingSoon?: boolean;
+  insufficientData?: boolean;
 }
 
 export interface LpiBenchmarks {
   universe: BenchmarkPool;
   portfolio: BenchmarkPool;
   assetClass: BenchmarkPool;
+}
+
+export type USRegion = "South" | "Northeast" | "Southeast" | "Midwest" | "Northwest" | "Southwest";
+export type AumBracket = "<$1B" | "$1B–$5B" | "$5B–$25B" | "$25B–$100B" | "$100B+";
+
+export interface OrgGeography {
+  city?: string;
+  state?: string;
+  country: string;
+  region?: USRegion;
+  isUSBased: boolean;
+}
+
+export interface GeographyBenchmarkSlice {
+  universe: BenchmarkPool;
+  portfolio: BenchmarkPool;
+}
+
+export interface GeographyBenchmarks {
+  regions?: Partial<Record<USRegion, GeographyBenchmarkSlice>>;
+  usBased?: GeographyBenchmarkSlice;
+  country?: GeographyBenchmarkSlice;
+  city?: GeographyBenchmarkSlice;
+}
+
+export interface AumBenchmarkSlice {
+  universe: BenchmarkPool;
+  portfolio: BenchmarkPool;
+}
+
+export interface AumBenchmarks {
+  managerBracket: AumBracket;
+  brackets: Partial<Record<AumBracket, AumBenchmarkSlice>>;
 }
 
 /**
@@ -118,6 +152,9 @@ export interface InvitedOrg {
   benchmarks: LpiBenchmarks | null;
   genderDemographics: GenderDemographics | null;
   racialDemographics: RacialDemographics | null;
+  geography?: OrgGeography | null;
+  geographyBenchmarks?: GeographyBenchmarks | null;
+  aumBenchmarks?: AumBenchmarks | null;
 }
 
 export interface GenderDemographics {

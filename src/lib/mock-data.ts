@@ -117,8 +117,8 @@ export const MOCK_ORGS: InvitedOrg[] = [
     aum: "$1.0T",
     aumRaw: 1000,
     founded: "1985",
-    headquarters: "New York, NY",
-    location: "New York, NY",
+    headquarters: "Miami, FL",
+    location: "Miami, FL",
     lpiScore: 8.2,
     lpiVersion: "v3.1",
 
@@ -210,6 +210,220 @@ export const MOCK_ORGS: InvitedOrg[] = [
         white:          10,
         other:          1,
         multiracial:    0,
+      },
+    },
+    aumBenchmarks: {
+      managerBracket: "$100B+",
+      brackets: {
+        "$100B+": {
+          universe: {
+            label: "$100B+ · RoundTables Universe",
+            p10: 5.1, q1: 6.4, median: 7.4, q3: 8.5, p90: 9.3,
+            min: 3.2, max: 10.0,
+            managerValue: 8.2, managerPercentile: 74, n: 18,
+          },
+          portfolio: {
+            label: "$100B+ · My Portfolio",
+            p10: 5.8, q1: 6.9, median: 7.8, q3: 8.7, p90: 9.4,
+            min: 4.5, max: 9.8,
+            managerValue: 8.2, managerPercentile: 63, n: 6,
+          },
+        },
+        "$25B–$100B": {
+          universe: {
+            label: "$25B–$100B · RoundTables Universe",
+            p10: 4.4, q1: 5.9, median: 7.0, q3: 8.1, p90: 9.0,
+            min: 2.7, max: 9.8,
+            managerValue: 8.2, managerPercentile: 67, n: 44,
+          },
+          portfolio: {
+            label: "$25B–$100B · My Portfolio",
+            p10: 5.2, q1: 6.4, median: 7.3, q3: 8.3, p90: 9.1,
+            min: 3.9, max: 9.7,
+            managerValue: 8.2, managerPercentile: 58, n: 12,
+          },
+        },
+        "$5B–$25B": {
+          universe: {
+            label: "$5B–$25B · RoundTables Universe",
+            p10: 4.0, q1: 5.6, median: 6.8, q3: 7.9, p90: 8.9,
+            min: 2.4, max: 9.9,
+            managerValue: 8.2, managerPercentile: 71, n: 87,
+          },
+          portfolio: {
+            label: "$5B–$25B · My Portfolio",
+            p10: 4.9, q1: 6.1, median: 7.1, q3: 8.2, p90: 9.0,
+            min: 3.6, max: 9.6,
+            managerValue: 8.2, managerPercentile: 62, n: 18,
+          },
+        },
+        "$1B–$5B": {
+          universe: {
+            label: "$1B–$5B · RoundTables Universe",
+            p10: 3.8, q1: 5.3, median: 6.6, q3: 7.7, p90: 8.8,
+            min: 2.1, max: 10.0,
+            managerValue: 8.2, managerPercentile: 69, n: 124,
+          },
+          portfolio: {
+            label: "$1B–$5B · My Portfolio",
+            p10: 4.7, q1: 5.9, median: 6.9, q3: 8.0, p90: 8.9,
+            min: 3.4, max: 9.8,
+            managerValue: 8.2, managerPercentile: 57, n: 22,
+          },
+        },
+        "<$1B": {
+          universe: {
+            label: "<$1B · RoundTables Universe",
+            p10: 3.2, q1: 4.6, median: 5.9, q3: 7.2, p90: 8.4,
+            min: 1.5, max: 9.7,
+            managerValue: 8.2, managerPercentile: 83, n: 39,
+          },
+          portfolio: {
+            label: "<$1B · My Portfolio",
+            p10: 4.1, q1: 5.4, median: 6.4, q3: 7.6, p90: 8.5,
+            min: 2.8, max: 9.4,
+            managerValue: 8.2, managerPercentile: 71, n: 5,
+          },
+        },
+      },
+    },
+    geography: {
+      city: "Miami",
+      state: "Florida",
+      country: "United States",
+      region: "Southeast",
+      isUSBased: true,
+    },
+    geographyBenchmarks: {
+      regions: {
+        Southeast: {
+          universe: {
+            label: "Southeast Region · RoundTables Universe",
+            p10: 3.9, q1: 5.4, median: 6.6, q3: 7.7, p90: 8.8,
+            min: 2.3, max: 9.7,
+            managerValue: 8.2, managerPercentile: 78, n: 47,
+          },
+          portfolio: {
+            label: "Southeast Region · My Portfolio",
+            p10: 5.0, q1: 6.1, median: 7.0, q3: 8.0, p90: 8.9,
+            min: 3.9, max: 9.5,
+            managerValue: 8.2, managerPercentile: 68, n: 11,
+          },
+        },
+        Northeast: {
+          universe: {
+            label: "Northeast Region · RoundTables Universe",
+            p10: 4.5, q1: 6.1, median: 7.3, q3: 8.4, p90: 9.2,
+            min: 2.8, max: 10.0,
+            managerValue: 8.2, managerPercentile: 65, n: 89,
+          },
+          portfolio: {
+            label: "Northeast Region · My Portfolio",
+            p10: 5.3, q1: 6.5, median: 7.4, q3: 8.5, p90: 9.3,
+            min: 4.0, max: 9.8,
+            managerValue: 8.2, managerPercentile: 55, n: 18,
+          },
+        },
+        South: {
+          universe: {
+            label: "South Region · RoundTables Universe",
+            p10: 3.7, q1: 5.1, median: 6.4, q3: 7.5, p90: 8.6,
+            min: 2.0, max: 9.5,
+            managerValue: 8.2, managerPercentile: 71, n: 38,
+          },
+          portfolio: {
+            label: "South Region · My Portfolio",
+            p10: 4.8, q1: 5.9, median: 6.8, q3: 7.8, p90: 8.7,
+            min: 3.5, max: 9.2,
+            managerValue: 8.2, managerPercentile: 61, n: 9,
+          },
+        },
+        Midwest: {
+          universe: {
+            label: "Midwest Region · RoundTables Universe",
+            p10: 3.5, q1: 4.9, median: 6.2, q3: 7.4, p90: 8.5,
+            min: 1.9, max: 9.6,
+            managerValue: 8.2, managerPercentile: 82, n: 52,
+          },
+          portfolio: {
+            label: "Midwest Region · My Portfolio",
+            p10: 4.6, q1: 5.8, median: 6.7, q3: 7.7, p90: 8.7,
+            min: 3.3, max: 9.4,
+            managerValue: 8.2, managerPercentile: 72, n: 13,
+          },
+        },
+        Northwest: {
+          universe: {
+            label: "Northwest Region · RoundTables Universe",
+            p10: 4.3, q1: 5.8, median: 7.0, q3: 8.1, p90: 9.1,
+            min: 2.6, max: 9.9,
+            managerValue: 8.2, managerPercentile: 58, n: 29,
+          },
+          portfolio: {
+            label: "Northwest Region · My Portfolio",
+            p10: 5.1, q1: 6.3, median: 7.2, q3: 8.3, p90: 9.0,
+            min: 3.7, max: 9.6,
+            managerValue: 8.2, managerPercentile: 48, n: 7,
+          },
+        },
+        Southwest: {
+          universe: {
+            label: "Southwest Region · RoundTables Universe",
+            p10: 3.8, q1: 5.2, median: 6.5, q3: 7.6, p90: 8.8,
+            min: 2.1, max: 9.7,
+            managerValue: 8.2, managerPercentile: 75, n: 35,
+          },
+          portfolio: {
+            label: "Southwest Region · My Portfolio",
+            p10: 4.9, q1: 6.0, median: 6.9, q3: 7.9, p90: 8.8,
+            min: 3.6, max: 9.3,
+            managerValue: 8.2, managerPercentile: 65, n: 8,
+          },
+        },
+      },
+      usBased: {
+        universe: {
+          label: "U.S.-Based · RoundTables Universe",
+          p10: 4.1, q1: 5.7, median: 6.8, q3: 7.9, p90: 9.0,
+          min: 2.1, max: 10.0,
+          managerValue: 8.2, managerPercentile: 71, n: 198,
+        },
+        portfolio: {
+          label: "U.S.-Based · My Portfolio",
+          p10: 5.0, q1: 6.2, median: 7.1, q3: 8.2, p90: 9.2,
+          min: 3.5, max: 9.8,
+          managerValue: 8.2, managerPercentile: 60, n: 39,
+        },
+      },
+      country: {
+        universe: {
+          label: "United States · RoundTables Universe",
+          p10: 4.1, q1: 5.6, median: 6.8, q3: 7.9, p90: 9.0,
+          min: 2.0, max: 10.0,
+          managerValue: 8.2, managerPercentile: 72, n: 201,
+        },
+        portfolio: {
+          label: "United States · My Portfolio",
+          p10: 5.0, q1: 6.2, median: 7.1, q3: 8.2, p90: 9.2,
+          min: 3.5, max: 9.8,
+          managerValue: 8.2, managerPercentile: 61, n: 40,
+        },
+      },
+      city: {
+        universe: {
+          label: "Miami, FL · RoundTables Universe",
+          p10: 0, q1: 0, median: 0, q3: 0, p90: 0,
+          min: 0, max: 0,
+          managerValue: 8.2, managerPercentile: 0, n: 3,
+          insufficientData: true,
+        },
+        portfolio: {
+          label: "Miami, FL · My Portfolio",
+          p10: 0, q1: 0, median: 0, q3: 0, p90: 0,
+          min: 0, max: 0,
+          managerValue: 8.2, managerPercentile: 0, n: 1,
+          insufficientData: true,
+        },
       },
     },
   },
