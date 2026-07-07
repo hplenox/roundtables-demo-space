@@ -416,7 +416,7 @@ export default function HelpCenterPage() {
             <Zap size={13} className="text-[#00b8a9]" strokeWidth={2} />
             <div>
               <h2 className="text-sm font-semibold text-slate-900">Top Lenni Bott Answers</h2>
-              <p className="text-xs text-slate-400 mt-0.5">Most-triggered response flows</p>
+              <p className="text-xs text-slate-400 mt-0.5">Most-triggered response flows · Last 30 days (Jun 7 – Jul 6, 2026)</p>
             </div>
           </div>
           <div className="p-5 space-y-3.5">
@@ -450,7 +450,7 @@ export default function HelpCenterPage() {
             <Layers size={13} className="text-blue-500" strokeWidth={2} />
             <div>
               <h2 className="text-sm font-semibold text-slate-900">Top User Selections</h2>
-              <p className="text-xs text-slate-400 mt-0.5">Options chosen in bot conversations</p>
+              <p className="text-xs text-slate-400 mt-0.5">Options chosen in bot conversations · Last 30 days (Jun 7 – Jul 6, 2026)</p>
             </div>
           </div>
           <div className="divide-y divide-slate-50">
