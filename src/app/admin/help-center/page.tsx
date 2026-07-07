@@ -4,7 +4,6 @@ import { useRef, useEffect, useState } from "react";
 import * as d3 from "d3";
 import {
   Bot,
-  TrendingUp,
   Users,
   MessageSquare,
   AlertTriangle,
@@ -42,22 +41,6 @@ const PERIOD_KPIS: Record<string, { conversations: number; autoRes: number; esca
   "90d": { conversations: 122, autoRes: 36, escalations: 0, dropOffs:  86 },
   "6m":  { conversations: 246, autoRes: 52, escalations: 3, dropOffs: 191 },
 };
-
-const RESOLUTION_GROWTH = [
-  { month: "Sep '25", value:  0, forecast: false },
-  { month: "Oct '25", value:  6, forecast: false },
-  { month: "Nov '25", value: 17, forecast: false },
-  { month: "Dec '25", value: 34, forecast: false },
-  { month: "Jan '26", value: 38, forecast: false },
-  { month: "Feb '26", value: 38, forecast: false },
-  { month: "Mar '26", value: 46, forecast: false },
-  { month: "Apr '26", value: 67, forecast: false },
-  { month: "May '26", value: 80, forecast: false },
-  { month: "Jun '26", value: 89, forecast: false },
-  { month: "Jul '26", value: 90, forecast: true  },
-  { month: "Aug '26", value: 90, forecast: true  },
-  { month: "Sep '26", value: 90, forecast: true  },
-];
 
 const AI_RESPONSES = [
   { label: "Generated a reply", value: 52, color: "#3b82f6" },
@@ -223,89 +206,6 @@ function ConversationsChart({ data }: { data: MonthRow[] }) {
         className="pointer-events-none absolute hidden z-20 p-2.5 rounded-lg bg-white border border-slate-200 shadow-lg text-[11.5px] leading-relaxed"
         style={{ minWidth: 148 }}
       />
-    </div>
-  );
-}
-
-// ── Resolution growth bar chart ───────────────────────────────────────────────
-
-function ResolutionGrowthChart({ data }: { data: typeof RESOLUTION_GROWTH }) {
-  const wrapRef = useRef<HTMLDivElement>(null);
-  const svgRef  = useRef<SVGSVGElement>(null);
-
-  useEffect(() => {
-    if (!svgRef.current || !wrapRef.current) return;
-    const el = svgRef.current;
-    const W  = wrapRef.current.clientWidth || 800;
-    const H  = 200;
-    const mg = { top: 10, right: 12, bottom: 36, left: 38 };
-    const iw = W - mg.left - mg.right;
-    const ih = H - mg.top - mg.bottom;
-
-    d3.select(el).selectAll("*").remove();
-    el.setAttribute("viewBox", `0 0 ${W} ${H}`);
-    el.setAttribute("height", String(H));
-
-    const svg = d3.select(el).append("g").attr("transform", `translate(${mg.left},${mg.top})`);
-
-    const x = d3.scaleBand().domain(data.map(d => d.month)).range([0, iw]).padding(0.22);
-    const y = d3.scaleLinear().domain([0, 100]).range([ih, 0]);
-
-    svg.append("g")
-      .call(d3.axisLeft(y).tickSize(-iw).tickFormat(() => "").ticks(5))
-      .call(g => {
-        g.select(".domain").remove();
-        g.selectAll(".tick line").attr("stroke", "#f1f5f9");
-      });
-
-    svg.selectAll(".bar")
-      .data(data)
-      .join("rect")
-      .attr("x", d => x(d.month) ?? 0)
-      .attr("y", ih).attr("width", x.bandwidth()).attr("height", 0)
-      .attr("fill", d => d.forecast ? "#e2e8f0" : "#3b82f6")
-      .attr("rx", 2)
-      .transition().duration(600).delay((_, i) => i * 35)
-      .attr("y", d => y(d.value))
-      .attr("height", d => ih - y(d.value));
-
-    svg.selectAll(".lbl")
-      .data(data.filter(d => d.value > 0))
-      .join("text")
-      .attr("x", d => (x(d.month) ?? 0) + x.bandwidth() / 2)
-      .attr("y", d => y(d.value) - 4)
-      .attr("text-anchor", "middle").attr("font-size", "9")
-      .attr("fill", d => d.forecast ? "#94a3b8" : "#475569")
-      .text(d => String(d.value));
-
-    svg.append("g").attr("transform", `translate(0,${ih})`)
-      .call(d3.axisBottom(x).tickSize(0))
-      .call(g => {
-        g.select(".domain").attr("stroke", "#e2e8f0");
-        g.selectAll(".tick text").attr("fill", "#94a3b8").attr("font-size", "9.5").attr("dy", "1.2em");
-      });
-
-    svg.append("g").call(d3.axisLeft(y).ticks(5).tickSize(0))
-      .call(g => {
-        g.select(".domain").remove();
-        g.selectAll(".tick text").attr("fill", "#94a3b8").attr("font-size", "9.5");
-      });
-
-    const firstFx = data.find(d => d.forecast);
-    if (firstFx) {
-      const fxX = (x(firstFx.month) ?? 0) - x.step() * 0.06;
-      svg.append("line")
-        .attr("x1", fxX).attr("x2", fxX).attr("y1", 0).attr("y2", ih)
-        .attr("stroke", "#cbd5e1").attr("stroke-dasharray", "3,3");
-      svg.append("text")
-        .attr("x", fxX + 4).attr("y", 12)
-        .attr("fill", "#94a3b8").attr("font-size", "9").text("Forecast →");
-    }
-  }, [data]);
-
-  return (
-    <div ref={wrapRef}>
-      <svg ref={svgRef} className="w-full" />
     </div>
   );
 }
@@ -504,34 +404,6 @@ export default function HelpCenterPage() {
               ))}
             </div>
           </div>
-        </div>
-      </div>
-
-      {/* ── Resolution Growth ── */}
-      <div className="bg-white rounded-xl border border-slate-200">
-        <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100">
-          <div>
-            <div className="flex items-center gap-2">
-              <TrendingUp size={13} className="text-blue-500" strokeWidth={2} />
-              <h2 className="text-sm font-semibold text-slate-900">Automated Resolutions — Cumulative Growth</h2>
-            </div>
-            <p className="text-xs text-slate-400 mt-0.5">Sep 2025 – Sep 2026 · total AI-resolved conversations</p>
-          </div>
-          <div className="flex items-center gap-3 text-[11px]">
-            {[
-              { label: "Actual",   color: "#3b82f6" },
-              { label: "Forecast", color: "#e2e8f0", border: "#cbd5e1" },
-            ].map(l => (
-              <span key={l.label} className="flex items-center gap-1.5">
-                <span className="w-2.5 h-2.5 rounded-sm inline-block flex-shrink-0"
-                  style={{ background: l.color, border: l.border ? `1px solid ${l.border}` : undefined }} />
-                <span className="text-slate-400">{l.label}</span>
-              </span>
-            ))}
-          </div>
-        </div>
-        <div className="px-5 py-4">
-          <ResolutionGrowthChart data={RESOLUTION_GROWTH} />
         </div>
       </div>
 
