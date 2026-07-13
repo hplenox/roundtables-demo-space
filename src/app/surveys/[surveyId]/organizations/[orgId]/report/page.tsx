@@ -13,6 +13,7 @@ import RacialDemographicsSection from "@/components/report/RacialDemographicsSec
 import EvennessSection from "@/components/report/EvennessSection";
 import GeographyBenchmarkWidget from "@/components/report/GeographyBenchmarkWidget";
 import AumBenchmarkWidget from "@/components/report/AumBenchmarkWidget";
+import AssetClassBenchmarkWidget from "@/components/report/AssetClassBenchmarkWidget";
 
 import {
   ChevronRight, ChevronLeft, ChevronDown, Printer, Download,
@@ -783,10 +784,48 @@ export default function ManagerReportPage() {
           </div>
         </ReportSection>
 
-        {/* SECTION 3 — Geography Benchmark */}
+        {/* SECTION 3 — Asset Class Benchmark */}
+        <ReportSection>
+          <SectionLabel>Section 3 · Asset Class Benchmark</SectionLabel>
+          <div className="p-6">
+            <div className="mb-5">
+              <div className="flex items-center gap-2.5 mb-1">
+                <h2 className="text-[15px] font-bold text-slate-800">Asset Class LPI Comparison</h2>
+                <div className="relative group inline-flex items-center">
+                  <Info
+                    size={15}
+                    className="text-slate-400 hover:text-blue-500 cursor-pointer transition-colors"
+                  />
+                  <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 w-72 bg-[#0f1923] rounded-xl p-4 shadow-2xl opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-200 z-50">
+                    <p className="text-[12.5px] text-slate-200 leading-relaxed">
+                      <strong className="text-amber-400">Asset Class Benchmark</strong>
+                      {" "}— filters the benchmark pool by asset class to show how this manager
+                      compares to direct peers. The teal dot marks this manager&apos;s own class.
+                      Toggle other classes to see cross-class comparisons.
+                    </p>
+                    <div className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-3 h-3 bg-[#0f1923] rotate-45 rounded-sm" />
+                  </div>
+                </div>
+              </div>
+              <p className="text-[12.5px] text-slate-500 leading-relaxed max-w-2xl">
+                How <strong>{org.name}</strong>&apos;s LPI score of{" "}
+                <strong>{org.lpiScore.toFixed(1)}</strong> compares to managers within the same
+                asset class — toggle between classes to explore cross-class positioning.
+                The teal dot marks this manager&apos;s own peer group.
+              </p>
+            </div>
+            <AssetClassBenchmarkWidget
+              orgLpiScore={org.lpiScore}
+              orgAssetClass={org.assetClass}
+              orgName={org.name}
+            />
+          </div>
+        </ReportSection>
+
+        {/* SECTION 4 — Geography Benchmark */}
         {org.geography && org.geographyBenchmarks && (
           <ReportSection>
-            <SectionLabel>Section 3 · Geography Benchmark</SectionLabel>
+            <SectionLabel>Section 4 · Geography Benchmark</SectionLabel>
             <div className="p-6">
               <div className="mb-5">
                 <div className="flex items-center gap-2.5 mb-1">
@@ -823,10 +862,10 @@ export default function ManagerReportPage() {
           </ReportSection>
         )}
 
-        {/* SECTION 4 — AUM Benchmark */}
+        {/* SECTION 5 — AUM Benchmark */}
         {org.aumBenchmarks && (
           <ReportSection>
-            <SectionLabel>Section 4 · AUM Benchmark</SectionLabel>
+            <SectionLabel>Section 5 · AUM Benchmark</SectionLabel>
             <div className="p-6">
               <div className="mb-5">
                 <div className="flex items-center gap-2.5 mb-1">
