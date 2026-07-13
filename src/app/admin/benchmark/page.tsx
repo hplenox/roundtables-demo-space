@@ -265,6 +265,18 @@ function ColFilterDropdown({
   );
 }
 
+// ── Focused asset class groups (user-defined) ─────────────────────────────────
+type FocusedGroup = { key: string; label: string; sourceClasses: AssetClass[]; note: string | null };
+
+const FOCUSED_GROUPS: FocusedGroup[] = [
+  { key: "private-equity", label: "Private Equity",  sourceClasses: ["Private Equity", "Venture Capital"], note: "Incl. Venture Capital" },
+  { key: "hedge-funds",    label: "Hedge Funds",      sourceClasses: ["Hedge Fund"],                        note: null },
+  { key: "long-only",      label: "Long-Only",        sourceClasses: ["Long-Only"],                         note: null },
+  { key: "credit",         label: "Credit",           sourceClasses: ["Credit"],                            note: null },
+  { key: "real-estate",    label: "Real Estate",      sourceClasses: ["Real Estate"],                       note: null },
+  { key: "real-assets",    label: "Real Assets",      sourceClasses: ["Real Assets"],                       note: null },
+];
+
 // ── Score range labels for filter ─────────────────────────────────────────────
 const SCORE_RANGES = ["Zero", "Low (<5)", "Mid (5–6.5)", "Good (6.5–8)", "High (≥8)"] as const;
 
@@ -360,6 +372,23 @@ export default function BenchmarkPage() {
   );
 
   const activeFiltersCount = Object.values(colFilters).filter((v) => v.length > 0).length;
+
+  // ── Focused asset class group ────────────────────────────────────────────────
+  const [focusedGroupKey, setFocusedGroupKey] = useState<string>("private-equity");
+
+  const focusedGroupData = useMemo(() => {
+    const group = FOCUSED_GROUPS.find((g) => g.key === focusedGroupKey);
+    if (!group) return null;
+    const entries = orgs.filter(
+      (e) =>
+        !e.excludedFromBenchmark &&
+        e.lpiScore > 0 &&
+        e.assetClass !== null &&
+        (group.sourceClasses as string[]).includes(e.assetClass)
+    );
+    const stats = computeDistStats(entries.map((e) => e.lpiScore));
+    return { group, entries, stats };
+  }, [focusedGroupKey, orgs]);
 
   // ── Actions ────────────────────────────────────────────────────────────────
   function toggleExclude(id: string) {
@@ -823,18 +852,15 @@ export default function BenchmarkPage() {
       {/* ── BY ASSET CLASS TAB ────────────────────────────────────────────── */}
       {subTab === "by-class" && (
         <div className="space-y-5">
-          <div className="flex items-center justify-between gap-4">
-            <div className="flex items-center gap-3 text-[12px] text-slate-500">
-              <span className="flex items-center gap-1.5 bg-white border border-slate-200 px-3 py-1.5 rounded-lg shadow-sm">
-                <TrendingUp size={11} className="text-[#00b8a9]" />
-                {classData.filter((c) => c.entries.length > 0).length} / {ASSET_CLASSES.length} classes with data
-              </span>
-              <span className="flex items-center gap-1.5 bg-white border border-slate-200 px-3 py-1.5 rounded-lg shadow-sm">
-                <Users size={11} className="text-slate-400" />
-                {activeOrgs.length} active organizations
-              </span>
-            </div>
-            <p className="text-[11px] text-slate-400">Cards sorted by number of organizations</p>
+          <div className="flex items-center gap-3 text-[12px] text-slate-500 flex-wrap">
+            <span className="flex items-center gap-1.5 bg-white border border-slate-200 px-3 py-1.5 rounded-lg shadow-sm">
+              <TrendingUp size={11} className="text-[#00b8a9]" />
+              {FOCUSED_GROUPS.length} asset class groups
+            </span>
+            <span className="flex items-center gap-1.5 bg-white border border-slate-200 px-3 py-1.5 rounded-lg shadow-sm">
+              <Users size={11} className="text-slate-400" />
+              {activeOrgs.length} active organizations
+            </span>
           </div>
 
           {overallStats && (
@@ -866,10 +892,132 @@ export default function BenchmarkPage() {
             </div>
           )}
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {classData.map(({ cls, entries: clsEntries }) => (
-              <AssetClassCard key={cls} cls={cls} entries={clsEntries} />
-            ))}
+          {/* ── Focused Asset Class Benchmarks ────────────────────────────── */}
+          <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+            <div className="px-5 py-4 border-b border-slate-100">
+              <p className="text-[13px] font-bold text-slate-800">Asset Class Benchmarks</p>
+              <p className="text-[11.5px] text-slate-400 mt-0.5">Select an asset class to view its LPI distribution</p>
+            </div>
+
+            <div className="px-5 py-3.5 flex items-center gap-2 flex-wrap border-b border-slate-100">
+              {FOCUSED_GROUPS.map((g) => {
+                const n = orgs.filter(
+                  (e) =>
+                    !e.excludedFromBenchmark &&
+                    e.lpiScore > 0 &&
+                    e.assetClass !== null &&
+                    (g.sourceClasses as string[]).includes(e.assetClass)
+                ).length;
+                return (
+                  <button
+                    key={g.key}
+                    onClick={() => setFocusedGroupKey(g.key)}
+                    className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-[12px] font-semibold border transition-all duration-150 ${
+                      focusedGroupKey === g.key
+                        ? "bg-[#00b8a9] border-[#00b8a9] text-white shadow-sm"
+                        : "bg-white border-slate-200 text-slate-600 hover:border-[#00b8a9]/40 hover:text-[#00897b]"
+                    }`}
+                  >
+                    {g.label}
+                    <span
+                      className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${
+                        focusedGroupKey === g.key ? "bg-white/25 text-white" : "bg-slate-100 text-slate-400"
+                      }`}
+                    >
+                      {n}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+
+            {focusedGroupData && (
+              <div className="p-5">
+                {/* Title */}
+                <div className="flex items-center gap-2 mb-0.5">
+                  <p className="text-[13px] font-bold text-slate-800">{focusedGroupData.group.label}</p>
+                  {focusedGroupData.group.note && (
+                    <span className="text-[10.5px] text-slate-400 bg-slate-100 px-2 py-0.5 rounded-full border border-slate-200">
+                      {focusedGroupData.group.note}
+                    </span>
+                  )}
+                </div>
+                <p className="text-[11.5px] text-slate-400 mb-4">
+                  {focusedGroupData.entries.length} organizations · LPI score 0–10
+                </p>
+
+                {/* Stat tiles — own row */}
+                {focusedGroupData.stats && focusedGroupData.entries.length >= 3 && (
+                  <div className="flex items-center gap-2 mb-4 flex-wrap">
+                    {(["P10", "Q1", "Median", "Q3", "P90"] as const).map((l) => {
+                      const s = focusedGroupData.stats!;
+                      const v =
+                        l === "P10" ? s.p10 : l === "Q1" ? s.q1 : l === "Median" ? s.median : l === "Q3" ? s.q3 : s.p90;
+                      return (
+                        <div key={l} className="text-center px-3 py-1.5 bg-slate-50 rounded-lg border border-slate-200 min-w-[52px]">
+                          <p className="text-[9.5px] text-slate-400">{l}</p>
+                          <p className="text-[12px] font-bold text-slate-700 font-mono">{v.toFixed(2)}</p>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+
+                {focusedGroupData.stats && focusedGroupData.entries.length >= 3 ? (
+                  <>
+                    <DistBar stats={focusedGroupData.stats} size="md" />
+                    <div className="mt-4 pt-3 border-t border-slate-100">
+                      <ChartLegend />
+                    </div>
+                  </>
+                ) : focusedGroupData.entries.length > 0 ? (
+                  <p className="text-[11px] text-slate-400 py-2">Min. 3 organizations needed for distribution chart.</p>
+                ) : (
+                  <p className="text-[11px] text-slate-400 py-2">No active organizations in this class.</p>
+                )}
+
+                {focusedGroupData.entries.length > 0 && (
+                  <div className="mt-4 pt-3 border-t border-slate-100">
+                    <p className="text-[11px] font-semibold text-slate-500 mb-2.5 uppercase tracking-wide">
+                      Organizations · sorted by score
+                    </p>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                      {[...focusedGroupData.entries]
+                        .sort((a, b) => b.lpiScore - a.lpiScore)
+                        .map((e) => (
+                          <div
+                            key={e.id}
+                            className="flex items-center justify-between gap-2 bg-slate-50 rounded-lg px-3 py-2 border border-slate-100"
+                          >
+                            <div className="min-w-0 flex-1">
+                              <p className="text-[11.5px] font-medium text-slate-700 truncate">{e.orgName}</p>
+                              {e.assetClass === "Venture Capital" && (
+                                <p className="text-[9.5px] text-slate-400">VC</p>
+                              )}
+                            </div>
+                            <ScoreBadge score={e.lpiScore} />
+                          </div>
+                        ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+
+          {/* All classes breakdown */}
+          <div>
+            <div className="flex items-center gap-3 mb-3">
+              <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">All Asset Classes</p>
+              <div className="flex-1 h-px bg-slate-200" />
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {classData
+                .filter(({ cls }) => FOCUSED_GROUPS.some((g) => (g.sourceClasses as string[]).includes(cls)))
+                .map(({ cls, entries: clsEntries }) => (
+                  <AssetClassCard key={cls} cls={cls} entries={clsEntries} />
+                ))}
+            </div>
           </div>
         </div>
       )}
