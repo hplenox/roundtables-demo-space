@@ -551,7 +551,7 @@ export default function BenchmarkPage() {
       </div>
 
       {/* Sub-tabs */}
-      <div className="flex items-end gap-0 border-b border-slate-200 -mb-1">
+      <div className="flex items-end gap-0 border-b border-slate-200 -mb-px">
         {([
           { key: "overview",  label: "All Organizations", Icon: Users  },
           { key: "by-class",  label: "By Asset Class",    Icon: Layers },
