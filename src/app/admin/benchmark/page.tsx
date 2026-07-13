@@ -851,7 +851,7 @@ export default function BenchmarkPage() {
 
       {/* ── BY ASSET CLASS TAB ────────────────────────────────────────────── */}
       {subTab === "by-class" && (
-        <div className="space-y-5">
+        <div className="space-y-8 pt-3">
           <div className="flex items-center gap-3 text-[12px] text-slate-500 flex-wrap">
             <span className="flex items-center gap-1.5 bg-white border border-slate-200 px-3 py-1.5 rounded-lg shadow-sm">
               <TrendingUp size={11} className="text-[#00b8a9]" />
