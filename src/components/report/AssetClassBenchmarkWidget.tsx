@@ -21,13 +21,13 @@ interface Props {
   orgLpiScore: number;
   orgAssetClass: string;
   orgName: string;
-  /** Authoritative benchmark group from the org's custom asset class mapping, if set. */
-  mappedGroup?: BenchmarkGroupKey;
+  /** Authoritative benchmark group(s) from the org's custom asset class mapping, if set. Can be more than one. */
+  mappedGroups?: BenchmarkGroupKey[];
 }
 
-export default function AssetClassBenchmarkWidget({ orgLpiScore, orgAssetClass, orgName, mappedGroup }: Props) {
-  const homeGroup = mappedGroup ?? resolveGroup(orgAssetClass);
-  const [activeGroup, setActiveGroup] = useState<BenchmarkGroupKey>(homeGroup);
+export default function AssetClassBenchmarkWidget({ orgLpiScore, orgAssetClass, orgName, mappedGroups }: Props) {
+  const homeGroups = mappedGroups && mappedGroups.length > 0 ? mappedGroups : [resolveGroup(orgAssetClass)];
+  const [activeGroup, setActiveGroup] = useState<BenchmarkGroupKey>(homeGroups[0]);
 
   const pool = useMemo(
     () => buildBenchmarkPool(activeGroup, orgLpiScore),
@@ -39,7 +39,7 @@ export default function AssetClassBenchmarkWidget({ orgLpiScore, orgAssetClass, 
     pool.managerPercentile >= 40 ? "#b45309" :
     "#dc2626";
 
-  const isOwnClass = homeGroup === activeGroup;
+  const isOwnClass = homeGroups.includes(activeGroup);
   const activeLabel = GROUPS.find((g) => g.key === activeGroup)?.label ?? activeGroup;
 
   return (
@@ -48,7 +48,7 @@ export default function AssetClassBenchmarkWidget({ orgLpiScore, orgAssetClass, 
       <div className="flex items-center gap-1.5 flex-wrap mb-5">
         {GROUPS.map((g) => {
           const isActive = activeGroup === g.key;
-          const isHome   = homeGroup === g.key;
+          const isHome   = homeGroups.includes(g.key);
           return (
             <button
               key={g.key}
@@ -70,6 +70,11 @@ export default function AssetClassBenchmarkWidget({ orgLpiScore, orgAssetClass, 
           );
         })}
       </div>
+      {homeGroups.length > 1 && (
+        <p className="text-[10.5px] text-slate-400 -mt-3.5 mb-4">
+          This asset class is mapped to {homeGroups.length} categories &mdash; the teal dot marks each one.
+        </p>
+      )}
 
       {/* Context line */}
       <div className="flex items-center justify-between mb-3">

@@ -19,7 +19,7 @@ import AssetClassBenchmarkWidget from "@/components/report/AssetClassBenchmarkWi
 import {
   ChevronRight, ChevronLeft, ChevronDown, Printer, Download,
   User, Mail, Calendar, Clock, MapPin, TrendingUp, BadgeCheck,
-  Lock, LayoutDashboard, Search, Lightbulb, Building2, Sparkles, Info,
+  LayoutDashboard, Search, Lightbulb, Building2, Sparkles, Info, Layers,
 } from "lucide-react";
 import type { InvitedOrg } from "@/types/survey";
 
@@ -509,18 +509,21 @@ export default function ManagerReportPage() {
   }) + " at " + now.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" });
 
   // Orgs classified via the survey's Asset Classes tab get a live, computed
-  // asset-class benchmark; unclassified orgs keep the "Coming Soon" pool.
-  const mappedGroup = org.customAssetClass
-    ? (getCustomAssetClassesBySurveyId(surveyId).find((c) => c.name === org.customAssetClass)
-        ?.benchmarkGroup as BenchmarkGroupKey | undefined)
-    : undefined;
+  // asset-class benchmark; unclassified (or not-yet-mapped) orgs fall back to
+  // a "not mapped" pool. A class can map to multiple categories — the first
+  // is used as the primary benchmark for this compact card; the full set is
+  // explorable in the interactive widget below (Section 3).
+  const mappedGroups = (org.customAssetClass
+    ? getCustomAssetClassesBySurveyId(surveyId).find((c) => c.name === org.customAssetClass)?.benchmarkGroups
+    : undefined) as BenchmarkGroupKey[] | undefined;
+  const primaryGroup = mappedGroups?.[0];
 
   const benchmarkPools = [
     { key: "universe",   data: org.benchmarks.universe },
     { key: "portfolio",  data: org.benchmarks.portfolio },
     {
       key: "assetClass",
-      data: mappedGroup ? buildBenchmarkPool(mappedGroup, org.lpiScore) : org.benchmarks.assetClass,
+      data: primaryGroup ? buildBenchmarkPool(primaryGroup, org.lpiScore) : org.benchmarks.assetClass,
     },
   ];
 
@@ -695,12 +698,14 @@ export default function ManagerReportPage() {
                   data.managerPercentile >= 40 ? "#b45309" : "#dc2626";
 
                 return (
-                  <div key={key} className={`relative rounded-xl border overflow-hidden ${data.comingSoon ? "border-slate-200" : "border-slate-200"}`}>
+                  <div key={key} className={`relative rounded-xl border overflow-hidden ${data.comingSoon ? "border-amber-200" : "border-slate-200"}`}>
                     <div className="flex items-start justify-between px-4 pt-4 pb-3 border-b border-slate-100">
                       <div>
                         <p className="text-[9.5px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">Relative to</p>
 
-                        {key === "universe" ? (
+                        {data.comingSoon ? (
+                          <p className="text-[13px] font-bold text-slate-800 leading-tight">Asset Class</p>
+                        ) : key === "universe" ? (
                           <>
                             <div className="flex items-center gap-1.5">
                               <p className="text-[13px] font-bold text-slate-800 leading-tight">
@@ -746,15 +751,15 @@ export default function ManagerReportPage() {
                       )}
                     </div>
 
-                    <div className={`px-3 pt-5 pb-3 ${data.comingSoon ? "opacity-50" : ""}`}>
+                    <div className={`px-3 pt-5 pb-3 ${data.comingSoon ? "bg-amber-50/40" : ""}`}>
                       {data.comingSoon ? (
                         <div className="flex flex-col items-center justify-center py-8 gap-2">
-                          <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center">
-                            <Lock size={14} className="text-slate-400" />
+                          <div className="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center">
+                            <Layers size={14} className="text-amber-600" />
                           </div>
-                          <p className="text-[12px] font-semibold text-slate-500">Coming Soon</p>
-                          <p className="text-[11px] text-slate-400 text-center leading-snug max-w-[140px]">
-                            Asset class benchmarks available Q3 2026
+                          <p className="text-[12px] font-semibold text-amber-700">Asset Class Not Mapped</p>
+                          <p className="text-[11px] text-slate-500 text-center leading-snug max-w-[160px]">
+                            This organization hasn&apos;t been mapped to a benchmark category yet.
                           </p>
                         </div>
                       ) : (
@@ -829,7 +834,7 @@ export default function ManagerReportPage() {
               orgLpiScore={org.lpiScore}
               orgAssetClass={org.assetClass}
               orgName={org.name}
-              mappedGroup={mappedGroup}
+              mappedGroups={mappedGroups}
             />
           </div>
         </ReportSection>

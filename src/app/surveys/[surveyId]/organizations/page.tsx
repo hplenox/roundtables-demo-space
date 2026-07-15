@@ -3,6 +3,7 @@
 import { useParams, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useState, useEffect, useRef } from "react";
+import { createPortal } from "react-dom";
 import { getOrgsBySurveyId } from "@/lib/mock-data";
 import { InvitedOrg } from "@/types/survey";
 import {
@@ -1012,6 +1013,39 @@ Survey Administration Team`;
   );
 }
 
+// Renders its tooltip into document.body via a portal, positioned with
+// `fixed` coordinates from the anchor's own bounding box — so it always
+// floats on top of the page instead of being clipped by an ancestor's
+// `overflow-hidden` (e.g. the rounded table container).
+function HoverTooltip({ children, content }: { children: React.ReactNode; content: React.ReactNode }) {
+  const [show, setShow] = useState(false);
+  const [coords, setCoords] = useState({ top: 0, left: 0 });
+  const anchorRef = useRef<HTMLSpanElement>(null);
+
+  function handleEnter() {
+    const rect = anchorRef.current?.getBoundingClientRect();
+    if (rect) setCoords({ top: rect.top, left: rect.left + rect.width / 2 });
+    setShow(true);
+  }
+
+  return (
+    <span ref={anchorRef} onMouseEnter={handleEnter} onMouseLeave={() => setShow(false)} className="inline-flex">
+      {children}
+      {show &&
+        createPortal(
+          <div
+            style={{ position: "fixed", top: coords.top, left: coords.left, transform: "translate(-50%, calc(-100% - 8px))" }}
+            className="z-[9999] w-52 px-2.5 py-1.5 rounded-lg bg-[#0f1923] text-white text-[10.5px] leading-snug text-center pointer-events-none shadow-2xl"
+          >
+            {content}
+            <span className="absolute left-1/2 -translate-x-1/2 top-full w-2 h-2 bg-[#0f1923] rotate-45 -mt-1" />
+          </div>,
+          document.body
+        )}
+    </span>
+  );
+}
+
 function OrgRow({ org, surveyId, onNudge }: { org: InvitedOrg; surveyId: string; onNudge: (org: InvitedOrg) => void }) {
   const st = STATUS_CONFIG[org.status];
   const canNudge = org.progress < 80;
@@ -1029,10 +1063,16 @@ function OrgRow({ org, surveyId, onNudge }: { org: InvitedOrg; surveyId: string;
             </div>
             <p className="text-[13px] font-semibold text-slate-800 group-hover:text-[#00897b] transition-colors truncate">{org.name}</p>
             <span className="shrink-0 text-[10px] font-medium px-1.5 py-0.5 rounded bg-slate-100 text-slate-500">{org.type}</span>
-            {org.customAssetClass && (
+            {org.customAssetClass ? (
               <span className="shrink-0 text-[10px] font-medium px-1.5 py-0.5 rounded bg-[#e8f5f3] text-[#00897b]">
                 {org.customAssetClass}
               </span>
+            ) : (
+              <HoverTooltip content="No custom asset class mapped yet — assign one from this organization's detail page to include it in asset class benchmarking.">
+                <span className="shrink-0 inline-flex items-center text-[10px] font-medium px-1.5 py-0.5 rounded border border-dashed border-amber-300 bg-amber-50 text-amber-700 cursor-help">
+                  Unmapped
+                </span>
+              </HoverTooltip>
             )}
           </div>
           <p className="text-[11.5px] text-slate-400 ml-8 truncate">

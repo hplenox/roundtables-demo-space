@@ -131,8 +131,8 @@ export interface CustomAssetClass {
   surveyId: string;
   /** Host-defined label, e.g. "Growth Buyout" */
   name: string;
-  /** Key into BENCHMARK_GROUPS (src/lib/asset-class-groups.ts) */
-  benchmarkGroup: string;
+  /** Keys into BENCHMARK_GROUPS (src/lib/asset-class-groups.ts). May be empty if not yet mapped. */
+  benchmarkGroups: string[];
   createdAt: string;
 }
 

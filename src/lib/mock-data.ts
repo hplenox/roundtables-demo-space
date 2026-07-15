@@ -113,7 +113,7 @@ export const MOCK_ORGS: InvitedOrg[] = [
     status: "submitted",
     progress: 100,
     assetClass: "Private Equity",
-    customAssetClass: "Large-Cap Buyout",
+    customAssetClass: null, // example: not yet classified with a custom asset class
     strategyFocus: ["Buyout", "Real Estate", "Credit", "Infrastructure"],
     aum: "$1.0T",
     aumRaw: 1000,
@@ -778,17 +778,19 @@ export function getOrgById(id: string): InvitedOrg | undefined {
 }
 
 // ── Custom asset classes (per-survey, host-defined) ─────────────────────────
-// Each maps a free-text label the host uses internally to one of the fixed
-// Roundtables benchmark categories (see src/lib/asset-class-groups.ts).
+// Each maps a free-text label the host uses internally to zero or more of the
+// fixed Roundtables benchmark categories (see src/lib/asset-class-groups.ts).
+// Mapping is optional at creation time and can span multiple categories.
 export const MOCK_CUSTOM_ASSET_CLASSES: CustomAssetClass[] = [
-  { id: "cac-large-cap-buyout",    surveyId: "survey-2026-dei-lenox", name: "Large-Cap Buyout",        benchmarkGroup: "private-equity", createdAt: "Feb 9, 2026" },
-  { id: "cac-mid-market-buyout",   surveyId: "survey-2026-dei-lenox", name: "Middle-Market Buyout",     benchmarkGroup: "private-equity", createdAt: "Feb 9, 2026" },
-  { id: "cac-growth-equity",       surveyId: "survey-2026-dei-lenox", name: "Growth Equity",            benchmarkGroup: "private-equity", createdAt: "Feb 10, 2026" },
-  { id: "cac-direct-lending",      surveyId: "survey-2026-dei-lenox", name: "Direct Lending",           benchmarkGroup: "credit",         createdAt: "Feb 11, 2026" },
-  { id: "cac-core-plus-re",        surveyId: "survey-2026-dei-lenox", name: "Core-Plus Real Estate",    benchmarkGroup: "real-estate",    createdAt: "Feb 12, 2026" },
-  { id: "cac-diversified-macro",   surveyId: "survey-2026-dei-lenox", name: "Diversified Macro",        benchmarkGroup: "hedge-funds",    createdAt: "Feb 12, 2026" },
-  { id: "cac-infra-debt",          surveyId: "survey-2026-dei-lenox", name: "Infrastructure Debt",      benchmarkGroup: "real-assets",    createdAt: "Feb 13, 2026" },
-  { id: "cac-long-only-equities",  surveyId: "survey-2026-dei-lenox", name: "Public Equities Long-Only", benchmarkGroup: "long-only",     createdAt: "Feb 13, 2026" },
+  { id: "cac-large-cap-buyout",    surveyId: "survey-2026-dei-lenox", name: "Large-Cap Buyout",         benchmarkGroups: ["private-equity"],          createdAt: "Feb 9, 2026" },
+  { id: "cac-mid-market-buyout",   surveyId: "survey-2026-dei-lenox", name: "Middle-Market Buyout",      benchmarkGroups: ["private-equity"],          createdAt: "Feb 9, 2026" },
+  { id: "cac-growth-equity",       surveyId: "survey-2026-dei-lenox", name: "Growth Equity",             benchmarkGroups: ["private-equity"],          createdAt: "Feb 10, 2026" },
+  { id: "cac-direct-lending",      surveyId: "survey-2026-dei-lenox", name: "Direct Lending",            benchmarkGroups: ["credit"],                  createdAt: "Feb 11, 2026" },
+  { id: "cac-core-plus-re",        surveyId: "survey-2026-dei-lenox", name: "Core-Plus Real Estate",     benchmarkGroups: ["real-estate"],             createdAt: "Feb 12, 2026" },
+  { id: "cac-diversified-macro",   surveyId: "survey-2026-dei-lenox", name: "Diversified Macro",         benchmarkGroups: ["hedge-funds"],             createdAt: "Feb 12, 2026" },
+  { id: "cac-infra-debt",          surveyId: "survey-2026-dei-lenox", name: "Infrastructure Debt",       benchmarkGroups: ["real-assets", "credit"],   createdAt: "Feb 13, 2026" },
+  { id: "cac-long-only-equities",  surveyId: "survey-2026-dei-lenox", name: "Public Equities Long-Only", benchmarkGroups: ["long-only"],               createdAt: "Feb 13, 2026" },
+  { id: "cac-emerging-markets",    surveyId: "survey-2026-dei-lenox", name: "Emerging Markets",          benchmarkGroups: [],                          createdAt: "Feb 14, 2026" },
 ];
 
 export function getCustomAssetClassesBySurveyId(surveyId: string): CustomAssetClass[] {

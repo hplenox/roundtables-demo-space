@@ -1,11 +1,135 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { useParams } from "next/navigation";
 import { getSurveyById, getOrgsBySurveyId, getCustomAssetClassesBySurveyId } from "@/lib/mock-data";
-import { BENCHMARK_GROUPS, type BenchmarkGroupKey } from "@/lib/asset-class-groups";
+import { BENCHMARK_GROUPS, benchmarkGroupLabel, type BenchmarkGroupKey } from "@/lib/asset-class-groups";
 import type { CustomAssetClass } from "@/types/survey";
-import { Plus, ArrowRight, X, Layers, Trash2, Search, Info } from "lucide-react";
+import { Plus, ArrowRight, X, Layers, Trash2, Search, Info, ChevronDown, Check } from "lucide-react";
+
+// ─── Benchmark category multi-select ───────────────────────────────────────
+// Reused in both the Add Asset Class modal and each list row's inline
+// remapping control, since a custom asset class can map to more than one
+// benchmark category (or none yet).
+
+function BenchmarkGroupMultiSelect({
+  selected,
+  onChange,
+  placeholder = "Not mapped",
+  size = "md",
+}: {
+  selected: BenchmarkGroupKey[];
+  onChange: (next: BenchmarkGroupKey[]) => void;
+  placeholder?: string;
+  size?: "sm" | "md";
+}) {
+  const [open, setOpen] = useState(false);
+  const [coords, setCoords] = useState({ top: 0, left: 0, width: 0 });
+  const anchorRef = useRef<HTMLDivElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
+
+  // The panel is portaled to document.body and positioned `fixed` from the
+  // anchor's live bounding box, so it isn't clipped by an ancestor's
+  // `overflow-hidden` (e.g. the rounded list container) — same fix pattern
+  // as the org list's HoverTooltip.
+  useEffect(() => {
+    function handler(e: MouseEvent) {
+      const target = e.target as Node;
+      if (anchorRef.current?.contains(target)) return;
+      if (panelRef.current?.contains(target)) return;
+      setOpen(false);
+    }
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
+
+  function toggleOpen() {
+    if (!open) {
+      const rect = anchorRef.current?.getBoundingClientRect();
+      if (rect) setCoords({ top: rect.bottom + 6, left: rect.left, width: rect.width });
+    }
+    setOpen((o) => !o);
+  }
+
+  function toggle(key: BenchmarkGroupKey) {
+    onChange(selected.includes(key) ? selected.filter((k) => k !== key) : [...selected, key]);
+  }
+
+  const isSm = size === "sm";
+
+  return (
+    <div ref={anchorRef} className="relative">
+      <button
+        type="button"
+        onClick={toggleOpen}
+        className={`w-full flex items-center gap-1.5 rounded-lg border bg-white transition-colors ${
+          isSm ? "min-h-8 px-2.5 py-1" : "min-h-9 px-3 py-1.5"
+        } ${open ? "border-[#00b8a9] ring-1 ring-[#00b8a9]/20" : selected.length === 0 ? "border-amber-200 bg-amber-50/40" : "border-slate-200 hover:border-slate-300"}`}
+      >
+        <div className="flex-1 flex items-center gap-1 flex-wrap min-w-0">
+          {selected.length === 0 ? (
+            <span className={`text-slate-400 ${isSm ? "text-[11.5px]" : "text-[13px]"}`}>{placeholder}</span>
+          ) : (
+            selected.map((key) => (
+              <span
+                key={key}
+                className={`inline-flex items-center gap-1 rounded font-medium bg-[#e8f5f3] text-[#00897b] ${
+                  isSm ? "px-1.5 py-0.5 text-[10.5px]" : "px-1.5 py-0.5 text-[11.5px]"
+                }`}
+              >
+                {benchmarkGroupLabel(key)}
+                <span
+                  role="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    toggle(key);
+                  }}
+                  className="hover:text-[#00695c]"
+                >
+                  <X size={10} />
+                </span>
+              </span>
+            ))
+          )}
+        </div>
+        <ChevronDown size={13} className={`text-slate-400 shrink-0 transition-transform ${open ? "rotate-180" : ""}`} />
+      </button>
+
+      {open &&
+        createPortal(
+          <div
+            ref={panelRef}
+            style={{ position: "fixed", top: coords.top, left: coords.left, minWidth: Math.max(coords.width, 224) }}
+            className="z-[9999] bg-white rounded-lg border border-slate-200 shadow-lg py-1.5"
+          >
+            {BENCHMARK_GROUPS.map((g) => {
+              const checked = selected.includes(g.key);
+              return (
+                <button
+                  key={g.key}
+                  type="button"
+                  onClick={() => toggle(g.key)}
+                  className="w-full flex items-center gap-2.5 px-3 py-1.5 text-left hover:bg-slate-50 transition-colors"
+                >
+                  <span
+                    className={`w-4 h-4 rounded border flex items-center justify-center shrink-0 transition-colors ${
+                      checked ? "bg-[#00b8a9] border-[#00b8a9]" : "border-slate-300"
+                    }`}
+                  >
+                    {checked && <Check size={11} className="text-white" strokeWidth={2.5} />}
+                  </span>
+                  <span className="text-[12.5px] text-slate-700">{g.label}</span>
+                  {g.note && <span className="text-[10px] text-slate-400 ml-auto shrink-0">{g.note}</span>}
+                </button>
+              );
+            })}
+          </div>,
+          document.body
+        )}
+    </div>
+  );
+}
 
 // ─── Add Asset Class modal ─────────────────────────────────────────────────
 
@@ -16,14 +140,14 @@ function AddAssetClassModal({
 }: {
   existingNames: string[];
   onClose: () => void;
-  onAdd: (name: string, group: BenchmarkGroupKey) => void;
+  onAdd: (name: string, groups: BenchmarkGroupKey[]) => void;
 }) {
   const [name, setName] = useState("");
-  const [group, setGroup] = useState<BenchmarkGroupKey | "">("");
+  const [groups, setGroups] = useState<BenchmarkGroupKey[]>([]);
 
   const trimmed = name.trim();
   const isDuplicate = trimmed !== "" && existingNames.some((n) => n.toLowerCase() === trimmed.toLowerCase());
-  const canSubmit = trimmed !== "" && group !== "" && !isDuplicate;
+  const canSubmit = trimmed !== "" && !isDuplicate;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
@@ -35,7 +159,7 @@ function AddAssetClassModal({
             </div>
             <div>
               <p className="text-[13.5px] font-semibold text-slate-800">Add Asset Class</p>
-              <p className="text-[11px] text-slate-400 mt-0.5">Define a label and map it to a benchmark category</p>
+              <p className="text-[11px] text-slate-400 mt-0.5">Define a label, and optionally map it to benchmark categories</p>
             </div>
           </div>
           <button onClick={onClose} className="w-7 h-7 rounded-lg hover:bg-slate-100 flex items-center justify-center">
@@ -63,28 +187,19 @@ function AddAssetClassModal({
 
           <div>
             <label className="text-[11px] font-semibold text-slate-500 uppercase tracking-wide mb-1.5 block">
-              Maps To
+              Maps To <span className="text-slate-400 font-normal normal-case">(optional — can pick more than one, or set this later)</span>
             </label>
             <div className="flex items-center gap-2">
               <div className="w-5 flex items-center justify-center shrink-0">
                 <ArrowRight size={15} className="text-slate-300" />
               </div>
-              <select
-                value={group}
-                onChange={(e) => setGroup(e.target.value as BenchmarkGroupKey)}
-                className="flex-1 h-9 px-3 rounded-lg border border-slate-200 bg-white text-[13px] text-slate-700 focus:outline-none focus:border-[#00b8a9] transition-colors"
-              >
-                <option value="" disabled>Select benchmark category…</option>
-                {BENCHMARK_GROUPS.map((g) => (
-                  <option key={g.key} value={g.key}>
-                    {g.label}{g.note ? ` — ${g.note}` : ""}
-                  </option>
-                ))}
-              </select>
+              <div className="flex-1">
+                <BenchmarkGroupMultiSelect selected={groups} onChange={setGroups} placeholder="Select benchmark categories…" />
+              </div>
             </div>
             <p className="text-[11px] text-slate-400 mt-1.5 flex items-start gap-1">
               <Info size={11} className="mt-[1.5px] shrink-0" />
-              Organizations tagged with this asset class will be benchmarked against the mapped category&apos;s peer group.
+              Organizations tagged with this asset class will be benchmarked against every mapped category&apos;s peer group.
             </p>
           </div>
         </div>
@@ -95,7 +210,7 @@ function AddAssetClassModal({
           </button>
           <button
             disabled={!canSubmit}
-            onClick={() => canSubmit && onAdd(trimmed, group as BenchmarkGroupKey)}
+            onClick={() => canSubmit && onAdd(trimmed, groups)}
             className="flex items-center gap-1.5 px-4 py-1.5 rounded-lg bg-[#0f1923] text-white text-[12px] font-medium hover:bg-[#1a2733] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
           >
             <Plus size={12} /> Add Asset Class
@@ -125,16 +240,16 @@ export default function AssetClassesPage() {
     return orgs.filter((o) => o.customAssetClass === className).length;
   }
 
-  function handleAdd(name: string, group: BenchmarkGroupKey) {
+  function handleAdd(name: string, groups: BenchmarkGroupKey[]) {
     setClasses((prev) => [
       ...prev,
-      { id: `cac-custom-${prev.length}-${name.toLowerCase().replace(/\s+/g, "-")}`, surveyId, name, benchmarkGroup: group, createdAt: "Just now" },
+      { id: `cac-custom-${prev.length}-${name.toLowerCase().replace(/\s+/g, "-")}`, surveyId, name, benchmarkGroups: groups, createdAt: "Just now" },
     ]);
     setShowAdd(false);
   }
 
-  function handleRemap(id: string, group: BenchmarkGroupKey) {
-    setClasses((prev) => prev.map((c) => (c.id === id ? { ...c, benchmarkGroup: group } : c)));
+  function handleRemap(id: string, groups: BenchmarkGroupKey[]) {
+    setClasses((prev) => prev.map((c) => (c.id === id ? { ...c, benchmarkGroups: groups } : c)));
   }
 
   function handleRemove(id: string) {
@@ -142,9 +257,10 @@ export default function AssetClassesPage() {
   }
 
   const filtered = classes.filter((c) => !search || c.name.toLowerCase().includes(search.toLowerCase()));
+  const unmappedCount = classes.filter((c) => c.benchmarkGroups.length === 0).length;
 
   const groupSummary = BENCHMARK_GROUPS.map((g) => {
-    const classesInGroup = classes.filter((c) => c.benchmarkGroup === g.key);
+    const classesInGroup = classes.filter((c) => c.benchmarkGroups.includes(g.key));
     return {
       ...g,
       classCount: classesInGroup.length,
@@ -167,8 +283,8 @@ export default function AssetClassesPage() {
         <div className="min-w-0">
           <h2 className="text-[15px] font-bold text-slate-800">Asset Classes</h2>
           <p className="text-[12px] text-slate-400 mt-0.5 max-w-xl">
-            Define the asset class labels used across this survey, then map each one to a Roundtables benchmark
-            category so peer comparisons stay accurate.
+            Define the asset class labels used across this survey, then map each one to one or more Roundtables
+            benchmark categories so peer comparisons stay accurate.
           </p>
         </div>
         <button
@@ -208,6 +324,9 @@ export default function AssetClassesPage() {
         </div>
         <p className="text-[11.5px] text-slate-400 ml-auto">
           {classes.length} asset class{classes.length === 1 ? "" : "es"} defined
+          {unmappedCount > 0 && (
+            <span className="text-amber-600 font-medium"> · {unmappedCount} not yet mapped</span>
+          )}
         </p>
       </div>
 
@@ -216,7 +335,7 @@ export default function AssetClassesPage() {
         <div className="flex items-center gap-4 px-5 py-2.5 border-b border-slate-100 bg-slate-50/60">
           <div className="flex-1 text-[10.5px] font-semibold text-slate-400 uppercase tracking-wider">Custom Asset Class</div>
           <div className="w-5" />
-          <div className="w-48 text-[10.5px] font-semibold text-slate-400 uppercase tracking-wider">Benchmark Category</div>
+          <div className="w-60 text-[10.5px] font-semibold text-slate-400 uppercase tracking-wider">Benchmark Categories</div>
           <div className="w-28 text-right text-[10.5px] font-semibold text-slate-400 uppercase tracking-wider">Organizations</div>
           <div className="w-7" />
         </div>
@@ -231,7 +350,7 @@ export default function AssetClassesPage() {
             </p>
             <p className="text-[11.5px] text-slate-400 mt-1 max-w-xs">
               {classes.length === 0
-                ? "Add your first custom asset class and map it to a benchmark category to start organizing invited organizations."
+                ? "Add your first custom asset class. You can map it to one or more benchmark categories now or later."
                 : "Try a different search term."}
             </p>
             {classes.length === 0 && (
@@ -249,38 +368,34 @@ export default function AssetClassesPage() {
             return (
               <div
                 key={c.id}
-                className="flex items-center gap-4 px-5 py-3 border-b border-slate-50 last:border-0 hover:bg-slate-50/60 transition-colors"
+                className="flex items-start gap-4 px-5 py-3 border-b border-slate-50 last:border-0 hover:bg-slate-50/60 transition-colors"
               >
-                <div className="flex-1 min-w-0 flex items-center gap-2">
+                <div className="flex-1 min-w-0 flex items-center gap-2 h-8">
                   <div className="w-7 h-7 rounded-md bg-slate-100 flex items-center justify-center shrink-0">
                     <Layers size={12} className="text-slate-500" />
                   </div>
                   <p className="text-[13px] font-medium text-slate-700 truncate">{c.name}</p>
                 </div>
 
-                <div className="w-5 flex justify-center shrink-0">
+                <div className="w-5 h-8 flex items-center justify-center shrink-0">
                   <ArrowRight size={14} className="text-slate-300" />
                 </div>
 
-                <div className="w-48 shrink-0">
-                  <select
-                    value={c.benchmarkGroup}
-                    onChange={(e) => handleRemap(c.id, e.target.value as BenchmarkGroupKey)}
-                    className="w-full h-8 px-2.5 rounded-lg border border-slate-200 bg-slate-50 text-[12px] font-medium text-slate-700 focus:outline-none focus:border-[#00b8a9] transition-colors"
-                  >
-                    {BENCHMARK_GROUPS.map((g) => (
-                      <option key={g.key} value={g.key}>{g.label}</option>
-                    ))}
-                  </select>
+                <div className="w-60 shrink-0">
+                  <BenchmarkGroupMultiSelect
+                    selected={c.benchmarkGroups as BenchmarkGroupKey[]}
+                    onChange={(next) => handleRemap(c.id, next)}
+                    size="sm"
+                  />
                 </div>
 
-                <div className="w-28 text-right shrink-0">
+                <div className="w-28 h-8 flex items-center justify-end shrink-0">
                   <span className={`text-[11.5px] ${n > 0 ? "text-slate-600 font-medium" : "text-slate-400"}`}>
                     {n} org{n === 1 ? "" : "s"}
                   </span>
                 </div>
 
-                <div className="w-7 flex justify-end shrink-0">
+                <div className="w-7 h-8 flex items-center justify-end shrink-0">
                   <button
                     onClick={() => handleRemove(c.id)}
                     title="Remove asset class"
