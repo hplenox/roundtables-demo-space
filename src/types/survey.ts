@@ -126,6 +126,16 @@ export interface LpiSubComponents {
   peerGroups: LpiPeerGroup[];
 }
 
+export interface CustomAssetClass {
+  id: string;
+  surveyId: string;
+  /** Host-defined label, e.g. "Growth Buyout" */
+  name: string;
+  /** Key into BENCHMARK_GROUPS (src/lib/asset-class-groups.ts) */
+  benchmarkGroup: string;
+  createdAt: string;
+}
+
 export interface InvitedOrg {
   id: string;
   surveyId: string;
@@ -140,6 +150,8 @@ export interface InvitedOrg {
   status: "submitted" | "in_progress" | "not_started";
   progress: number;
   assetClass: string;
+  /** Name of the survey's custom asset class this org has been mapped to, if any */
+  customAssetClass?: string | null;
   strategyFocus: string[];
   aum: string;
   aumRaw: number;

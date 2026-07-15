@@ -3,7 +3,7 @@
 import { useState, useRef } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
-import { getOrgById, getSurveyById } from "@/lib/mock-data";
+import { getOrgById, getSurveyById, getCustomAssetClassesBySurveyId } from "@/lib/mock-data";
 import type { InvitedOrg } from "@/types/survey";
 import {
   ChevronRight,
@@ -27,6 +27,7 @@ import {
   StickyNote,
   BadgeCheck,
   Lock,
+  Layers,
 } from "lucide-react";
 
 // ─── Status config ────────────────────────────────────────────────────────────
@@ -167,6 +168,7 @@ export default function OrgDetailPage() {
   const [showNudge, setShowNudge]           = useState(false);
   const [adminComplete, setAdminComplete]   = useState(false);
   const [manualStatus, setManualStatus]     = useState("No information");
+  const [mappedAssetClass, setMappedAssetClass] = useState(org?.customAssetClass ?? "");
   const [orgCode, setOrgCode]               = useState("ORG-" + (orgId?.slice(-4).toUpperCase() ?? "0000"));
   const [editingCode, setEditingCode]       = useState(false);
   const [notes, setNotes]                   = useState("");
@@ -523,6 +525,24 @@ export default function OrgDetailPage() {
                       className="flex-1 text-[12px] font-medium text-slate-700 bg-transparent focus:outline-none"
                     >
                       {MANUAL_STATUSES.map((s) => <option key={s}>{s}</option>)}
+                    </select>
+                  </div>
+                </div>
+
+                {/* Asset class mapping */}
+                <div className="flex items-center gap-2">
+                  <div className="flex-1 flex items-center gap-2 px-3.5 py-2.5 rounded-lg border border-slate-200 bg-slate-50">
+                    <Layers size={13} className="text-slate-400 shrink-0" />
+                    <span className="text-[11.5px] text-slate-500 shrink-0">Custom Asset Class</span>
+                    <select
+                      value={mappedAssetClass}
+                      onChange={(e) => setMappedAssetClass(e.target.value)}
+                      className="flex-1 text-[12px] font-medium text-slate-700 bg-transparent focus:outline-none"
+                    >
+                      <option value="">Unassigned</option>
+                      {getCustomAssetClassesBySurveyId(surveyId).map((c) => (
+                        <option key={c.id} value={c.name}>{c.name}</option>
+                      ))}
                     </select>
                   </div>
                 </div>

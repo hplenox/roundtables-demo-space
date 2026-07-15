@@ -1029,6 +1029,11 @@ function OrgRow({ org, surveyId, onNudge }: { org: InvitedOrg; surveyId: string;
             </div>
             <p className="text-[13px] font-semibold text-slate-800 group-hover:text-[#00897b] transition-colors truncate">{org.name}</p>
             <span className="shrink-0 text-[10px] font-medium px-1.5 py-0.5 rounded bg-slate-100 text-slate-500">{org.type}</span>
+            {org.customAssetClass && (
+              <span className="shrink-0 text-[10px] font-medium px-1.5 py-0.5 rounded bg-[#e8f5f3] text-[#00897b]">
+                {org.customAssetClass}
+              </span>
+            )}
           </div>
           <p className="text-[11.5px] text-slate-400 ml-8 truncate">
             {org.contactName} · {org.assetClass} · {org.location}

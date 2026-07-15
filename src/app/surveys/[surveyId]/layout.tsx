@@ -7,6 +7,7 @@ import { ChevronRight, Download, ShieldCheck, LayoutDashboard } from "lucide-rea
 
 const SUB_TABS = [
   { key: "overview",       label: "Overview",              href: "" },
+  { key: "asset-classes",  label: "Asset Classes",         href: "/asset-classes" },
   { key: "organizations",  label: "Invited Organizations", href: "/organizations" },
   { key: "analytics",      label: "Analytics",             href: "/analytics" },
   { key: "data-control",   label: "Data Control",          href: "/data-control" },
@@ -31,6 +32,7 @@ export default function SurveyLayout({ children }: { children: React.ReactNode }
 
   // Determine active sub-tab from pathname
   const activeSub = (() => {
+    if (pathname.includes("/asset-classes"))  return "asset-classes";
     if (pathname.includes("/organizations")) return "organizations";
     if (pathname.includes("/analytics"))     return "analytics";
     if (pathname.includes("/data-control"))  return "data-control";

@@ -1,4 +1,4 @@
-import { Survey, InvitedOrg } from "@/types/survey";
+import { Survey, InvitedOrg, CustomAssetClass } from "@/types/survey";
 
 export const MOCK_SURVEYS: Survey[] = [
   {
@@ -113,6 +113,7 @@ export const MOCK_ORGS: InvitedOrg[] = [
     status: "submitted",
     progress: 100,
     assetClass: "Private Equity",
+    customAssetClass: "Large-Cap Buyout",
     strategyFocus: ["Buyout", "Real Estate", "Credit", "Infrastructure"],
     aum: "$1.0T",
     aumRaw: 1000,
@@ -442,6 +443,7 @@ export const MOCK_ORGS: InvitedOrg[] = [
     status: "submitted",
     progress: 100,
     assetClass: "Private Equity",
+    customAssetClass: "Large-Cap Buyout",
     strategyFocus: ["Buyout", "Growth Equity", "Credit"],
     aum: "$510B",
     aumRaw: 510,
@@ -536,6 +538,7 @@ export const MOCK_ORGS: InvitedOrg[] = [
     status: "in_progress",
     progress: 64,
     assetClass: "Private Credit",
+    customAssetClass: "Direct Lending",
     strategyFocus: ["Credit", "Private Equity", "Real Assets"],
     aum: "$651B",
     aumRaw: 651,
@@ -564,6 +567,7 @@ export const MOCK_ORGS: InvitedOrg[] = [
     status: "in_progress",
     progress: 41,
     assetClass: "Private Equity",
+    customAssetClass: "Middle-Market Buyout",
     strategyFocus: ["Buyout", "Growth Capital", "Infrastructure"],
     aum: "$426B",
     aumRaw: 426,
@@ -592,6 +596,7 @@ export const MOCK_ORGS: InvitedOrg[] = [
     status: "not_started",
     progress: 0,
     assetClass: "Private Equity",
+    customAssetClass: "Growth Equity",
     strategyFocus: ["Buyout", "Growth", "Impact"],
     aum: "$222B",
     aumRaw: 222,
@@ -620,6 +625,7 @@ export const MOCK_ORGS: InvitedOrg[] = [
     status: "not_started",
     progress: 0,
     assetClass: "Venture Capital",
+    customAssetClass: "Growth Equity",
     strategyFocus: ["Software Buyout", "Growth Equity"],
     aum: "$101B",
     aumRaw: 101,
@@ -648,6 +654,7 @@ export const MOCK_ORGS: InvitedOrg[] = [
     status: "submitted",
     progress: 100,
     assetClass: "Private Equity",
+    customAssetClass: "Middle-Market Buyout",
     strategyFocus: ["Buyout", "Venture", "Credit"],
     aum: "$185B",
     aumRaw: 185,
@@ -742,6 +749,7 @@ export const MOCK_ORGS: InvitedOrg[] = [
     status: "in_progress",
     progress: 22,
     assetClass: "Venture Capital",
+    customAssetClass: "Growth Equity",
     strategyFocus: ["Growth Equity", "Venture"],
     aum: "$83B",
     aumRaw: 83,
@@ -767,6 +775,24 @@ export function getOrgsBySurveyId(surveyId: string): InvitedOrg[] {
 
 export function getOrgById(id: string): InvitedOrg | undefined {
   return MOCK_ORGS.find((o) => o.id === id);
+}
+
+// ── Custom asset classes (per-survey, host-defined) ─────────────────────────
+// Each maps a free-text label the host uses internally to one of the fixed
+// Roundtables benchmark categories (see src/lib/asset-class-groups.ts).
+export const MOCK_CUSTOM_ASSET_CLASSES: CustomAssetClass[] = [
+  { id: "cac-large-cap-buyout",    surveyId: "survey-2026-dei-lenox", name: "Large-Cap Buyout",        benchmarkGroup: "private-equity", createdAt: "Feb 9, 2026" },
+  { id: "cac-mid-market-buyout",   surveyId: "survey-2026-dei-lenox", name: "Middle-Market Buyout",     benchmarkGroup: "private-equity", createdAt: "Feb 9, 2026" },
+  { id: "cac-growth-equity",       surveyId: "survey-2026-dei-lenox", name: "Growth Equity",            benchmarkGroup: "private-equity", createdAt: "Feb 10, 2026" },
+  { id: "cac-direct-lending",      surveyId: "survey-2026-dei-lenox", name: "Direct Lending",           benchmarkGroup: "credit",         createdAt: "Feb 11, 2026" },
+  { id: "cac-core-plus-re",        surveyId: "survey-2026-dei-lenox", name: "Core-Plus Real Estate",    benchmarkGroup: "real-estate",    createdAt: "Feb 12, 2026" },
+  { id: "cac-diversified-macro",   surveyId: "survey-2026-dei-lenox", name: "Diversified Macro",        benchmarkGroup: "hedge-funds",    createdAt: "Feb 12, 2026" },
+  { id: "cac-infra-debt",          surveyId: "survey-2026-dei-lenox", name: "Infrastructure Debt",      benchmarkGroup: "real-assets",    createdAt: "Feb 13, 2026" },
+  { id: "cac-long-only-equities",  surveyId: "survey-2026-dei-lenox", name: "Public Equities Long-Only", benchmarkGroup: "long-only",     createdAt: "Feb 13, 2026" },
+];
+
+export function getCustomAssetClassesBySurveyId(surveyId: string): CustomAssetClass[] {
+  return MOCK_CUSTOM_ASSET_CLASSES.filter((c) => c.surveyId === surveyId);
 }
 
 // Gender demographics are exported separately for Blackstone

@@ -3,7 +3,8 @@
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { useState, useEffect, useRef } from "react";
-import { getOrgById, getSurveyById, getOrgsBySurveyId } from "@/lib/mock-data";
+import { getOrgById, getSurveyById, getOrgsBySurveyId, getCustomAssetClassesBySurveyId } from "@/lib/mock-data";
+import { buildBenchmarkPool, type BenchmarkGroupKey } from "@/lib/asset-class-groups";
 import LpiGaugeBar from "@/components/report/LpiGaugeBar";
 import BenchmarkDistributionChart from "@/components/report/BenchmarkDistributionChart";
 import LpiSubComponentsSection from "@/components/report/LpiSubComponentsSection";
@@ -507,10 +508,20 @@ export default function ManagerReportPage() {
     month: "long", day: "numeric", year: "numeric",
   }) + " at " + now.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" });
 
+  // Orgs classified via the survey's Asset Classes tab get a live, computed
+  // asset-class benchmark; unclassified orgs keep the "Coming Soon" pool.
+  const mappedGroup = org.customAssetClass
+    ? (getCustomAssetClassesBySurveyId(surveyId).find((c) => c.name === org.customAssetClass)
+        ?.benchmarkGroup as BenchmarkGroupKey | undefined)
+    : undefined;
+
   const benchmarkPools = [
     { key: "universe",   data: org.benchmarks.universe },
     { key: "portfolio",  data: org.benchmarks.portfolio },
-    { key: "assetClass", data: org.benchmarks.assetClass },
+    {
+      key: "assetClass",
+      data: mappedGroup ? buildBenchmarkPool(mappedGroup, org.lpiScore) : org.benchmarks.assetClass,
+    },
   ];
 
   return (
@@ -818,6 +829,7 @@ export default function ManagerReportPage() {
               orgLpiScore={org.lpiScore}
               orgAssetClass={org.assetClass}
               orgName={org.name}
+              mappedGroup={mappedGroup}
             />
           </div>
         </ReportSection>

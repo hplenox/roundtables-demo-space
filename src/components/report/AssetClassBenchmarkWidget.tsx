@@ -3,80 +3,34 @@
 import { useState, useMemo } from "react";
 import { Layers } from "lucide-react";
 import BenchmarkDistributionChart from "./BenchmarkDistributionChart";
-import type { BenchmarkPool } from "@/types/survey";
+import { BENCHMARK_GROUPS, buildBenchmarkPool, type BenchmarkGroupKey } from "@/lib/asset-class-groups";
 
-// ── Hard-coded peer scores per group (from Roundtables benchmark pool) ─────────
-const GROUP_SCORES: Record<string, number[]> = {
-  "Private Equity": [8.2, 7.8, 7.8, 7.5, 7.3, 7.1, 7.0, 6.7, 6.6, 6.5, 6.4, 6.4, 6.3, 6.2, 6.1, 6.0, 5.9, 5.9, 5.6],
-  "Hedge Funds":    [6.2, 6.0, 5.8, 5.7, 5.4, 5.1],
-  "Long-Only":      [7.4, 7.2, 6.9, 6.5],
-  "Credit":         [6.9, 6.8, 6.5, 6.1, 5.9, 5.7, 5.4],
-  "Real Estate":    [6.8, 6.1, 5.9],
-  "Real Assets":    [7.0, 6.7, 6.3],
-};
+const GROUPS = BENCHMARK_GROUPS;
 
-const GROUPS = [
-  { key: "Private Equity", label: "Private Equity", note: "Incl. Venture Capital" },
-  { key: "Hedge Funds",    label: "Hedge Funds",    note: null },
-  { key: "Long-Only",      label: "Long-Only",      note: null },
-  { key: "Credit",         label: "Credit",         note: null },
-  { key: "Real Estate",    label: "Real Estate",    note: null },
-  { key: "Real Assets",    label: "Real Assets",    note: null },
-] as const;
-
-type GroupKey = typeof GROUPS[number]["key"];
-
-// Map org's raw assetClass string → one of our 5 group keys
-function resolveGroup(assetClass: string): GroupKey {
-  if (assetClass === "Venture Capital")  return "Private Equity";
-  if (assetClass === "Hedge Fund")       return "Hedge Funds";
-  if ((GROUPS as readonly { key: string }[]).some(g => g.key === assetClass))
-    return assetClass as GroupKey;
-  return "Private Equity";
-}
-
-function computePercentile(sorted: number[], value: number): number {
-  const below = sorted.filter(s => s < value).length;
-  return Math.round((below / sorted.length) * 100);
-}
-
-function pctValue(sorted: number[], p: number): number {
-  const idx = (p / 100) * (sorted.length - 1);
-  const lo = Math.floor(idx);
-  const hi = Math.ceil(idx);
-  if (lo === hi) return sorted[lo];
-  return sorted[lo] + (sorted[hi] - sorted[lo]) * (idx - lo);
-}
-
-function buildPool(groupKey: GroupKey, managerScore: number): BenchmarkPool {
-  const scores = [...GROUP_SCORES[groupKey]].sort((a, b) => a - b);
-  return {
-    label: groupKey,
-    p10: pctValue(scores, 10),
-    q1:  pctValue(scores, 25),
-    median: pctValue(scores, 50),
-    q3:  pctValue(scores, 75),
-    p90: pctValue(scores, 90),
-    min: scores[0],
-    max: scores[scores.length - 1],
-    managerValue: managerScore,
-    managerPercentile: computePercentile(scores, managerScore),
-    n: scores.length,
-  };
+// Legacy fallback: map org's raw assetClass string → a benchmark group key.
+// Only used when the org has no host-defined custom asset class mapping.
+function resolveGroup(assetClass: string): BenchmarkGroupKey {
+  if (assetClass === "Venture Capital") return "private-equity";
+  if (assetClass === "Hedge Fund")      return "hedge-funds";
+  const direct = BENCHMARK_GROUPS.find((g) => g.label === assetClass);
+  if (direct) return direct.key;
+  return "private-equity";
 }
 
 interface Props {
   orgLpiScore: number;
   orgAssetClass: string;
   orgName: string;
+  /** Authoritative benchmark group from the org's custom asset class mapping, if set. */
+  mappedGroup?: BenchmarkGroupKey;
 }
 
-export default function AssetClassBenchmarkWidget({ orgLpiScore, orgAssetClass, orgName }: Props) {
-  const defaultGroup = resolveGroup(orgAssetClass);
-  const [activeGroup, setActiveGroup] = useState<GroupKey>(defaultGroup);
+export default function AssetClassBenchmarkWidget({ orgLpiScore, orgAssetClass, orgName, mappedGroup }: Props) {
+  const homeGroup = mappedGroup ?? resolveGroup(orgAssetClass);
+  const [activeGroup, setActiveGroup] = useState<BenchmarkGroupKey>(homeGroup);
 
   const pool = useMemo(
-    () => buildPool(activeGroup, orgLpiScore),
+    () => buildBenchmarkPool(activeGroup, orgLpiScore),
     [activeGroup, orgLpiScore]
   );
 
@@ -85,7 +39,8 @@ export default function AssetClassBenchmarkWidget({ orgLpiScore, orgAssetClass, 
     pool.managerPercentile >= 40 ? "#b45309" :
     "#dc2626";
 
-  const isOwnClass = resolveGroup(orgAssetClass) === activeGroup;
+  const isOwnClass = homeGroup === activeGroup;
+  const activeLabel = GROUPS.find((g) => g.key === activeGroup)?.label ?? activeGroup;
 
   return (
     <div>
@@ -93,7 +48,7 @@ export default function AssetClassBenchmarkWidget({ orgLpiScore, orgAssetClass, 
       <div className="flex items-center gap-1.5 flex-wrap mb-5">
         {GROUPS.map((g) => {
           const isActive = activeGroup === g.key;
-          const isHome   = resolveGroup(orgAssetClass) === g.key;
+          const isHome   = homeGroup === g.key;
           return (
             <button
               key={g.key}
@@ -122,8 +77,8 @@ export default function AssetClassBenchmarkWidget({ orgLpiScore, orgAssetClass, 
           <Layers size={11} className="text-slate-400" />
           <span>
             {isOwnClass
-              ? <><strong>{orgName}</strong>&apos;s peer group &mdash; {activeGroup}</>
-              : <>Comparing to <strong>{activeGroup}</strong> managers</>
+              ? <><strong>{orgName}</strong>&apos;s peer group &mdash; {activeLabel}</>
+              : <>Comparing to <strong>{activeLabel}</strong> managers</>
             }
           </span>
         </div>
@@ -138,7 +93,7 @@ export default function AssetClassBenchmarkWidget({ orgLpiScore, orgAssetClass, 
           </span>
           <span className="text-[13px] font-bold" style={{ color: pctColor }}>th percentile</span>
           <span className="text-[11.5px] text-slate-400">
-            vs. {activeGroup} benchmark
+            vs. {activeLabel} benchmark
             {!isOwnClass && (
               <span className="ml-1 text-amber-600 text-[10.5px] font-medium">(cross-class)</span>
             )}
