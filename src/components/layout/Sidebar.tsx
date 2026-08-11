@@ -5,15 +5,18 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import {
-  Home,
-  ClipboardList,
-  Building2,
-  Users,
-  UserCog,
-  ChevronLeft,
   LayoutDashboard,
-  HelpCircle,
-  HeadphonesIcon,
+  Layers,
+  Contact,
+  ArrowLeftRight,
+  Building2,
+  Wallet,
+  Calendar,
+  Share2,
+  Shield,
+  Settings,
+  MessageSquare,
+  ChevronLeft,
   Sparkles,
 } from "lucide-react";
 
@@ -21,18 +24,26 @@ type NavItem = {
   label: string;
   href: string;
   icon: React.ComponentType<{ size?: number; className?: string; strokeWidth?: number }>;
+  disabled?: boolean;
 };
 
 const TOP_ITEMS: NavItem[] = [
-  { label: "Home", href: "/", icon: Home },
-  { label: "My Surveys", href: "/my-surveys", icon: ClipboardList },
+  { label: "Home", href: "/", icon: LayoutDashboard },
+  { label: "Surveys", href: "/my-surveys", icon: Layers },
+  { label: "PODs", href: "/pods", icon: Contact },
+  { label: "Exchange", href: "/roadmap", icon: ArrowLeftRight, disabled: true },
+];
+
+const ORG_ITEMS: NavItem[] = [
   { label: "My Organization", href: "/organization", icon: Building2 },
-  { label: "PODs", href: "/pods", icon: Users },
+  { label: "My Portfolio", href: "/portfolio", icon: Wallet, disabled: true },
+  { label: "Calendar", href: "/roadmap", icon: Calendar, disabled: true },
+  { label: "Community", href: "/roadmap", icon: Share2, disabled: true },
 ];
 
 const ADMIN_ITEMS: NavItem[] = [
-  { label: "Survey Admin", href: "/surveys", icon: LayoutDashboard },
-  { label: "Administrator", href: "/admin", icon: UserCog },
+  { label: "Survey Admin", href: "/surveys", icon: Layers },
+  { label: "Administrator", href: "/admin", icon: Shield },
 ];
 
 function NavLink({
@@ -44,27 +55,39 @@ function NavLink({
   collapsed: boolean;
   active: boolean;
 }) {
-  const { label, href, icon: Icon } = item;
+  const { label, href, icon: Icon, disabled } = item;
+
+  if (disabled) {
+    return (
+      <li>
+        <span
+          title={collapsed ? label : undefined}
+          className="
+            flex items-center gap-3 px-2.5 py-2 rounded-lg
+            text-[13px] font-medium whitespace-nowrap
+            text-white/25 cursor-default select-none
+          "
+        >
+          <Icon size={16} className="shrink-0" strokeWidth={1.75} />
+          {!collapsed && <span>{label}</span>}
+        </span>
+      </li>
+    );
+  }
+
   return (
     <li>
       <Link
         href={href}
         title={collapsed ? label : undefined}
         className={`
-          relative flex items-center gap-3 px-2.5 py-2 rounded-lg
+          relative flex items-center gap-3 px-2.5 py-2 rounded-xl
           text-[13px] font-medium whitespace-nowrap
           transition-all duration-150
-          ${active ? "bg-[#00b8a9]/15 text-[#00b8a9]" : "text-white/65 hover:text-white hover:bg-white/[0.06]"}
+          ${active ? "bg-[#4361ee] text-white shadow-sm" : "text-white/80 hover:text-white hover:bg-white/[0.07]"}
         `}
       >
-        {active && (
-          <span className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 rounded-r-full bg-[#00b8a9]" />
-        )}
-        <Icon
-          size={16}
-          className="shrink-0"
-          strokeWidth={active ? 2 : 1.75}
-        />
+        <Icon size={16} className="shrink-0" strokeWidth={active ? 2 : 1.75} />
         {!collapsed && <span>{label}</span>}
       </Link>
     </li>
@@ -75,89 +98,91 @@ export default function Sidebar() {
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(false);
 
+  const isActive = (item: NavItem) =>
+    !item.disabled &&
+    (pathname === item.href || (item.href !== "/" && pathname.startsWith(item.href)));
+
   return (
     <aside
       className={`
-        relative flex flex-col shrink-0 h-screen
-        bg-[#0f1923] border-r border-white/[0.06]
+        relative flex flex-col shrink-0 h-screen overflow-hidden
+        border-r border-white/[0.06]
         transition-all duration-300 ease-in-out
-        ${collapsed ? "w-[64px]" : "w-[200px]"}
+        ${collapsed ? "w-[64px]" : "w-[228px]"}
       `}
+      style={{
+        backgroundColor: "#0a0e14",
+        backgroundImage: `
+          radial-gradient(circle at 15% 100%, rgba(0,184,169,0.28) 0%, transparent 55%),
+          radial-gradient(circle at 100% 100%, rgba(67,97,238,0.30) 0%, transparent 55%),
+          linear-gradient(180deg, #090c11 0%, #0a0e14 45%, #0c121a 100%)
+        `,
+      }}
     >
       {/* Logo */}
-      <div className="flex items-center gap-2.5 px-4 py-5 border-b border-white/[0.06]">
-        <div className="shrink-0 w-7 h-7 rounded-lg bg-[#00b8a9] flex items-center justify-center">
-          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-            <circle cx="7" cy="7" r="3" fill="white" />
-            <circle cx="7" cy="7" r="6" stroke="white" strokeWidth="1.5" fill="none" />
-          </svg>
-        </div>
+      <div className="flex items-center gap-2.5 px-4 py-5">
+        <svg width="26" height="26" viewBox="0 0 26 26" fill="none" className="shrink-0">
+          <path d="M13 2C13 7.5 9 11 4 11C4 5.5 8 2 13 2Z" fill="#2dd4bf" />
+          <path d="M24 13C18.5 13 15 9 15 4C20.5 4 24 8 24 13Z" fill="#3b82f6" />
+          <path d="M13 24C13 18.5 17 15 22 15C22 20.5 18 24 13 24Z" fill="#818cf8" />
+          <path d="M2 13C7.5 13 11 17 11 22C5.5 22 2 18 2 13Z" fill="#22d3ee" />
+          <circle cx="13" cy="13" r="3" fill="#0a0e14" />
+        </svg>
         {!collapsed && (
-          <span className="text-white font-semibold text-[13px] tracking-tight leading-tight whitespace-nowrap">
-            ROUNDTABLES DEMO
+          <span className="text-white font-semibold text-[15px] tracking-[0.15em] whitespace-nowrap">
+            ROUNDTABLES
           </span>
         )}
+        {!collapsed && (
+          <button
+            onClick={() => setCollapsed(true)}
+            className="ml-auto shrink-0 text-white/40 hover:text-white/80 transition-colors duration-150"
+          >
+            <ChevronLeft size={16} />
+          </button>
+        )}
       </div>
-
-      {/* Collapse toggle */}
-      <button
-        onClick={() => setCollapsed(!collapsed)}
-        className="
-          absolute -right-3 top-[52px] z-10
-          w-6 h-6 rounded-full
-          bg-[#0f1923] border border-white/[0.12]
-          flex items-center justify-center
-          text-white/40 hover:text-white/80
-          transition-colors duration-150
-        "
-      >
-        <ChevronLeft
-          size={12}
-          className={`transition-transform duration-300 ${collapsed ? "rotate-180" : ""}`}
-        />
-      </button>
+      {collapsed && (
+        <button
+          onClick={() => setCollapsed(false)}
+          className="absolute -right-3 top-[26px] z-10 w-6 h-6 rounded-full bg-[#0a0e14] border border-white/[0.12] flex items-center justify-center text-white/40 hover:text-white/80 transition-colors duration-150"
+        >
+          <ChevronLeft size={12} className="rotate-180" />
+        </button>
+      )}
 
       {/* Nav */}
       <nav className="flex-1 py-3 overflow-y-auto overflow-x-hidden">
-        {/* Top items */}
         <ul className="space-y-0.5 px-2">
-          {TOP_ITEMS.map((item) => {
-            const active =
-              pathname === item.href ||
-              (item.href !== "/" && pathname.startsWith(item.href));
-            return (
-              <NavLink key={item.href} item={item} collapsed={collapsed} active={active} />
-            );
-          })}
+          {TOP_ITEMS.map((item) => (
+            <NavLink key={item.label} item={item} collapsed={collapsed} active={isActive(item)} />
+          ))}
         </ul>
 
-        {/* Divider */}
         <div className="mx-3 my-3 border-t border-white/[0.08]" />
 
-        {/* Admin items */}
         <ul className="space-y-0.5 px-2">
-          {ADMIN_ITEMS.map((item) => {
-            const active =
-              pathname === item.href ||
-              (item.href !== "/" && pathname.startsWith(item.href));
-            return (
-              <NavLink key={item.href} item={item} collapsed={collapsed} active={active} />
-            );
-          })}
-          {/* What's Coming — sits right under Administrator */}
+          {ORG_ITEMS.map((item) => (
+            <NavLink key={item.label} item={item} collapsed={collapsed} active={isActive(item)} />
+          ))}
+        </ul>
+
+        <div className="mx-3 my-3 border-t border-white/[0.08]" />
+
+        <ul className="space-y-0.5 px-2">
+          {ADMIN_ITEMS.map((item) => (
+            <NavLink key={item.label} item={item} collapsed={collapsed} active={isActive(item)} />
+          ))}
           <li>
             <Link
               href="/roadmap"
               title={collapsed ? "What's Coming" : undefined}
               className={`
-                relative flex items-center gap-3 px-2.5 py-2 rounded-lg
+                relative flex items-center gap-3 px-2.5 py-2 rounded-xl
                 text-[13px] font-medium whitespace-nowrap transition-all duration-150
-                ${pathname === "/roadmap" ? "bg-[#00b8a9]/15 text-[#00b8a9]" : "text-white/40 hover:text-white/80 hover:bg-white/[0.06]"}
+                ${pathname === "/roadmap" ? "bg-[#4361ee] text-white shadow-sm" : "text-white/40 hover:text-white/80 hover:bg-white/[0.07]"}
               `}
             >
-              {pathname === "/roadmap" && (
-                <span className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 rounded-r-full bg-[#00b8a9]" />
-              )}
               <Sparkles size={15} className="shrink-0" strokeWidth={1.75} />
               {!collapsed && <span>What&rsquo;s Coming</span>}
             </Link>
@@ -166,21 +191,21 @@ export default function Sidebar() {
       </nav>
 
       {/* Bottom: Help + Support */}
-      <div className="border-t border-white/[0.06] py-3 px-2 space-y-0.5">
+      <div className="px-2.5 pb-4 pt-3 space-y-2">
         <Link
           href="/help"
           title={collapsed ? "Help Center" : undefined}
-          className="flex items-center gap-3 px-2.5 py-2 rounded-lg text-[13px] font-medium text-white/50 hover:text-white hover:bg-white/[0.06] transition-all duration-150 whitespace-nowrap"
+          className="flex items-center gap-3 px-2.5 py-2 rounded-lg text-[13px] font-medium text-white/70 hover:text-white hover:bg-white/[0.07] transition-all duration-150 whitespace-nowrap"
         >
-          <HelpCircle size={16} className="shrink-0" strokeWidth={1.75} />
+          <Settings size={16} className="shrink-0" strokeWidth={1.75} />
           {!collapsed && <span>Help Center</span>}
         </Link>
         <Link
           href="/support"
           title={collapsed ? "Contact Support" : undefined}
-          className="flex items-center gap-3 px-2.5 py-2 rounded-lg text-[13px] font-medium text-white/50 hover:text-white hover:bg-white/[0.06] transition-all duration-150 whitespace-nowrap"
+          className="flex items-center justify-center gap-2.5 px-3 py-2.5 rounded-xl bg-[#3fae4a] hover:bg-[#379a41] text-white text-[13px] font-semibold transition-colors duration-150 whitespace-nowrap"
         >
-          <HeadphonesIcon size={16} className="shrink-0" strokeWidth={1.75} />
+          <MessageSquare size={16} className="shrink-0" strokeWidth={1.75} />
           {!collapsed && <span>Contact Support</span>}
         </Link>
       </div>
