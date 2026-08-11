@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { useState } from "react";
 import {
   LayoutDashboard,
+  ClipboardList,
   Layers,
   Contact,
   ArrowLeftRight,
@@ -14,21 +15,39 @@ import {
   Calendar,
   Share2,
   Shield,
+  Handshake,
   Settings,
   MessageSquare,
   ChevronLeft,
   Sparkles,
 } from "lucide-react";
+import { getClientById } from "@/lib/mock-clients";
+
+// Same demo persona the onboarding page and Home dashboard greet by name —
+// see src/app/onboarding/page.tsx.
+const MY_CLIENT_ID = "client-lenox";
+
+// Computed fresh on every render (not baked into a module-level constant)
+// so it reflects onboarding steps the client has submitted this session —
+// see submitOnboardingStepAsClient in mock-clients.ts, which writes those
+// submissions into the shared store rather than local-only state.
+function myPendingOnboardingCount(): number {
+  const client = getClientById(MY_CLIENT_ID);
+  if (!client) return 0;
+  return client.surveys.reduce((sum, cycle) => sum + cycle.onboarding.filter((s) => s.status !== "approved").length, 0);
+}
 
 type NavItem = {
   label: string;
   href: string;
   icon: React.ComponentType<{ size?: number; className?: string; strokeWidth?: number }>;
   disabled?: boolean;
+  badge?: number;
 };
 
-const TOP_ITEMS: NavItem[] = [
+const BASE_TOP_ITEMS: NavItem[] = [
   { label: "Home", href: "/", icon: LayoutDashboard },
+  { label: "Onboarding", href: "/onboarding", icon: ClipboardList },
   { label: "Surveys", href: "/my-surveys", icon: Layers },
   { label: "PODs", href: "/pods", icon: Contact },
   { label: "Exchange", href: "/roadmap", icon: ArrowLeftRight, disabled: true },
@@ -42,6 +61,7 @@ const ORG_ITEMS: NavItem[] = [
 ];
 
 const ADMIN_ITEMS: NavItem[] = [
+  { label: "Client CRM", href: "/client-crm", icon: Handshake },
   { label: "Survey Admin", href: "/surveys", icon: Layers },
   { label: "Administrator", href: "/admin", icon: Shield },
 ];
@@ -55,7 +75,7 @@ function NavLink({
   collapsed: boolean;
   active: boolean;
 }) {
-  const { label, href, icon: Icon, disabled } = item;
+  const { label, href, icon: Icon, disabled, badge } = item;
 
   if (disabled) {
     return (
@@ -88,7 +108,16 @@ function NavLink({
         `}
       >
         <Icon size={16} className="shrink-0" strokeWidth={active ? 2 : 1.75} />
-        {!collapsed && <span>{label}</span>}
+        {!collapsed && <span className="flex-1">{label}</span>}
+        {!!badge && (
+          <span
+            className={`shrink-0 flex items-center justify-center rounded-full text-[10px] font-bold ${
+              collapsed ? "absolute -right-0.5 -top-0.5 w-4 h-4" : "w-5 h-5"
+            } ${active ? "bg-white/25 text-white" : "bg-[#4361ee] text-white"}`}
+          >
+            {badge}
+          </span>
+        )}
       </Link>
     </li>
   );
@@ -101,6 +130,11 @@ export default function Sidebar() {
   const isActive = (item: NavItem) =>
     !item.disabled &&
     (pathname === item.href || (item.href !== "/" && pathname.startsWith(item.href)));
+
+  const pendingOnboarding = myPendingOnboardingCount();
+  const topItems = BASE_TOP_ITEMS.map((item) =>
+    item.label === "Onboarding" ? { ...item, badge: pendingOnboarding } : item
+  );
 
   return (
     <aside
@@ -154,7 +188,7 @@ export default function Sidebar() {
       {/* Nav */}
       <nav className="flex-1 py-3 overflow-y-auto overflow-x-hidden">
         <ul className="space-y-0.5 px-2">
-          {TOP_ITEMS.map((item) => (
+          {topItems.map((item) => (
             <NavLink key={item.label} item={item} collapsed={collapsed} active={isActive(item)} />
           ))}
         </ul>
