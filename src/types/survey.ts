@@ -136,6 +136,24 @@ export interface CustomAssetClass {
   createdAt: string;
 }
 
+export interface Contact {
+  id: string;
+  surveyId: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  title: string;
+  /** Employer/company text exactly as it appeared in the host's raw contact list — often messy or inconsistent. */
+  rawOrgLabel: string;
+  /** The InvitedOrg this contact has been matched to. Null = not yet matched to a platform organization. A contact can link to at most one org, mirroring the 1-account-to-1-org login model. */
+  orgId: string | null;
+  /** Whether this person has already created a platform login. */
+  hasAccount: boolean;
+  lastLogin: string | null;
+  /** Whether this contact has personally submitted a survey on behalf of their matched org before (a prior cycle, not necessarily this one). */
+  hasSubmittedBefore: boolean;
+}
+
 export interface InvitedOrg {
   id: string;
   surveyId: string;

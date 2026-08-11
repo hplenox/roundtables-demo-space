@@ -1,4 +1,4 @@
-import { Survey, InvitedOrg, CustomAssetClass } from "@/types/survey";
+import { Survey, InvitedOrg, CustomAssetClass, Contact } from "@/types/survey";
 
 export const MOCK_SURVEYS: Survey[] = [
   {
@@ -795,6 +795,36 @@ export const MOCK_CUSTOM_ASSET_CLASSES: CustomAssetClass[] = [
 
 export function getCustomAssetClassesBySurveyId(surveyId: string): CustomAssetClass[] {
   return MOCK_CUSTOM_ASSET_CLASSES.filter((c) => c.surveyId === surveyId);
+}
+
+// ── Contacts (per-survey, from the host's raw contact list) ─────────────────
+// Survey hosts hand us contact lists that don't reliably indicate which
+// organization each person belongs to. `rawOrgLabel` preserves exactly what
+// the host wrote (often messy/abbreviated), while `orgId` is the platform
+// organization an admin has matched it to — null until scrubbed. Each
+// contact logs into their own account and links to at most one org, so this
+// is a plain nullable foreign key rather than a many-to-many mapping.
+export const MOCK_CONTACTS: Contact[] = [
+  // ── Matched — already scrubbed and linked to an invited organization ──
+  { id: "contact-1",  surveyId: "survey-2026-dei-lenox", firstName: "Michael",  lastName: "Davis",  email: "m.davis@blackstone.com",         title: "Chief Diversity & Inclusion Officer", rawOrgLabel: "Blackstone",              orgId: "org-blackstone", hasAccount: true,  lastLogin: "Mar 10, 2026", hasSubmittedBefore: true },
+  { id: "contact-2",  surveyId: "survey-2026-dei-lenox", firstName: "Jennifer", lastName: "Walsh",  email: "j.walsh@kkr.com",                title: "Head of Human Capital",                rawOrgLabel: "KKR & Co. Inc.",          orgId: "org-kkr",       hasAccount: true,  lastLogin: "Mar 8, 2026",  hasSubmittedBefore: true },
+  { id: "contact-3",  surveyId: "survey-2026-dei-lenox", firstName: "Robert",   lastName: "Kim",    email: "r.kim@apollo.com",               title: "Managing Director, DEI",               rawOrgLabel: "Apollo Global Mgmt",      orgId: "org-apollo",    hasAccount: true,  lastLogin: "Mar 5, 2026",  hasSubmittedBefore: false },
+  { id: "contact-4",  surveyId: "survey-2026-dei-lenox", firstName: "Amanda",   lastName: "Torres", email: "a.torres@carlyle.com",           title: "VP, Diversity & Inclusion",            rawOrgLabel: "The Carlyle Group",       orgId: "org-carlyle",   hasAccount: true,  lastLogin: "Feb 27, 2026", hasSubmittedBefore: true },
+  { id: "contact-5",  surveyId: "survey-2026-dei-lenox", firstName: "Chris",    lastName: "Lee",    email: "c.lee@tpg.com",                  title: "Director, Human Resources",            rawOrgLabel: "TPG Capital, L.P.",       orgId: "org-tpg",       hasAccount: true,  lastLogin: "Feb 22, 2026", hasSubmittedBefore: false },
+  { id: "contact-6",  surveyId: "survey-2026-dei-lenox", firstName: "Nicole",   lastName: "Brown",  email: "n.brown@vistaequitypartners.com", title: "Chief People Officer",                rawOrgLabel: "Vista Eq. Partners",      orgId: "org-vista",     hasAccount: true,  lastLogin: "Feb 18, 2026", hasSubmittedBefore: true },
+  { id: "contact-7",  surveyId: "survey-2026-dei-lenox", firstName: "Thomas",   lastName: "Grant",  email: "t.grant@baincapital.com",        title: "Partner, Talent & Culture",            rawOrgLabel: "Bain Capital LP",         orgId: "org-bain",      hasAccount: false, lastLogin: null,           hasSubmittedBefore: false },
+  { id: "contact-8",  surveyId: "survey-2026-dei-lenox", firstName: "Lisa",     lastName: "Park",   email: "l.park@warburgpincus.com",       title: "Managing Director",                    rawOrgLabel: "Warburg Pincus LLC",      orgId: "org-warburg",   hasAccount: false, lastLogin: null,           hasSubmittedBefore: false },
+
+  // ── Unmatched — imported from the host's list without a clear org match ──
+  { id: "contact-9",  surveyId: "survey-2026-dei-lenox", firstName: "Sarah",    lastName: "Kessler", email: "skessler@bx-advisors.com",     title: "Investor Relations Associate",         rawOrgLabel: "BX Advisors",             orgId: null, hasAccount: false, lastLogin: null, hasSubmittedBefore: false },
+  { id: "contact-10", surveyId: "survey-2026-dei-lenox", firstName: "Daniel",   lastName: "Osei",    email: "d.osei@meridianpeakcap.com",   title: "Chief of Staff",                       rawOrgLabel: "Meridian Peak Capital",   orgId: null, hasAccount: false, lastLogin: null, hasSubmittedBefore: false },
+  { id: "contact-11", surveyId: "survey-2026-dei-lenox", firstName: "Priya",    lastName: "Nair",    email: "priya.nair@tpgaxonpartn.com",  title: "Associate, Portfolio Ops",             rawOrgLabel: "TPG-Axon Sourcing",       orgId: null, hasAccount: false, lastLogin: null, hasSubmittedBefore: false },
+  { id: "contact-12", surveyId: "survey-2026-dei-lenox", firstName: "Evelyn",   lastName: "Marsh",   email: "e.marsh@carlylegrp-intl.com",  title: "Senior Associate",                     rawOrgLabel: "Carlyle Grp (Intl Ops)",  orgId: null, hasAccount: false, lastLogin: null, hasSubmittedBefore: false },
+  { id: "contact-13", surveyId: "survey-2026-dei-lenox", firstName: "Jonah",    lastName: "Fischer", email: "jonah.fischer@gmail.com",      title: "—",                                    rawOrgLabel: "",                        orgId: null, hasAccount: false, lastLogin: null, hasSubmittedBefore: false },
+];
+
+export function getContactsBySurveyId(surveyId: string): Contact[] {
+  return MOCK_CONTACTS.filter((c) => c.surveyId === surveyId);
 }
 
 // Gender demographics are exported separately for Blackstone
