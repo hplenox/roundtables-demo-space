@@ -49,7 +49,7 @@ const BASE_TOP_ITEMS: NavItem[] = [
   { label: "Home", href: "/", icon: LayoutDashboard },
   { label: "Onboarding", href: "/onboarding", icon: ClipboardList },
   { label: "Surveys", href: "/my-surveys", icon: Layers },
-  { label: "PODs", href: "/pods", icon: Contact },
+  { label: "Community Pods", href: "/pods", icon: Contact },
   { label: "Exchange", href: "/roadmap", icon: ArrowLeftRight, disabled: true },
 ];
 

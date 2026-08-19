@@ -12,7 +12,7 @@ function SubmissionBar({ submitted, inProgress, notStarted, total }: {
   const p = total === 0 ? 0 : (inProgress / total) * 100;
   return (
     <div className="flex h-2 rounded-full overflow-hidden bg-slate-100">
-      <div className="h-full bg-[#00b8a9] transition-all duration-700" style={{ width: `${s}%` }} />
+      <div className="h-full bg-[#4361ee] transition-all duration-700" style={{ width: `${s}%` }} />
       <div className="h-full bg-amber-400 transition-all duration-700" style={{ width: `${p}%` }} />
     </div>
   );
@@ -84,8 +84,8 @@ export default function OverviewPage() {
             className="bg-white rounded-2xl shadow-2xl border border-slate-200 p-8 max-w-sm w-full text-center pointer-events-auto mx-4"
             style={{ boxShadow: "0 25px 60px -10px rgba(0,0,0,0.18)" }}
           >
-            <div className="w-14 h-14 rounded-2xl bg-[#00b8a9]/10 flex items-center justify-center mx-auto mb-4">
-              <Upload size={24} className="text-[#00b8a9]" />
+            <div className="w-14 h-14 rounded-2xl bg-[#4361ee]/10 flex items-center justify-center mx-auto mb-4">
+              <Upload size={24} className="text-[#4361ee]" />
             </div>
             <h3 className="text-[15px] font-bold text-slate-800">Upload your contacts first</h3>
             <p className="text-[12.5px] text-slate-500 mt-2 leading-relaxed">
@@ -109,12 +109,12 @@ export default function OverviewPage() {
       <div className="bg-white rounded-xl border border-slate-200 px-5 py-4 flex flex-wrap items-center gap-6">
         {/* Response rate — hero stat */}
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-[#00b8a9]/10 flex items-center justify-center">
-            <TrendingUp size={15} className="text-[#00b8a9]" strokeWidth={2} />
+          <div className="w-8 h-8 rounded-lg bg-[#4361ee]/10 flex items-center justify-center">
+            <TrendingUp size={15} className="text-[#4361ee]" strokeWidth={2} />
           </div>
           <div>
             <p className="text-[11px] text-slate-400 font-medium">Response Rate</p>
-            <p className="text-[22px] font-bold text-[#00897b] leading-none tabular-nums">{rate}%</p>
+            <p className="text-[22px] font-bold text-[#3147af] leading-none tabular-nums">{rate}%</p>
           </div>
         </div>
 
@@ -213,7 +213,7 @@ export default function OverviewPage() {
             <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-widest">Recent Activity</p>
             <Link
               href={baseOrgsHref}
-              className="flex items-center gap-1 text-[12px] font-medium text-[#00897b] hover:underline"
+              className="flex items-center gap-1 text-[12px] font-medium text-[#3147af] hover:underline"
             >
               View all <ArrowRight size={11} />
             </Link>
@@ -232,7 +232,7 @@ export default function OverviewPage() {
                       {org.name.substring(0, 2).toUpperCase()}
                     </span>
                   </div>
-                  <p className="flex-1 text-[12.5px] font-medium text-slate-700 group-hover:text-[#00897b] transition-colors truncate">
+                  <p className="flex-1 text-[12.5px] font-medium text-slate-700 group-hover:text-[#3147af] transition-colors truncate">
                     {org.name}
                   </p>
                   {/* Mini progress bar */}
@@ -241,7 +241,7 @@ export default function OverviewPage() {
                       className="h-full rounded-full"
                       style={{
                         width: `${org.progress}%`,
-                        backgroundColor: org.progress === 100 ? "#00b8a9" : org.progress > 0 ? "#fbbf24" : "transparent",
+                        backgroundColor: org.progress === 100 ? "#4361ee" : org.progress > 0 ? "#fbbf24" : "transparent",
                       }}
                     />
                   </div>

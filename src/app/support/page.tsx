@@ -44,7 +44,7 @@ export default function SupportPage() {
           <div className="flex items-start justify-between mb-4">
             <div className="flex items-center gap-3">
               <div className="w-9 h-9 rounded-xl bg-[#0f1923] flex items-center justify-center">
-                <LifeBuoy size={17} className="text-[#00b8a9]" />
+                <LifeBuoy size={17} className="text-[#4361ee]" />
               </div>
               <div>
                 <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wide">Admin</p>
@@ -76,7 +76,7 @@ export default function SupportPage() {
                 onClick={() => setActiveTab(key)}
                 className={`flex items-center gap-2 px-4 py-2.5 text-[13px] font-medium border-b-2 transition-all
                   ${activeTab === key
-                    ? "border-[#00b8a9] text-[#00897b]"
+                    ? "border-[#4361ee] text-[#3147af]"
                     : "border-transparent text-slate-500 hover:text-slate-700"
                   }`}
               >
@@ -84,7 +84,7 @@ export default function SupportPage() {
                 {label}
                 {key === "inbox" && (
                   <span className={`text-[10.5px] font-bold px-1.5 py-0.5 rounded-full
-                    ${activeTab === key ? "bg-[#00b8a9]/15 text-[#00897b]" : "bg-slate-100 text-slate-400"}`}>
+                    ${activeTab === key ? "bg-[#4361ee]/15 text-[#3147af]" : "bg-slate-100 text-slate-400"}`}>
                     {tickets.length}
                   </span>
                 )}

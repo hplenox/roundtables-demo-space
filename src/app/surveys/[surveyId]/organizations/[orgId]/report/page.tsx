@@ -170,27 +170,27 @@ function InsightsBox({ org }: { org: InvitedOrg }) {
 
   return (
     <div className="max-w-5xl mx-auto px-6 pt-5 print:hidden">
-      <div className="rounded-xl border border-[#00b8a9]/30 bg-[#00b8a9]/5 overflow-hidden">
+      <div className="rounded-xl border border-[#4361ee]/30 bg-[#4361ee]/5 overflow-hidden">
         <button
           onClick={() => setExpanded((v) => !v)}
-          className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-[#00b8a9]/5 transition-colors group"
+          className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-[#4361ee]/5 transition-colors group"
         >
-          <div className="w-6 h-6 rounded-lg bg-[#00b8a9]/15 flex items-center justify-center shrink-0">
-            <Sparkles size={12} className="text-[#00897b]" strokeWidth={1.75} />
+          <div className="w-6 h-6 rounded-lg bg-[#4361ee]/15 flex items-center justify-center shrink-0">
+            <Sparkles size={12} className="text-[#3147af]" strokeWidth={1.75} />
           </div>
           <div className="flex-1 min-w-0">
-            <span className="text-[10px] font-bold text-[#00897b] uppercase tracking-widest">AI Insights Summary</span>
+            <span className="text-[10px] font-bold text-[#3147af] uppercase tracking-widest">AI Insights Summary</span>
             {!expanded && (
               <p className="text-[12px] text-slate-500 leading-snug mt-0.5 truncate">{preview}</p>
             )}
           </div>
           <ChevronDown
             size={14}
-            className={`shrink-0 text-[#00897b]/60 transition-transform duration-200 group-hover:text-[#00897b] ${expanded ? "rotate-180" : ""}`}
+            className={`shrink-0 text-[#3147af]/60 transition-transform duration-200 group-hover:text-[#3147af] ${expanded ? "rotate-180" : ""}`}
           />
         </button>
         {expanded && (
-          <div className="px-4 pb-4 pt-1 border-t border-[#00b8a9]/20">
+          <div className="px-4 pb-4 pt-1 border-t border-[#4361ee]/20">
             <p className="text-[12.5px] text-slate-600 leading-relaxed">{text}</p>
           </div>
         )}
@@ -322,7 +322,7 @@ function ManagerSwitcher({
           className="absolute -bottom-9 left-1/2 -translate-x-1/2 flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-[#0f1923] text-white text-[10.5px] font-medium whitespace-nowrap shadow-lg pointer-events-none z-50 animate-fade-in"
           style={{ animation: "fadeInUp 0.3s ease, fadeOut 0.5s ease 3.5s forwards" }}
         >
-          <Lightbulb size={10} className="text-[#00b8a9] shrink-0" />
+          <Lightbulb size={10} className="text-[#4361ee] shrink-0" />
           Switch organizations · Alt+← →
           <span className="absolute -top-1.5 left-1/2 -translate-x-1/2 w-3 h-1.5 overflow-hidden">
             <span className="block w-2 h-2 bg-[#0f1923] rotate-45 translate-y-1 mx-auto" />
@@ -361,7 +361,7 @@ function ManagerSwitcher({
                         onClick={() => !isCurrent && navigate(o.id)}
                         className={`w-full flex items-center gap-3 px-3 py-2.5 text-left transition-colors ${
                           isCurrent
-                            ? "bg-[#00b8a9]/8 cursor-default"
+                            ? "bg-[#4361ee]/8 cursor-default"
                             : "hover:bg-slate-50"
                         }`}
                       >
@@ -371,11 +371,11 @@ function ManagerSwitcher({
                         </span>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-1.5">
-                            <p className={`text-[12.5px] font-semibold truncate ${isCurrent ? "text-[#00897b]" : "text-slate-800"}`}>
+                            <p className={`text-[12.5px] font-semibold truncate ${isCurrent ? "text-[#3147af]" : "text-slate-800"}`}>
                               {o.name}
                             </p>
                             {isCurrent && (
-                              <span className="shrink-0 text-[9px] font-bold text-[#00b8a9] uppercase tracking-wide">current</span>
+                              <span className="shrink-0 text-[9px] font-bold text-[#4361ee] uppercase tracking-wide">current</span>
                             )}
                           </div>
                           <p className="text-[10.5px] text-slate-400 truncate">{o.assetClass}</p>
@@ -531,14 +531,14 @@ export default function ManagerReportPage() {
     <div className="min-h-screen bg-slate-50">
       {/* Sticky report top bar */}
       <div className="sticky top-0 z-30 bg-white border-b border-slate-200 shadow-sm print:hidden">
-        <div className="h-[3px] bg-gradient-to-r from-[#00b8a9] via-[#00b8a9]/70 to-transparent" />
+        <div className="h-[3px] bg-gradient-to-r from-[#4361ee] via-[#4361ee]/70 to-transparent" />
         <div className="max-w-5xl mx-auto px-6 h-11 flex items-center gap-3">
 
           {/* Breadcrumb — left */}
           <nav className="flex items-center gap-1.5 text-[11px] min-w-0 overflow-hidden flex-1">
             <Link
               href="/surveys"
-              className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-[#0f1923] text-[#00b8a9] hover:bg-[#1a2d3d] transition-colors font-semibold text-[9.5px] tracking-wide shrink-0"
+              className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-[#0f1923] text-[#4361ee] hover:bg-[#1a2d3d] transition-colors font-semibold text-[9.5px] tracking-wide shrink-0"
             >
               <LayoutDashboard size={9} strokeWidth={2} />
               Survey Admin
@@ -597,7 +597,7 @@ export default function ManagerReportPage() {
           <div className="p-6">
             <div className="flex items-start gap-5 mb-7">
               <div className="w-16 h-16 rounded-2xl bg-[#0f1923] flex items-center justify-center shrink-0 shadow-md">
-                <span className="text-[22px] font-black text-[#00b8a9] leading-none">
+                <span className="text-[22px] font-black text-[#4361ee] leading-none">
                   {org.name.substring(0, 2).toUpperCase()}
                 </span>
               </div>

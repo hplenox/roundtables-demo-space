@@ -21,10 +21,10 @@ const REPORT_TYPES = [
     icon: FileText,
     label: "Manager 2-Pager",
     description: "LPI score, benchmark distribution, and demographic overview.",
-    color: "text-[#00897b]",
-    bg: "bg-[#00b8a9]/8",
-    border: "border-[#00b8a9]/20",
-    hoverBorder: "hover:border-[#00b8a9]/50",
+    color: "text-[#3147af]",
+    bg: "bg-[#4361ee]/8",
+    border: "border-[#4361ee]/20",
+    hoverBorder: "hover:border-[#4361ee]/50",
     href: (surveyId: string, orgId: string) =>
       `/surveys/${surveyId}/organizations/${orgId}/report`,
   },
@@ -71,8 +71,8 @@ export default function ReportsPage() {
       <div className="rounded-2xl bg-[#0f1923] px-6 py-5 flex items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <BookOpen size={13} className="text-[#00b8a9]" />
-            <span className="text-[10.5px] font-bold tracking-widest uppercase text-[#00b8a9]">
+            <BookOpen size={13} className="text-[#4361ee]" />
+            <span className="text-[10.5px] font-bold tracking-widest uppercase text-[#4361ee]">
               Report Center
             </span>
           </div>
@@ -86,7 +86,7 @@ export default function ReportsPage() {
         </div>
         <div className="flex items-center gap-5 shrink-0">
           {[
-            { label: "Reports ready", value: submitted.length * 3, color: "text-[#00b8a9]" },
+            { label: "Reports ready", value: submitted.length * 3, color: "text-[#4361ee]" },
             { label: "Awaiting data", value: pending.length, color: "text-white/40" },
           ].map(({ label, value, color }) => (
             <div key={label} className="text-right">
@@ -116,7 +116,7 @@ export default function ReportsPage() {
               {/* Org header row */}
               <div className="flex items-center gap-4 px-5 py-4 border-b border-slate-100">
                 <div className="w-10 h-10 rounded-xl bg-[#0f1923] flex items-center justify-center shrink-0">
-                  <span className="text-[13px] font-black text-[#00b8a9]">
+                  <span className="text-[13px] font-black text-[#4361ee]">
                     {org.name.substring(0, 2).toUpperCase()}
                   </span>
                 </div>
@@ -124,7 +124,7 @@ export default function ReportsPage() {
                   <div className="flex items-center gap-2 flex-wrap">
                     <Link
                       href={`/surveys/${surveyId}/organizations/${org.id}`}
-                      className="text-[14px] font-bold text-slate-900 hover:text-[#00897b] transition-colors truncate"
+                      className="text-[14px] font-bold text-slate-900 hover:text-[#3147af] transition-colors truncate"
                     >
                       {org.name}
                     </Link>

@@ -60,7 +60,7 @@ export default function AssetClassBenchmarkWidget({ orgLpiScore, orgAssetClass, 
               }`}
             >
               {isHome && (
-                <span className="w-1.5 h-1.5 rounded-full bg-[#00b8a9] shrink-0" />
+                <span className="w-1.5 h-1.5 rounded-full bg-[#4361ee] shrink-0" />
               )}
               {g.label}
               {g.note && isActive && (

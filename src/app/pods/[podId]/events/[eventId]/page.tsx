@@ -40,7 +40,7 @@ export default function PodEventDetailPage() {
     <div className="min-h-full bg-slate-50">
       <div className="max-w-5xl mx-auto px-6 py-6">
         <div className="flex items-center gap-1.5 text-[11.5px] mb-4">
-          <Link href="/pods" className="font-medium text-slate-500 hover:text-slate-700">My PODs</Link>
+          <Link href="/pods" className="font-medium text-slate-500 hover:text-slate-700">My Community Pods</Link>
           <span className="text-slate-300">/</span>
           <Link href={`/pods/${pod.id}`} className="font-medium text-slate-500 hover:text-slate-700">{pod.name}</Link>
           <span className="text-slate-300">/</span>
@@ -58,7 +58,7 @@ export default function PodEventDetailPage() {
           <div className="flex items-start justify-between gap-4 flex-wrap">
             <div className="flex items-start gap-4">
               <div className="shrink-0 w-14 h-14 rounded-xl bg-slate-50 border border-slate-200 flex flex-col items-center justify-center leading-none">
-                <span className="text-[10px] font-bold text-[#00897b]">{event.dateISO.slice(5, 7) === "07" ? "JUL" : event.dateISO.slice(5, 7) === "08" ? "AUG" : event.dateISO.slice(5, 7)}</span>
+                <span className="text-[10px] font-bold text-[#3147af]">{event.dateISO.slice(5, 7) === "07" ? "JUL" : event.dateISO.slice(5, 7) === "08" ? "AUG" : event.dateISO.slice(5, 7)}</span>
                 <span className="text-[19px] font-bold text-slate-800">{event.dateISO.slice(8, 10)}</span>
               </div>
               <div>
@@ -67,7 +67,7 @@ export default function PodEventDetailPage() {
                 <div className="flex items-center gap-3 mt-1.5 text-[12px] text-slate-500 flex-wrap">
                   <span>{event.startTime} – {event.endTime} {event.timezone === "Eastern Time" ? "ET" : event.timezone}</span>
                   <span className="flex items-center gap-1"><LocationIcon size={12} /> {event.location.type === "zoom" ? event.location.detail : event.location.detail}</span>
-                  <span className="flex items-center gap-1 text-[#00897b] font-medium"><Download size={11} /> iCal</span>
+                  <span className="flex items-center gap-1 text-[#3147af] font-medium"><Download size={11} /> iCal</span>
                 </div>
                 {event.agenda && <p className="text-[12.5px] text-slate-500 mt-2 max-w-md">{event.agenda}</p>}
               </div>
@@ -77,7 +77,7 @@ export default function PodEventDetailPage() {
               <button
                 onClick={() => setRsvpMenuOpen((o) => !o)}
                 className={`inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-[13px] font-semibold transition-colors ${
-                  myStatus === "no_response" ? "bg-[#00b8a9] text-white hover:bg-[#00a89a]" : `border ${RSVP_STYLE[myStatus]}`
+                  myStatus === "no_response" ? "bg-[#4361ee] text-white hover:bg-[#3d58d9]" : `border ${RSVP_STYLE[myStatus]}`
                 }`}
               >
                 {myStatus !== "no_response" && <Check size={13} />}
@@ -111,11 +111,11 @@ export default function PodEventDetailPage() {
               value={inviteInput}
               onChange={(e) => setInviteInput(e.target.value)}
               placeholder="Add invitees by name or email — POD members auto-suggest"
-              className="flex-1 px-3.5 py-2.5 rounded-lg border border-slate-200 text-[13px] focus:outline-none focus:ring-2 focus:ring-[#00b8a9]/30"
+              className="flex-1 px-3.5 py-2.5 rounded-lg border border-slate-200 text-[13px] focus:outline-none focus:ring-2 focus:ring-[#4361ee]/30"
               onKeyDown={(e) => e.key === "Enter" && handleAddInvitee()}
             />
             <button className="inline-flex items-center gap-1.5 px-3 py-2.5 rounded-lg border border-slate-200 text-slate-600 text-[12.5px] font-semibold hover:border-slate-300 transition-colors">CSV</button>
-            <button onClick={handleAddInvitee} className="inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-lg bg-[#00b8a9] text-white text-[12.5px] font-semibold hover:bg-[#00a89a] transition-colors">
+            <button onClick={handleAddInvitee} className="inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-lg bg-[#4361ee] text-white text-[12.5px] font-semibold hover:bg-[#3d58d9] transition-colors">
               <UserPlus size={14} /> Add
             </button>
           </div>
@@ -137,7 +137,7 @@ export default function PodEventDetailPage() {
                     {inv.status === "no_response" ? "No response" : RSVP_LABEL[inv.status]}
                   </span>
                   {inv.status === "no_response" && inv.email !== CURRENT_USER.email && (
-                    <button className="inline-flex items-center gap-1 text-[12px] font-semibold text-[#00897b] hover:underline">
+                    <button className="inline-flex items-center gap-1 text-[12px] font-semibold text-[#3147af] hover:underline">
                       <Send size={11} /> Remind
                     </button>
                   )}
@@ -157,7 +157,7 @@ export default function PodEventDetailPage() {
             </div>
             <button
               onClick={() => uploadEventDocument(event.id, "New Upload.pdf", visibility)}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#00b8a9] text-white text-[12px] font-semibold hover:bg-[#00a89a] transition-colors"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#4361ee] text-white text-[12px] font-semibold hover:bg-[#3d58d9] transition-colors"
             >
               <Upload size={13} /> Upload
             </button>

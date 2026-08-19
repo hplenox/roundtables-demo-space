@@ -28,18 +28,18 @@ export default function OrganizationLayout({ children }: { children: React.React
     <div className="min-h-full bg-slate-50">
       {/* Header band */}
       <div className="bg-white border-b border-slate-200 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
-        <div className="h-[3px] bg-gradient-to-r from-[#00b8a9] via-[#00b8a9]/70 to-transparent" />
+        <div className="h-[3px] bg-gradient-to-r from-[#4361ee] via-[#4361ee]/70 to-transparent" />
         <div className="max-w-5xl mx-auto px-6 py-6">
           <div className="flex items-start gap-4">
             {/* Org avatar */}
             <div className="shrink-0 w-14 h-14 rounded-2xl bg-[#0f1923] flex items-center justify-center shadow-sm">
-              <Building2 size={22} className="text-[#00b8a9]" />
+              <Building2 size={22} className="text-[#4361ee]" />
             </div>
 
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-3 flex-wrap">
                 <h1 className="text-2xl font-bold text-slate-900">{org.name}</h1>
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#00b8a9]/10 border border-[#00b8a9]/25 text-[#00897b] text-[11px] font-semibold">
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#4361ee]/10 border border-[#4361ee]/25 text-[#3147af] text-[11px] font-semibold">
                   {org.type} — {org.assetClass}
                 </span>
                 {totalBadgesEarned > 0 && (
@@ -74,7 +74,7 @@ export default function OrganizationLayout({ children }: { children: React.React
                   <span className="text-[10px] text-white/40 font-semibold tracking-wide uppercase mb-0.5">
                     LPI Score
                   </span>
-                  <span className="text-2xl font-bold text-[#00b8a9]">{org.lpiScore}</span>
+                  <span className="text-2xl font-bold text-[#4361ee]">{org.lpiScore}</span>
                   <span className="text-[10px] text-white/30">{org.lpiVersion}</span>
                 </div>
               </div>
@@ -89,7 +89,7 @@ export default function OrganizationLayout({ children }: { children: React.React
                 href={`/organization${tab.href}`}
                 className={`px-4 py-2.5 text-[13px] font-medium border-b-2 transition-all duration-150 ${
                   activeSub === tab.key
-                    ? "border-[#00b8a9] text-[#00897b]"
+                    ? "border-[#4361ee] text-[#3147af]"
                     : "border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300"
                 }`}
               >

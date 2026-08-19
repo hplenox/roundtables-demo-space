@@ -156,7 +156,7 @@ export default function ClientHomePage() {
                 {activeCycle ? `${activeCycle.name} '${String(activeCycle.year).slice(2)} — kickoff through reporting delivery` : "No active survey cycle"}
               </p>
             </div>
-            <Link href="./key-dates" className="flex items-center gap-1 text-[#00b8a9] text-xs font-semibold hover:underline">
+            <Link href="./key-dates" className="flex items-center gap-1 text-[#4361ee] text-xs font-semibold hover:underline">
               Manage <ArrowRight size={11} />
             </Link>
           </div>
@@ -186,18 +186,18 @@ export default function ClientHomePage() {
           <div className="bg-white rounded-xl border border-slate-200 p-5">
             <div className="flex items-center justify-between mb-1">
               <h3 className="text-sm font-semibold text-slate-900">Checklist</h3>
-              <Link href="./checklist" className="text-[11px] text-[#00b8a9] font-semibold hover:underline">View</Link>
+              <Link href="./checklist" className="text-[11px] text-[#4361ee] font-semibold hover:underline">View</Link>
             </div>
             <p className="text-[11px] text-slate-400 mb-2.5">{checklistPct.done}/{checklistPct.total} items complete</p>
             <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
-              <div className="h-full rounded-full bg-[#00b8a9] transition-all" style={{ width: `${checklistPct.pct}%` }} />
+              <div className="h-full rounded-full bg-[#4361ee] transition-all" style={{ width: `${checklistPct.pct}%` }} />
             </div>
           </div>
 
           <div className="bg-white rounded-xl border border-slate-200 p-5">
             <div className="flex items-center justify-between mb-1">
               <h3 className="text-sm font-semibold text-slate-900">Onboarding</h3>
-              <Link href="./onboarding" className="text-[11px] text-[#00b8a9] font-semibold hover:underline">View</Link>
+              <Link href="./onboarding" className="text-[11px] text-[#4361ee] font-semibold hover:underline">View</Link>
             </div>
             <p className="text-[11px] text-slate-400 mb-2.5">{onboardingPct.done}/{onboardingPct.total} steps approved</p>
             <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
@@ -209,7 +209,7 @@ export default function ClientHomePage() {
             <div className="bg-white rounded-xl border border-slate-200 p-5">
               <div className="flex items-center justify-between mb-1">
                 <h3 className="text-sm font-semibold text-slate-900">Active Survey</h3>
-                <Link href="./surveys" className="text-[11px] text-[#00b8a9] font-semibold hover:underline">View</Link>
+                <Link href="./surveys" className="text-[11px] text-[#4361ee] font-semibold hover:underline">View</Link>
               </div>
               <p className="text-[12px] text-slate-600 mb-2.5">
                 {activeCycle.name} &rsquo;{String(activeCycle.year).slice(2)}

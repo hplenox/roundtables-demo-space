@@ -14,7 +14,7 @@ interface GenderDemographicsProps {
   workforce: GenderSplit;
 }
 
-const MEN_COLOR   = "#00897b";  // teal-ish green — matches app palette
+const MEN_COLOR   = "#3147af";  // teal-ish green — matches app palette
 const WOMEN_COLOR = "#0f1923";  // dark navy
 
 function PieChart({

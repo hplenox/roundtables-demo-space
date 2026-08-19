@@ -29,8 +29,8 @@ const TYPE_CONFIG: Record<
   survey_started: {
     label: "Survey Started",
     icon: Play,
-    color: "text-[#00897b]",
-    bg: "bg-[#00b8a9]/15",
+    color: "text-[#3147af]",
+    bg: "bg-[#4361ee]/15",
   },
   accessed: {
     label: "Survey Accessed",
@@ -53,8 +53,8 @@ const TYPE_CONFIG: Record<
   invitation_sent: {
     label: "Invitation Sent",
     icon: Send,
-    color: "text-[#00897b]",
-    bg: "bg-[#00b8a9]/15",
+    color: "text-[#3147af]",
+    bg: "bg-[#4361ee]/15",
   },
   invitation_opened: {
     label: "Email Opened",
@@ -334,7 +334,7 @@ export default function ActivityLogPage() {
                   className={`
                     flex items-center gap-1.5 px-3.5 py-2.5 text-[12.5px] font-medium border-b-2 transition-all whitespace-nowrap
                     ${activeFilter === f.key
-                      ? "border-[#00b8a9] text-[#00897b]"
+                      ? "border-[#4361ee] text-[#3147af]"
                       : "border-transparent text-slate-500 hover:text-slate-700"
                     }
                   `}
@@ -342,7 +342,7 @@ export default function ActivityLogPage() {
                   {f.label}
                   {count > 0 && (
                     <span className={`inline-flex items-center justify-center min-w-[16px] h-4 px-1 rounded-full text-[9px] font-bold ${
-                      activeFilter === f.key ? "bg-[#00b8a9]/15 text-[#00897b]" : "bg-slate-100 text-slate-500"
+                      activeFilter === f.key ? "bg-[#4361ee]/15 text-[#3147af]" : "bg-slate-100 text-slate-500"
                     }`}>
                       {count}
                     </span>

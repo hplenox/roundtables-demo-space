@@ -24,14 +24,14 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   return (
     <div className="min-h-full bg-slate-50">
       <div className="bg-white border-b border-slate-200 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
-        <div className="h-[3px] bg-gradient-to-r from-[#00b8a9] via-[#00b8a9]/70 to-transparent" />
+        <div className="h-[3px] bg-gradient-to-r from-[#4361ee] via-[#4361ee]/70 to-transparent" />
 
         <div className="max-w-6xl mx-auto px-6 pt-5 pb-0">
           {/* Breadcrumb */}
           <div className="flex items-center gap-1.5 text-[11.5px] mb-4">
             <Link
               href="/"
-              className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-[#0f1923] text-[#00b8a9] hover:bg-[#1a2d3d] transition-colors font-semibold text-[10.5px] tracking-wide"
+              className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-[#0f1923] text-[#4361ee] hover:bg-[#1a2d3d] transition-colors font-semibold text-[10.5px] tracking-wide"
             >
               <LayoutDashboard size={10} strokeWidth={2} />
               Home
@@ -44,7 +44,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           <div className="flex items-center justify-between gap-4 mb-5">
             <div className="flex items-center gap-3">
               <div className="shrink-0 w-10 h-10 rounded-xl bg-[#0f1923] flex items-center justify-center shadow-sm">
-                <UserCog size={16} className="text-[#00b8a9]" />
+                <UserCog size={16} className="text-[#4361ee]" />
               </div>
               <div>
                 <h1 className="text-[18px] font-bold text-slate-900 leading-tight">Administrator</h1>
@@ -54,7 +54,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               </div>
             </div>
 
-            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#00b8a9]/8 border border-[#00b8a9]/25 text-[#00897b]">
+            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#4361ee]/8 border border-[#4361ee]/25 text-[#3147af]">
               <Award size={13} strokeWidth={2} />
               <span className="text-[11.5px] font-semibold">Admin Access</span>
             </div>
@@ -69,7 +69,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 className={`
                   px-5 py-2.5 text-[13px] font-medium border-b-2 transition-all duration-150
                   ${activeTab === tab.key
-                    ? "border-[#00b8a9] text-[#00897b]"
+                    ? "border-[#4361ee] text-[#3147af]"
                     : "border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300"
                   }
                 `}

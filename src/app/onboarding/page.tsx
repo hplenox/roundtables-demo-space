@@ -78,13 +78,13 @@ function SurveySelector({
               key={c.id}
               onClick={() => onSelect(c.id)}
               className={`w-full flex items-center justify-between gap-3 px-5 py-3 text-left transition-colors ${
-                active ? "bg-[#00b8a9]/5" : "hover:bg-slate-50/60"
+                active ? "bg-[#4361ee]/5" : "hover:bg-slate-50/60"
               }`}
             >
               <div className="flex items-center gap-3 min-w-0">
-                <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${active ? "bg-[#00b8a9]" : "bg-transparent"}`} />
+                <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${active ? "bg-[#4361ee]" : "bg-transparent"}`} />
                 <div className="min-w-0">
-                  <p className={`text-[13px] font-medium truncate ${active ? "text-[#00897b]" : "text-slate-700"}`}>
+                  <p className={`text-[13px] font-medium truncate ${active ? "text-[#3147af]" : "text-slate-700"}`}>
                     {c.name} &rsquo;{String(c.year).slice(2)}
                   </p>
                   <p className="text-[11px] text-slate-400">{CYCLE_STATUS_CONFIG[c.status].label}</p>
@@ -143,7 +143,7 @@ function QuestionsStep({ step, onSubmit }: { step: OnboardingStep; onSubmit: () 
       <div className="px-5 py-3.5 flex items-center justify-between gap-3">
         <button
           onClick={() => setShowPreview((v) => !v)}
-          className="flex items-center gap-1.5 text-[12px] font-medium text-slate-600 hover:text-[#00897b] transition-colors"
+          className="flex items-center gap-1.5 text-[12px] font-medium text-slate-600 hover:text-[#3147af] transition-colors"
         >
           <ChevronDown size={13} className={`transition-transform ${showPreview ? "rotate-180" : ""}`} />
           Review previous year&rsquo;s questions
@@ -212,7 +212,7 @@ function ContactsStep({ step, surveyId, onSubmit }: { step: OnboardingStep; surv
         {surveyId ? (
           <Link
             href={`/surveys/${surveyId}/contacts`}
-            className="flex items-center gap-1.5 text-[12px] font-medium text-[#00897b] hover:underline"
+            className="flex items-center gap-1.5 text-[12px] font-medium text-[#3147af] hover:underline"
           >
             Review My Contact List <ExternalLink size={12} />
           </Link>
@@ -243,7 +243,7 @@ function FinalizationStep({ step, cycle }: { step: OnboardingStep; cycle: Client
       <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100">
         <div className="flex items-start gap-3 min-w-0">
           <div className="w-8 h-8 rounded-lg bg-[#e8f5f3] flex items-center justify-center shrink-0 mt-0.5">
-            <Mail size={15} className="text-[#00897b]" />
+            <Mail size={15} className="text-[#3147af]" />
           </div>
           <div className="min-w-0">
             <p className="text-[13px] font-semibold text-slate-800">3. {step.label}</p>
@@ -312,11 +312,11 @@ export default function ClientOnboardingViewPage() {
   return (
     <div className="min-h-full bg-slate-50">
       <div className="bg-white border-b border-slate-200 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
-        <div className="h-[3px] bg-gradient-to-r from-[#00b8a9] via-[#00b8a9]/70 to-transparent" />
+        <div className="h-[3px] bg-gradient-to-r from-[#4361ee] via-[#4361ee]/70 to-transparent" />
         <div className="max-w-5xl mx-auto px-6 py-6">
           <div className="flex items-start gap-3">
             <div className="shrink-0 w-11 h-11 rounded-xl bg-[#0f1923] flex items-center justify-center">
-              <ClipboardList size={18} className="text-[#00b8a9]" />
+              <ClipboardList size={18} className="text-[#4361ee]" />
             </div>
             <div className="min-w-0">
               <h1 className="text-[18px] font-bold text-slate-900 leading-tight">Onboarding</h1>

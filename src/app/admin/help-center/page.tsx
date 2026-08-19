@@ -44,7 +44,7 @@ const PERIOD_KPIS: Record<string, { conversations: number; autoRes: number; esca
 
 const AI_RESPONSES = [
   { label: "Generated a reply", value: 52, color: "#3b82f6" },
-  { label: "Showed an answer",  value: 30, color: "#00b8a9" },
+  { label: "Showed an answer",  value: 30, color: "#4361ee" },
   { label: "Couldn't answer",   value: 18, color: "#be185d" },
 ];
 
@@ -97,7 +97,7 @@ function ConversationsChart({ data }: { data: MonthRow[] }) {
     if (keys.length === 0) return;
 
     const colors: Record<string, string> = {
-      autoRes:     "#00b8a9",
+      autoRes:     "#4361ee",
       escalations: "#0d5e58",
       dropOffs:    "#e2e8f0",
     };
@@ -139,7 +139,7 @@ function ConversationsChart({ data }: { data: MonthRow[] }) {
             <p class="font-semibold text-slate-800 mb-1">${md.month}</p>
             <div class="space-y-0.5 text-[11px] text-slate-500">
               <div>Conversations: <span class="font-semibold text-slate-700">${md.conversations}</span></div>
-              <div>Auto Resolved: <span class="font-semibold" style="color:#00897b">${md.autoRes}</span></div>
+              <div>Auto Resolved: <span class="font-semibold" style="color:#3147af">${md.autoRes}</span></div>
               <div>Escalated: <span class="font-semibold text-slate-700">${md.escalations}</span></div>
               <div>Drop-offs: <span class="font-semibold text-slate-700">${md.dropOffs}</span></div>
             </div>
@@ -176,7 +176,7 @@ function ConversationsChart({ data }: { data: MonthRow[] }) {
   }, [data, vis]);
 
   const legendItems = [
-    { key: "autoRes",     label: "Auto Resolved", color: "#00b8a9" },
+    { key: "autoRes",     label: "Auto Resolved", color: "#4361ee" },
     { key: "escalations", label: "Escalations",   color: "#0d5e58" },
     { key: "dropOffs",    label: "Drop-offs",      color: "#e2e8f0", border: "#cbd5e1" },
   ];
@@ -277,19 +277,19 @@ export default function HelpCenterPage() {
       {/* ── Executive Summary ── */}
       <div className="rounded-xl bg-[#0f1923] p-5">
         <div className="flex items-start gap-3">
-          <div className="shrink-0 w-8 h-8 rounded-lg bg-[#00b8a9]/15 border border-[#00b8a9]/30 flex items-center justify-center mt-0.5">
-            <Bot size={15} className="text-[#00b8a9]" />
+          <div className="shrink-0 w-8 h-8 rounded-lg bg-[#4361ee]/15 border border-[#4361ee]/30 flex items-center justify-center mt-0.5">
+            <Bot size={15} className="text-[#4361ee]" />
           </div>
           <div className="flex-1">
             <div className="flex items-center gap-2 mb-2 flex-wrap">
               <p className="text-[13px] font-bold text-white">Lenni Bott — Support Intelligence Summary</p>
-              <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-[#00b8a9]/15 text-[#00b8a9] border border-[#00b8a9]/25">
+              <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-[#4361ee]/15 text-[#4361ee] border border-[#4361ee]/25">
                 Zendesk AI Agent · Jul 6, 2026
               </span>
             </div>
             <div className="space-y-1.5 text-[12px] leading-relaxed text-white/55">
               <p>
-                <span className="text-[#00b8a9] font-semibold">Lenni Bott has autonomously resolved 89 cumulative conversations</span> since launch — sustaining an 18–21% automated resolution rate over the past 6 months with <span className="text-white/80">zero human escalations</span> in the last quarter, protecting the support team&apos;s bandwidth.
+                <span className="text-[#4361ee] font-semibold">Lenni Bott has autonomously resolved 89 cumulative conversations</span> since launch — sustaining an 18–21% automated resolution rate over the past 6 months with <span className="text-white/80">zero human escalations</span> in the last quarter, protecting the support team&apos;s bandwidth.
               </p>
               <p>
                 Traffic spiked to <span className="text-white/80">95 conversations in December 2025</span> and <span className="text-white/80">98 in April 2026</span> — both surges absorbed entirely by Lenni Bott with no agent transfers, proving elastic AI capacity at peak demand.
@@ -318,7 +318,7 @@ export default function HelpCenterPage() {
                 onClick={() => setPeriod(k)}
                 className={`px-3.5 py-1.5 text-[11px] font-semibold transition-colors duration-150 ${
                   period === k
-                    ? "bg-[#00b8a9] text-white"
+                    ? "bg-[#4361ee] text-white"
                     : "text-slate-400 hover:text-slate-600 hover:bg-slate-50"
                 }`}
               >
@@ -331,7 +331,7 @@ export default function HelpCenterPage() {
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
           {[
             { label: "Conversations", value: kpi.conversations, icon: MessageSquare, color: "text-blue-600",    bg: "bg-blue-50"           },
-            { label: "Auto Resolved", value: kpi.autoRes,       icon: CheckCircle2,  color: "text-[#00897b]",   bg: "bg-[#00b8a9]/10"      },
+            { label: "Auto Resolved", value: kpi.autoRes,       icon: CheckCircle2,  color: "text-[#3147af]",   bg: "bg-[#4361ee]/10"      },
             { label: "Escalations",   value: kpi.escalations,   icon: AlertTriangle, color: "text-amber-600",   bg: "bg-amber-50"          },
             { label: "Drop-offs",     value: kpi.dropOffs,      icon: XCircle,       color: "text-slate-500",   bg: "bg-slate-100"         },
           ].map(({ label, value, icon: Icon, color, bg }) => (
@@ -342,7 +342,7 @@ export default function HelpCenterPage() {
               <p className="text-2xl font-bold text-slate-900">{value}</p>
               <p className="text-xs text-slate-400 mt-0.5">{label}</p>
               {label === "Auto Resolved" && kpi.conversations > 0 && (
-                <p className="text-[10.5px] text-[#00897b] font-medium mt-1">
+                <p className="text-[10.5px] text-[#3147af] font-medium mt-1">
                   {Math.round((value / kpi.conversations) * 100)}% resolution rate
                 </p>
               )}
@@ -359,7 +359,7 @@ export default function HelpCenterPage() {
           <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100">
             <div>
               <div className="flex items-center gap-2">
-                <BarChart2 size={13} className="text-[#00b8a9]" strokeWidth={2} />
+                <BarChart2 size={13} className="text-[#4361ee]" strokeWidth={2} />
                 <h2 className="text-sm font-semibold text-slate-900">Conversations by Month</h2>
               </div>
               <p className="text-xs text-slate-400 mt-0.5">Jul 2025 – Jun 2026 · click legend to filter series</p>
@@ -373,7 +373,7 @@ export default function HelpCenterPage() {
         {/* Donut + stats */}
         <div className="bg-white rounded-xl border border-slate-200">
           <div className="flex items-center gap-2 px-5 py-4 border-b border-slate-100">
-            <Activity size={13} className="text-[#00b8a9]" strokeWidth={2} />
+            <Activity size={13} className="text-[#4361ee]" strokeWidth={2} />
             <div>
               <h2 className="text-sm font-semibold text-slate-900">AI Response Mix</h2>
               <p className="text-xs text-slate-400 mt-0.5">30-day · Jun 7 – Jul 6</p>
@@ -394,7 +394,7 @@ export default function HelpCenterPage() {
               {[
                 { v: "31",  l: "Active Users",   c: "text-slate-900" },
                 { v: "0%",  l: "Transfer Rate",  c: "text-slate-900" },
-                { v: "18%", l: "AI Resolution",  c: "text-[#00897b]" },
+                { v: "18%", l: "AI Resolution",  c: "text-[#3147af]" },
                 { v: "96%", l: "Engage Rate",    c: "text-blue-600"  },
               ].map(m => (
                 <div key={m.l} className="text-center">
@@ -413,7 +413,7 @@ export default function HelpCenterPage() {
         {/* Top answers */}
         <div className="bg-white rounded-xl border border-slate-200">
           <div className="flex items-center gap-2 px-5 py-4 border-b border-slate-100">
-            <Zap size={13} className="text-[#00b8a9]" strokeWidth={2} />
+            <Zap size={13} className="text-[#4361ee]" strokeWidth={2} />
             <div>
               <h2 className="text-sm font-semibold text-slate-900">Top Lenni Bott Answers</h2>
               <p className="text-xs text-slate-400 mt-0.5">Most-triggered response flows · Last 30 days (Jun 7 – Jul 6, 2026)</p>
@@ -425,7 +425,7 @@ export default function HelpCenterPage() {
                 <span
                   className="w-5 h-5 rounded-full flex items-center justify-center text-[9.5px] font-bold flex-shrink-0"
                   style={i < 2
-                    ? { background: "#00b8a9", color: "white" }
+                    ? { background: "#4361ee", color: "white" }
                     : { background: "#f1f5f9", color: "#94a3b8" }
                   }
                 >{i + 1}</span>
@@ -433,7 +433,7 @@ export default function HelpCenterPage() {
                   <p className="text-[12px] text-slate-700 font-medium truncate">{a.name}</p>
                   <div className="mt-1.5 h-1.5 bg-slate-100 rounded-full overflow-hidden">
                     <div
-                      className="h-full rounded-full bg-[#00b8a9] transition-all"
+                      className="h-full rounded-full bg-[#4361ee] transition-all"
                       style={{ width: `${(a.engaged / 4) * 100}%` }}
                     />
                   </div>
@@ -477,13 +477,13 @@ export default function HelpCenterPage() {
           {/* Jun snapshot */}
           <div className="px-5 py-4 border-t border-slate-100 bg-slate-50/60 rounded-b-xl">
             <div className="flex items-center gap-1.5 mb-2">
-              <Sparkles size={11} className="text-[#00897b]" />
+              <Sparkles size={11} className="text-[#3147af]" />
               <p className="text-[10.5px] font-semibold text-slate-500">June 2026 Snapshot</p>
             </div>
             <div className="grid grid-cols-4 gap-2">
               {[
                 { v: "24",  l: "Total",    c: "text-slate-900" },
-                { v: "23",  l: "Engaged",  c: "text-[#00897b]" },
+                { v: "23",  l: "Engaged",  c: "text-[#3147af]" },
                 { v: "0",   l: "Transfer", c: "text-slate-400" },
                 { v: "96%", l: "Rate",     c: "text-blue-600"  },
               ].map(m => (
@@ -500,7 +500,7 @@ export default function HelpCenterPage() {
       {/* ── Users by Month ── */}
       <div className="bg-white rounded-xl border border-slate-200">
         <div className="flex items-center gap-2 px-5 py-4 border-b border-slate-100">
-          <Users size={13} className="text-[#00b8a9]" strokeWidth={2} />
+          <Users size={13} className="text-[#4361ee]" strokeWidth={2} />
           <div>
             <h2 className="text-sm font-semibold text-slate-900">Users by Month</h2>
             <p className="text-xs text-slate-400 mt-0.5">Total · Engaged with bot · Transferred to agent</p>
@@ -517,7 +517,7 @@ export default function HelpCenterPage() {
                 <div className="space-y-2.5">
                   {[
                     { label: "Total users",       value: row.total,       color: "#0f1923" },
-                    { label: "Engaged with bot",  value: row.engaged,     color: "#00b8a9" },
+                    { label: "Engaged with bot",  value: row.engaged,     color: "#4361ee" },
                     { label: "Transferred",       value: row.transferred, color: "#f59e0b" },
                   ].map(s => (
                     <div key={s.label} className="flex items-center justify-between">
@@ -531,12 +531,12 @@ export default function HelpCenterPage() {
                 </div>
               </div>
             ))}
-            <div className="flex-1 rounded-xl border border-[#00b8a9]/20 bg-[#00b8a9]/5 p-4 flex flex-col justify-center">
-              <p className="text-[10.5px] font-semibold text-[#00897b] uppercase tracking-wide mb-3">Key Insights</p>
+            <div className="flex-1 rounded-xl border border-[#4361ee]/20 bg-[#4361ee]/5 p-4 flex flex-col justify-center">
+              <p className="text-[10.5px] font-semibold text-[#3147af] uppercase tracking-wide mb-3">Key Insights</p>
               <ul className="space-y-2 text-[11.5px] text-slate-600 leading-snug">
-                <li className="flex gap-2"><span className="text-[#00b8a9] font-bold mt-0.5">·</span>96% of June users engaged with Lenni Bott directly</li>
-                <li className="flex gap-2"><span className="text-[#00b8a9] font-bold mt-0.5">·</span>Zero transfers to human agents in June</li>
-                <li className="flex gap-2"><span className="text-[#00b8a9] font-bold mt-0.5">·</span>Bot contained all traffic autonomously</li>
+                <li className="flex gap-2"><span className="text-[#4361ee] font-bold mt-0.5">·</span>96% of June users engaged with Lenni Bott directly</li>
+                <li className="flex gap-2"><span className="text-[#4361ee] font-bold mt-0.5">·</span>Zero transfers to human agents in June</li>
+                <li className="flex gap-2"><span className="text-[#4361ee] font-bold mt-0.5">·</span>Bot contained all traffic autonomously</li>
               </ul>
             </div>
           </div>

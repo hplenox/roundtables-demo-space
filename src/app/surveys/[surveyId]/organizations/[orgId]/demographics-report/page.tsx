@@ -162,7 +162,7 @@ export default function DemographicsReportPage() {
           <nav className="flex items-center gap-1.5 text-[11px] min-w-0 overflow-hidden">
             <Link
               href="/surveys"
-              className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-[#0f1923] text-[#00b8a9] hover:bg-[#1a2d3d] transition-colors font-semibold text-[9.5px] tracking-wide shrink-0"
+              className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-[#0f1923] text-[#4361ee] hover:bg-[#1a2d3d] transition-colors font-semibold text-[9.5px] tracking-wide shrink-0"
             >
               <LayoutDashboard size={9} strokeWidth={2} />
               Survey Admin
@@ -199,11 +199,11 @@ export default function DemographicsReportPage() {
 
         {/* ── Report header ─────────────────────────────────────────── */}
         <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
-          <div className="h-1.5 bg-gradient-to-r from-sky-500 via-sky-400 to-[#00b8a9]" />
+          <div className="h-1.5 bg-gradient-to-r from-sky-500 via-sky-400 to-[#4361ee]" />
           <div className="p-6 flex items-start justify-between gap-5">
             <div className="flex items-center gap-4">
               <div className="w-14 h-14 rounded-2xl bg-[#0f1923] flex items-center justify-center shrink-0 shadow-md">
-                <span className="text-[18px] font-black text-[#00b8a9]">
+                <span className="text-[18px] font-black text-[#4361ee]">
                   {org.name.substring(0, 2).toUpperCase()}
                 </span>
               </div>

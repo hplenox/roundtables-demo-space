@@ -35,7 +35,7 @@ const RACE_COLORS: Record<RaceKey, string> = {
 };
 
 const ROLE_COLORS = {
-  ownership:  "#00897b",
+  ownership:  "#3147af",
   leadership: "#3b82f6",
   workforce:  "#f59e0b",
 };
@@ -188,7 +188,7 @@ function GroupedBarChart({ data }: { data: RacialDemographics }) {
               .style("left", `${mx + 12}px`)
               .style("top",  `${my - 10}px`)
               .html(`
-                <div style="color:#00b8a9;font-weight:700;margin-bottom:4px;line-height:1.3">${race.label}</div>
+                <div style="color:#4361ee;font-weight:700;margin-bottom:4px;line-height:1.3">${race.label}</div>
                 <div style="display:flex;align-items:center;gap:6px">
                   <span style="width:8px;height:8px;border-radius:2px;background:${ROLE_COLORS[role.key as keyof typeof ROLE_COLORS]};display:inline-block;flex-shrink:0"></span>
                   <span style="color:#94a3b8">${role.label}:</span>
@@ -350,7 +350,7 @@ function StackedBarChart({ data }: { data: RacialDemographics }) {
             .style("left", `${mx + 12}px`)
             .style("top",  `${my - 10}px`)
             .html(`
-              <div style="color:#00b8a9;font-weight:700;margin-bottom:6px">${role.label} (n=${total})</div>
+              <div style="color:#4361ee;font-weight:700;margin-bottom:6px">${role.label} (n=${total})</div>
               ${rows}
             `);
         })

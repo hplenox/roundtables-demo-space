@@ -63,7 +63,7 @@ export default function TicketList({ tickets, selectedId, onSelect }: TicketList
             placeholder="Search tickets..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-8 pr-3 py-1.5 text-[12px] bg-slate-50 border border-slate-200 rounded-lg outline-none focus:border-[#00b8a9] transition-colors"
+            className="w-full pl-8 pr-3 py-1.5 text-[12px] bg-slate-50 border border-slate-200 rounded-lg outline-none focus:border-[#4361ee] transition-colors"
           />
         </div>
       </div>
@@ -115,7 +115,7 @@ export default function TicketList({ tickets, selectedId, onSelect }: TicketList
               onClick={() => onSelect(ticket)}
               className={`w-full text-left px-3 py-3 border-b border-slate-50 transition-colors hover:bg-slate-50
                 ${selectedId === ticket.id
-                  ? "bg-[#00b8a9]/[0.06] border-l-2 border-l-[#00b8a9]"
+                  ? "bg-[#4361ee]/[0.06] border-l-2 border-l-[#4361ee]"
                   : "border-l-2 border-l-transparent"
                 }`}
             >

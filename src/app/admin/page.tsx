@@ -57,8 +57,8 @@ export default function AdminPage() {
             icon: Users,
             label: "Total Organizations",
             value: totalOrgs,
-            color: "text-[#00897b]",
-            bg: "bg-[#00b8a9]/10",
+            color: "text-[#3147af]",
+            bg: "bg-[#4361ee]/10",
           },
           {
             icon: TrendingUp,
@@ -90,7 +90,7 @@ export default function AdminPage() {
             </div>
             <Link
               href="/admin/badges"
-              className="flex items-center gap-1 text-[#00b8a9] text-xs font-semibold hover:underline"
+              className="flex items-center gap-1 text-[#4361ee] text-xs font-semibold hover:underline"
             >
               Manage <ArrowRight size={11} />
             </Link>
@@ -134,33 +134,33 @@ export default function AdminPage() {
             <div className="space-y-2">
               <Link
                 href="/"
-                className="flex items-center gap-3 p-3 rounded-lg bg-slate-50 hover:bg-[#00b8a9]/5 border border-slate-100 hover:border-[#00b8a9]/30 transition-colors group"
+                className="flex items-center gap-3 p-3 rounded-lg bg-slate-50 hover:bg-[#4361ee]/5 border border-slate-100 hover:border-[#4361ee]/30 transition-colors group"
               >
                 <LayoutDashboard size={14} className="text-slate-500" />
-                <span className="text-[12px] font-medium text-slate-700 group-hover:text-[#00897b]">
+                <span className="text-[12px] font-medium text-slate-700 group-hover:text-[#3147af]">
                   Dashboard
                 </span>
-                <ArrowRight size={11} className="ml-auto text-slate-300 group-hover:text-[#00b8a9]" />
+                <ArrowRight size={11} className="ml-auto text-slate-300 group-hover:text-[#4361ee]" />
               </Link>
               <Link
                 href="/surveys"
-                className="flex items-center gap-3 p-3 rounded-lg bg-slate-50 hover:bg-[#00b8a9]/5 border border-slate-100 hover:border-[#00b8a9]/30 transition-colors group"
+                className="flex items-center gap-3 p-3 rounded-lg bg-slate-50 hover:bg-[#4361ee]/5 border border-slate-100 hover:border-[#4361ee]/30 transition-colors group"
               >
-                <BarChart3 size={14} className="text-[#00b8a9]" />
-                <span className="text-[12px] font-medium text-slate-700 group-hover:text-[#00897b]">
+                <BarChart3 size={14} className="text-[#4361ee]" />
+                <span className="text-[12px] font-medium text-slate-700 group-hover:text-[#3147af]">
                   Survey Admin
                 </span>
-                <ArrowRight size={11} className="ml-auto text-slate-300 group-hover:text-[#00b8a9]" />
+                <ArrowRight size={11} className="ml-auto text-slate-300 group-hover:text-[#4361ee]" />
               </Link>
               <Link
                 href="/organization"
-                className="flex items-center gap-3 p-3 rounded-lg bg-slate-50 hover:bg-[#00b8a9]/5 border border-slate-100 hover:border-[#00b8a9]/30 transition-colors group"
+                className="flex items-center gap-3 p-3 rounded-lg bg-slate-50 hover:bg-[#4361ee]/5 border border-slate-100 hover:border-[#4361ee]/30 transition-colors group"
               >
                 <Building2 size={14} className="text-violet-500" />
-                <span className="text-[12px] font-medium text-slate-700 group-hover:text-[#00897b]">
+                <span className="text-[12px] font-medium text-slate-700 group-hover:text-[#3147af]">
                   My Organization
                 </span>
-                <ArrowRight size={11} className="ml-auto text-slate-300 group-hover:text-[#00b8a9]" />
+                <ArrowRight size={11} className="ml-auto text-slate-300 group-hover:text-[#4361ee]" />
               </Link>
             </div>
           </div>
@@ -168,8 +168,8 @@ export default function AdminPage() {
           {/* Permission notice */}
           <div className="rounded-xl bg-[#0f1923] p-4">
             <div className="flex items-center gap-2 mb-2">
-              <ShieldCheck size={13} className="text-[#00b8a9]" />
-              <p className="text-[11px] font-bold text-[#00b8a9] tracking-wide uppercase">Admin Access</p>
+              <ShieldCheck size={13} className="text-[#4361ee]" />
+              <p className="text-[11px] font-bold text-[#4361ee] tracking-wide uppercase">Admin Access</p>
             </div>
             <p className="text-[11px] text-white/50 leading-relaxed">
               You have full administrator privileges for Lenox Park Solutions. Badge assignments are recorded against the active survey cohort.

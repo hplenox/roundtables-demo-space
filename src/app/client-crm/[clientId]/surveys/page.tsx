@@ -28,7 +28,7 @@ function CycleCard({ cycle }: { cycle: ClientSurveyCycle }) {
         {rate !== null && (
           <div className="flex items-center gap-2 mt-1">
             <div className="flex-1 h-1.5 bg-slate-100 rounded-full overflow-hidden">
-              <div className="h-full rounded-full bg-[#00b8a9]" style={{ width: `${rate}%` }} />
+              <div className="h-full rounded-full bg-[#4361ee]" style={{ width: `${rate}%` }} />
             </div>
             <span className="text-[10.5px] text-slate-500 tabular-nums">{rate}%</span>
           </div>
@@ -45,7 +45,7 @@ function CycleCard({ cycle }: { cycle: ClientSurveyCycle }) {
           href={`/surveys/${cycle.surveyId}`}
           target="_blank"
           rel="noopener noreferrer"
-          className="shrink-0 flex items-center gap-1 text-[11.5px] font-medium text-[#00897b] hover:underline"
+          className="shrink-0 flex items-center gap-1 text-[11.5px] font-medium text-[#3147af] hover:underline"
         >
           Full Detail <ArrowUpRight size={11} />
         </Link>

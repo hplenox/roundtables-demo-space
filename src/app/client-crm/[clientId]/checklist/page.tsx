@@ -50,7 +50,7 @@ export default function ClientChecklistPage() {
         <div className="px-5 py-3 border-b border-slate-50">
           <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
             <div
-              className={`h-full rounded-full transition-all duration-500 ${allDone ? "bg-emerald-500" : "bg-[#00b8a9]"}`}
+              className={`h-full rounded-full transition-all duration-500 ${allDone ? "bg-emerald-500" : "bg-[#4361ee]"}`}
               style={{ width: `${progress.pct}%` }}
             />
           </div>
@@ -66,7 +66,7 @@ export default function ClientChecklistPage() {
               <span className="text-[11px] text-slate-300 tabular-nums w-4 shrink-0">{i + 1}</span>
               <span
                 className={`w-5 h-5 rounded-md border flex items-center justify-center shrink-0 transition-colors ${
-                  item.done ? "bg-[#00b8a9] border-[#00b8a9]" : "border-slate-300"
+                  item.done ? "bg-[#4361ee] border-[#4361ee]" : "border-slate-300"
                 }`}
               >
                 {item.done && <Check size={12} className="text-white" strokeWidth={3} />}

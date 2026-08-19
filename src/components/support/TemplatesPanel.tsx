@@ -15,7 +15,7 @@ const CATEGORIES: Array<TemplateCategory | "All"> = [
 
 const CATEGORY_COLORS: Record<TemplateCategory, string> = {
   "Permissions & Access": "bg-violet-50 text-violet-700",
-  "Survey Completion":    "bg-[#00b8a9]/10 text-[#00897b]",
+  "Survey Completion":    "bg-[#4361ee]/10 text-[#3147af]",
   "Data & Benchmarks":    "bg-amber-50 text-amber-700",
   "Status Updates":       "bg-blue-50 text-blue-700",
 };
@@ -30,7 +30,7 @@ function TemplateCard({
   onCopy: (t: QuickReplyTemplate) => void;
 }) {
   return (
-    <div className="bg-white rounded-xl border border-slate-200 p-4 flex flex-col gap-3 hover:border-[#00b8a9]/40 hover:shadow-sm transition-all">
+    <div className="bg-white rounded-xl border border-slate-200 p-4 flex flex-col gap-3 hover:border-[#4361ee]/40 hover:shadow-sm transition-all">
       <span className={`self-start text-[10.5px] font-semibold px-2 py-0.5 rounded-md ${CATEGORY_COLORS[template.category]}`}>
         {template.category}
       </span>

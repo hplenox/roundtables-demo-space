@@ -33,7 +33,7 @@ export default function LpiGaugeBar({ score, version = "v3.1" }: LpiGaugeProps) 
       { offset: "35%",  color: "#f97316" },
       { offset: "55%",  color: "#eab308" },
       { offset: "72%",  color: "#84cc16" },
-      { offset: "100%", color: "#00b8a9" },
+      { offset: "100%", color: "#4361ee" },
     ];
     stops.forEach(s => grad.append("stop").attr("offset", s.offset).attr("stop-color", s.color));
 
@@ -105,7 +105,7 @@ export default function LpiGaugeBar({ score, version = "v3.1" }: LpiGaugeProps) 
   }, [score]);
 
   // Color for score badge
-  const scoreColor = score >= 8 ? "#00897b" : score >= 6.5 ? "#b45309" : "#dc2626";
+  const scoreColor = score >= 8 ? "#3147af" : score >= 6.5 ? "#b45309" : "#dc2626";
   const scoreLabel = score >= 8 ? "Strong" : score >= 6.5 ? "Developing" : "Emerging";
 
   return (
@@ -135,7 +135,7 @@ export default function LpiGaugeBar({ score, version = "v3.1" }: LpiGaugeProps) 
             {[
               { label: "Emerging", color: "#ef4444" },
               { label: "Developing", color: "#eab308" },
-              { label: "Strong", color: "#00b8a9" },
+              { label: "Strong", color: "#4361ee" },
             ].map(({ label, color }) => (
               <div key={label} className="flex items-center gap-1">
                 <span className="w-2 h-2 rounded-full inline-block" style={{ backgroundColor: color }} />

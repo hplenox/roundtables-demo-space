@@ -71,7 +71,7 @@ export default function AumBenchmarkWidget({ aum, benchmarks }: Props) {
               }`}
             >
               {isHome && (
-                <span className="w-1.5 h-1.5 rounded-full bg-[#00b8a9] shrink-0" />
+                <span className="w-1.5 h-1.5 rounded-full bg-[#4361ee] shrink-0" />
               )}
               {bracket}
             </button>

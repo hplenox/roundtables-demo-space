@@ -101,7 +101,7 @@ The RoundTables LPS Team`;
         <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100">
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-lg bg-[#e8f5f3] flex items-center justify-center shrink-0">
-              <Mail size={15} className="text-[#00897b]" />
+              <Mail size={15} className="text-[#3147af]" />
             </div>
             <div>
               <p className="text-[13.5px] font-semibold text-slate-800">{isReminder ? "Send Reminder" : "Send Request"}</p>
@@ -199,7 +199,7 @@ The RoundTables LPS Team`;
         <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100">
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-lg bg-[#e8f5f3] flex items-center justify-center shrink-0">
-              <Mail size={15} className="text-[#00897b]" />
+              <Mail size={15} className="text-[#3147af]" />
             </div>
             <div>
               <p className="text-[13.5px] font-semibold text-slate-800">Send Onboarding Finalization Email</p>
@@ -273,7 +273,7 @@ function StepEmailAction({
         className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12px] font-medium border transition-colors ${
           step.status === "approved"
             ? "border-slate-100 text-slate-300 cursor-not-allowed"
-            : "border-[#00b8a9]/30 bg-[#00b8a9]/5 text-[#00897b] hover:bg-[#00b8a9]/10"
+            : "border-[#4361ee]/30 bg-[#4361ee]/5 text-[#3147af] hover:bg-[#4361ee]/10"
         }`}
       >
         <Send size={12} />
@@ -319,7 +319,7 @@ function QuestionsStep({
       <div className="px-5 py-3.5 flex items-center justify-between gap-3">
         <button
           onClick={() => setShowPreview((v) => !v)}
-          className="flex items-center gap-1.5 text-[12px] font-medium text-slate-600 hover:text-[#00897b] transition-colors"
+          className="flex items-center gap-1.5 text-[12px] font-medium text-slate-600 hover:text-[#3147af] transition-colors"
         >
           <ChevronDown size={13} className={`transition-transform ${showPreview ? "rotate-180" : ""}`} />
           Review previous year&rsquo;s questions
@@ -391,7 +391,7 @@ function ContactsStep({
             href={`/surveys/${surveyId}/contacts`}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-1.5 text-[12px] font-medium text-[#00897b] hover:underline"
+            className="flex items-center gap-1.5 text-[12px] font-medium text-[#3147af] hover:underline"
           >
             Review Contact List <ExternalLink size={12} />
           </Link>
@@ -432,7 +432,7 @@ function FinalizationStep({
       <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100">
         <div className="flex items-start gap-3 min-w-0">
           <div className="w-8 h-8 rounded-lg bg-[#e8f5f3] flex items-center justify-center shrink-0 mt-0.5">
-            <Mail size={15} className="text-[#00897b]" />
+            <Mail size={15} className="text-[#3147af]" />
           </div>
           <div className="min-w-0">
             <p className="text-[13px] font-semibold text-slate-800">3. {step.label}</p>
@@ -451,7 +451,7 @@ function FinalizationStep({
           onClick={() => setShowModal(true)}
           disabled={step.status === "approved"}
           className={`flex items-center gap-1.5 text-[12px] font-medium transition-colors ${
-            step.status === "approved" ? "text-slate-400 cursor-not-allowed" : "text-[#00897b] hover:underline"
+            step.status === "approved" ? "text-slate-400 cursor-not-allowed" : "text-[#3147af] hover:underline"
           }`}
         >
           <Send size={12} /> {step.status === "approved" ? "Finalization email sent" : "Preview & Send Finalization Email"}

@@ -157,7 +157,7 @@ function ManagerCard({
 
   return (
     <div className={`bg-white rounded-xl border shadow-sm transition-all duration-150 overflow-hidden
-      ${selected ? "border-[#00b8a9] ring-1 ring-[#00b8a9]/30" : "border-slate-200 hover:border-slate-300"}`}>
+      ${selected ? "border-[#4361ee] ring-1 ring-[#4361ee]/30" : "border-slate-200 hover:border-slate-300"}`}>
 
       {/* Card header */}
       <div className="px-4 pt-4 pb-3">
@@ -166,7 +166,7 @@ function ManagerCard({
           <button
             onClick={onSelect}
             className={`shrink-0 mt-0.5 w-4 h-4 rounded border-2 flex items-center justify-center transition-colors
-              ${selected ? "bg-[#00b8a9] border-[#00b8a9]" : "border-slate-300 hover:border-slate-400"}`}
+              ${selected ? "bg-[#4361ee] border-[#4361ee]" : "border-slate-300 hover:border-slate-400"}`}
           >
             {selected && <CheckCircle size={10} className="text-white" strokeWidth={3} />}
           </button>
@@ -270,7 +270,7 @@ function ManagerCard({
             <div className="border-t border-slate-100">
               <button
                 onClick={onAddFund}
-                className="w-full flex items-center justify-center gap-1.5 px-4 py-2 text-[11px] font-medium text-[#00897b] hover:bg-[#e8f5f3] transition-colors"
+                className="w-full flex items-center justify-center gap-1.5 px-4 py-2 text-[11px] font-medium text-[#3147af] hover:bg-[#e8f5f3] transition-colors"
               >
                 <Plus size={12} />
                 Add Fund
@@ -322,7 +322,7 @@ function TableView({
             <button
               onClick={() => onToggle(m.id)}
               className={`shrink-0 w-4 h-4 rounded border-2 flex items-center justify-center transition-colors
-                ${sel ? "bg-[#00b8a9] border-[#00b8a9]" : "border-slate-300 hover:border-slate-400"}`}
+                ${sel ? "bg-[#4361ee] border-[#4361ee]" : "border-slate-300 hover:border-slate-400"}`}
             >
               {sel && <CheckCircle size={9} className="text-white" strokeWidth={3} />}
             </button>
@@ -466,7 +466,7 @@ function AddManagerModal({
               key={t}
               onClick={() => setTab(t)}
               className={`flex-1 py-2.5 text-[12px] font-medium transition-colors border-b-2 -mb-px
-                ${tab === t ? "border-[#00b8a9] text-[#00897b]" : "border-transparent text-slate-500 hover:text-slate-700"}`}
+                ${tab === t ? "border-[#4361ee] text-[#3147af]" : "border-transparent text-slate-500 hover:text-slate-700"}`}
             >
               {t === "directory" ? "Search Directory" : "Add Custom"}
             </button>
@@ -717,7 +717,7 @@ function UploadCSVModal({ onClose }: { onClose: () => void }) {
               onDrop={(e) => { e.preventDefault(); setDragging(false); setStage("preview"); }}
               onClick={() => fileRef.current?.click()}
               className={`border-2 border-dashed rounded-xl p-10 flex flex-col items-center gap-3 cursor-pointer transition-colors
-                ${dragging ? "border-[#00b8a9] bg-[#e8f5f3]" : "border-slate-200 hover:border-slate-300 hover:bg-slate-50"}`}
+                ${dragging ? "border-[#4361ee] bg-[#e8f5f3]" : "border-slate-200 hover:border-slate-300 hover:bg-slate-50"}`}
             >
               <div className="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center">
                 <FileText size={22} className="text-slate-400" />
@@ -818,7 +818,7 @@ function SurveyTargetModal({
         <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100">
           <div className="flex items-center gap-2.5">
             <div className="w-7 h-7 rounded-lg bg-[#e8f5f3] flex items-center justify-center">
-              <Send size={13} className="text-[#00897b]" />
+              <Send size={13} className="text-[#3147af]" />
             </div>
             <div>
               <p className="text-[13.5px] font-semibold text-slate-800">Target Survey</p>
@@ -851,14 +851,14 @@ function SurveyTargetModal({
                 <div className="space-y-2">
                   {activeSurveys.map((s) => (
                     <label key={s.id} className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-colors
-                      ${selectedSurveyId === s.id ? "border-[#00b8a9] bg-[#e8f5f3]/40" : "border-slate-200 hover:border-slate-300"}`}>
+                      ${selectedSurveyId === s.id ? "border-[#4361ee] bg-[#e8f5f3]/40" : "border-slate-200 hover:border-slate-300"}`}>
                       <input
                         type="radio"
                         name="survey"
                         value={s.id}
                         checked={selectedSurveyId === s.id}
                         onChange={() => setSelectedSurveyId(s.id)}
-                        className="mt-0.5 accent-[#00b8a9]"
+                        className="mt-0.5 accent-[#4361ee]"
                       />
                       <div>
                         <p className="text-[12.5px] font-semibold text-slate-800">{s.year} {s.name}</p>
@@ -987,7 +987,7 @@ export default function PortfolioPage() {
           <div className="flex items-start justify-between gap-4">
             <div className="flex items-center gap-3">
               <div className="w-9 h-9 rounded-xl bg-[#0f1923] flex items-center justify-center shrink-0">
-                <Briefcase size={16} className="text-[#00b8a9]" />
+                <Briefcase size={16} className="text-[#4361ee]" />
               </div>
               <div>
                 <h1 className="text-[20px] font-semibold text-slate-900">Portfolio Builder</h1>
@@ -1086,7 +1086,7 @@ export default function PortfolioPage() {
         {selectedIds.size > 0 && (
           <div className="flex items-center gap-3 mb-4 px-4 py-2.5 rounded-xl bg-[#0f1923] text-white">
             <div className="flex items-center gap-2 flex-1">
-              <CheckCircle size={14} className="text-[#00b8a9]" />
+              <CheckCircle size={14} className="text-[#4361ee]" />
               <span className="text-[12.5px] font-medium">
                 {selectedIds.size} manager{selectedIds.size !== 1 ? "s" : ""} selected
               </span>
@@ -1097,7 +1097,7 @@ export default function PortfolioPage() {
             </div>
             <button
               onClick={() => setShowSurveyTarget(true)}
-              className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-[#00b8a9] text-white text-[12px] font-medium hover:bg-[#00a99b] transition-colors"
+              className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-[#4361ee] text-white text-[12px] font-medium hover:bg-[#3d58d9] transition-colors"
             >
               <Send size={12} />
               Target Survey
@@ -1118,7 +1118,7 @@ export default function PortfolioPage() {
               <Briefcase size={20} className="text-slate-400" />
             </div>
             <p className="text-[13px] font-medium text-slate-500">No managers match your filter</p>
-            <button onClick={() => { setSearch(""); setAssetFilter("all"); }} className="text-[12px] text-[#00897b] hover:underline">
+            <button onClick={() => { setSearch(""); setAssetFilter("all"); }} className="text-[12px] text-[#3147af] hover:underline">
               Clear filters
             </button>
           </div>

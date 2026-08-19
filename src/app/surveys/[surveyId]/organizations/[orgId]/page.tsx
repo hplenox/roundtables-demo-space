@@ -94,7 +94,7 @@ function NudgeModal({ org, onClose }: { org: InvitedOrg; onClose: () => void }) 
         <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100">
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-lg bg-[#e8f5f3] flex items-center justify-center">
-              <Mail size={15} className="text-[#00897b]" />
+              <Mail size={15} className="text-[#3147af]" />
             </div>
             <div>
               <p className="text-[13.5px] font-semibold text-slate-800">Send Nudge Reminder</p>
@@ -212,7 +212,7 @@ export default function OrgDetailPage() {
       <div className="space-y-4">
         {/* ── Breadcrumb ──────────────────────────────────────────── */}
         <nav className="flex items-center gap-1.5 text-[11.5px]">
-          <Link href="/surveys" className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-[#0f1923] text-[#00b8a9] hover:bg-[#1a2d3d] transition-colors font-semibold text-[10.5px] tracking-wide">
+          <Link href="/surveys" className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-[#0f1923] text-[#4361ee] hover:bg-[#1a2d3d] transition-colors font-semibold text-[10.5px] tracking-wide">
             <LayoutDashboard size={10} strokeWidth={2} />
             Survey Admin
           </Link>
@@ -230,11 +230,11 @@ export default function OrgDetailPage() {
 
         {/* ── Org header card ─────────────────────────────────────── */}
         <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-          <div className="h-[3px] bg-gradient-to-r from-[#00b8a9] via-[#00b8a9]/60 to-transparent" />
+          <div className="h-[3px] bg-gradient-to-r from-[#4361ee] via-[#4361ee]/60 to-transparent" />
           <div className="px-6 py-5 flex items-start justify-between gap-4 flex-wrap">
             <div className="flex items-center gap-4">
               <div className="w-12 h-12 rounded-xl bg-[#0f1923] flex items-center justify-center shrink-0">
-                <span className="text-[15px] font-black text-[#00b8a9]">{org.name.substring(0, 2).toUpperCase()}</span>
+                <span className="text-[15px] font-black text-[#4361ee]">{org.name.substring(0, 2).toUpperCase()}</span>
               </div>
               <div>
                 <div className="flex items-center gap-2 flex-wrap">
@@ -245,7 +245,7 @@ export default function OrgDetailPage() {
                     {adminComplete ? "Admin Complete" : st.label}
                   </span>
                   {adminComplete && (
-                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10.5px] font-semibold bg-[#00b8a9]/10 border border-[#00b8a9]/30 text-[#00897b]">
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10.5px] font-semibold bg-[#4361ee]/10 border border-[#4361ee]/30 text-[#3147af]">
                       <ShieldCheck size={10} />
                       Admin Complete
                     </span>
@@ -264,10 +264,10 @@ export default function OrgDetailPage() {
                       onChange={(e) => setOrgCode(e.target.value)}
                       onBlur={() => setEditingCode(false)}
                       onKeyDown={(e) => e.key === "Enter" && setEditingCode(false)}
-                      className="w-24 text-[12px] border-b border-[#00b8a9] outline-none bg-transparent text-slate-700"
+                      className="w-24 text-[12px] border-b border-[#4361ee] outline-none bg-transparent text-slate-700"
                     />
                   ) : (
-                    <button onClick={() => setEditingCode(true)} className="flex items-center gap-1 text-slate-600 hover:text-[#00897b] transition-colors font-mono">
+                    <button onClick={() => setEditingCode(true)} className="flex items-center gap-1 text-slate-600 hover:text-[#3147af] transition-colors font-mono">
                       {orgCode} <Edit2 size={10} className="opacity-40" />
                     </button>
                   )}
@@ -364,7 +364,7 @@ export default function OrgDetailPage() {
               <div className="grid grid-cols-2 gap-x-8 gap-y-3">
                 {[
                   { label: "Primary Contact",  value: org.contactName },
-                  { label: "Email",            value: <a href={`mailto:${org.contactEmail}`} className="text-[#00897b] hover:underline">{org.contactEmail}</a> },
+                  { label: "Email",            value: <a href={`mailto:${org.contactEmail}`} className="text-[#3147af] hover:underline">{org.contactEmail}</a> },
                   { label: "Title",            value: org.contactTitle },
                   { label: "Organization Type",value: org.type },
                   { label: "Asset Class",      value: org.assetClass },
@@ -404,7 +404,7 @@ export default function OrgDetailPage() {
                   <SectionLabel>Notes</SectionLabel>
                   <button
                     onClick={() => setEditingNotes(!editingNotes)}
-                    className="text-[10.5px] text-[#00897b] hover:underline flex items-center gap-1"
+                    className="text-[10.5px] text-[#3147af] hover:underline flex items-center gap-1"
                   >
                     <Pencil size={10} />
                     {editingNotes ? "Done" : "Edit"}
@@ -471,7 +471,7 @@ export default function OrgDetailPage() {
                   <span className={`text-[13px] font-bold tabular-nums ${org.progress === 100 ? "text-emerald-600" : org.progress > 0 ? "text-amber-600" : "text-slate-400"}`}>{org.progress}%</span>
                 </div>
                 <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
-                  <div className="h-full rounded-full transition-all" style={{ width: `${org.progress}%`, backgroundColor: org.progress === 100 ? "#00b8a9" : "#fbbf24" }} />
+                  <div className="h-full rounded-full transition-all" style={{ width: `${org.progress}%`, backgroundColor: org.progress === 100 ? "#4361ee" : "#fbbf24" }} />
                 </div>
               </div>
               {[
@@ -507,7 +507,7 @@ export default function OrgDetailPage() {
                   onClick={() => setAdminComplete(!adminComplete)}
                   className={`w-full flex items-center gap-2.5 px-3.5 py-2.5 rounded-lg border text-[12.5px] font-semibold transition-all ${
                     adminComplete
-                      ? "bg-[#00b8a9]/10 border-[#00b8a9]/30 text-[#00897b]"
+                      ? "bg-[#4361ee]/10 border-[#4361ee]/30 text-[#3147af]"
                       : "bg-[#0f1923] border-[#0f1923] text-white hover:bg-[#1a2d3d]"
                   }`}
                 >
@@ -564,7 +564,7 @@ export default function OrgDetailPage() {
                 >
                   <StickyNote size={14} className="text-slate-400 shrink-0" />
                   Update Notes
-                  {notes && <span className="ml-auto w-1.5 h-1.5 rounded-full bg-[#00b8a9]" />}
+                  {notes && <span className="ml-auto w-1.5 h-1.5 rounded-full bg-[#4361ee]" />}
                 </button>
 
                 {/* Upload document */}
@@ -600,16 +600,16 @@ export default function OrgDetailPage() {
                 {hasReport ? (
                   <Link
                     href={`/surveys/${surveyId}/organizations/${orgId}/report`}
-                    className="group flex items-center gap-3 px-3.5 py-3 rounded-lg border border-[#00b8a9]/25 bg-[#00b8a9]/5 hover:bg-[#00b8a9]/10 hover:border-[#00b8a9]/40 transition-all"
+                    className="group flex items-center gap-3 px-3.5 py-3 rounded-lg border border-[#4361ee]/25 bg-[#4361ee]/5 hover:bg-[#4361ee]/10 hover:border-[#4361ee]/40 transition-all"
                   >
-                    <div className="w-7 h-7 rounded-lg bg-[#00b8a9]/15 flex items-center justify-center shrink-0">
-                      <FileText size={14} className="text-[#00897b]" strokeWidth={1.75} />
+                    <div className="w-7 h-7 rounded-lg bg-[#4361ee]/15 flex items-center justify-center shrink-0">
+                      <FileText size={14} className="text-[#3147af]" strokeWidth={1.75} />
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-[12.5px] font-semibold text-slate-800">Organization Dashboard</p>
                       <p className="text-[11px] text-slate-400">LPI, benchmarks & overview</p>
                     </div>
-                    <ChevronRight size={13} className="text-slate-300 group-hover:text-[#00b8a9] shrink-0 transition-colors" />
+                    <ChevronRight size={13} className="text-slate-300 group-hover:text-[#4361ee] shrink-0 transition-colors" />
                   </Link>
                 ) : (
                   <div className="flex items-center gap-3 px-3.5 py-3 rounded-lg border border-slate-100 bg-slate-50 opacity-50 cursor-not-allowed">
@@ -671,7 +671,7 @@ export default function OrgDetailPage() {
                       </div>
                       <p className="text-[10.5px] text-slate-400 truncate">{c.email}</p>
                     </div>
-                    <a href={`mailto:${c.email}`} className="text-slate-300 hover:text-[#00897b] transition-colors shrink-0">
+                    <a href={`mailto:${c.email}`} className="text-slate-300 hover:text-[#3147af] transition-colors shrink-0">
                       <Mail size={12} />
                     </a>
                   </div>
@@ -687,7 +687,7 @@ export default function OrgDetailPage() {
               </div>
               <div className="flex flex-wrap gap-1.5 mb-2">
                 {labels.map((l, i) => (
-                  <span key={i} className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#00b8a9]/10 text-[#00897b] border border-[#00b8a9]/20 text-[11px] font-medium">
+                  <span key={i} className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#4361ee]/10 text-[#3147af] border border-[#4361ee]/20 text-[11px] font-medium">
                     <Tag size={9} />
                     {l}
                     <button onClick={() => setLabels((prev) => prev.filter((_, j) => j !== i))} className="hover:text-red-500 transition-colors">

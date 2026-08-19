@@ -27,14 +27,14 @@ export default function HomePage() {
       <div className="relative rounded-2xl overflow-hidden bg-white border border-slate-200 shadow-sm p-7">
         <div className="absolute right-6 top-1/2 -translate-y-1/2 opacity-[0.04]">
           <svg width="180" height="180" viewBox="0 0 180 180" fill="none">
-            <circle cx="90" cy="90" r="80" stroke="#00b8a9" strokeWidth="1.5" />
-            <circle cx="90" cy="90" r="55" stroke="#00b8a9" strokeWidth="1.5" />
-            <circle cx="90" cy="90" r="30" stroke="#00b8a9" strokeWidth="1.5" />
-            <circle cx="90" cy="90" r="10" fill="#00b8a9" />
+            <circle cx="90" cy="90" r="80" stroke="#4361ee" strokeWidth="1.5" />
+            <circle cx="90" cy="90" r="55" stroke="#4361ee" strokeWidth="1.5" />
+            <circle cx="90" cy="90" r="30" stroke="#4361ee" strokeWidth="1.5" />
+            <circle cx="90" cy="90" r="10" fill="#4361ee" />
           </svg>
         </div>
         {/* Teal accent bar */}
-        <div className="absolute top-0 left-0 w-1 h-full bg-[#00b8a9] rounded-l-2xl" />
+        <div className="absolute top-0 left-0 w-1 h-full bg-[#4361ee] rounded-l-2xl" />
         {/* Floating badge seals */}
         <div className="absolute right-8 top-1/2 -translate-y-1/2 z-20 flex flex-col items-center gap-4">
           {recentBadges.map((ob, i) => (
@@ -47,14 +47,14 @@ export default function HomePage() {
               <div className="drop-shadow-lg group-hover:drop-shadow-xl group-hover:-translate-y-0.5 transition-all duration-200">
                 <MiniBadgeIcon badge={ob.badge} size={58} />
               </div>
-              <p className="text-[9px] font-semibold text-slate-400 text-center max-w-[72px] leading-tight group-hover:text-[#00897b] transition-colors">
+              <p className="text-[9px] font-semibold text-slate-400 text-center max-w-[72px] leading-tight group-hover:text-[#3147af] transition-colors">
                 {ob.badge.name}
               </p>
             </Link>
           ))}
         </div>
         <div className="relative z-10 pl-2 pr-[160px]">
-          <p className="text-[#00897b] text-xs font-semibold tracking-wide uppercase mb-1.5">
+          <p className="text-[#3147af] text-xs font-semibold tracking-wide uppercase mb-1.5">
             Lenox Park Solutions, Inc.
           </p>
           <h1 className="text-xl font-bold text-slate-900 mb-2">Welcome back, Esteban</h1>
@@ -72,7 +72,7 @@ export default function HomePage() {
               { value: `${submissionRate}%`, label: "Response Rate", highlight: true },
             ].map(({ value, label, highlight }) => (
               <div key={label}>
-                <p className={`text-2xl font-bold ${highlight ? "text-[#00b8a9]" : "text-slate-800"}`}>
+                <p className={`text-2xl font-bold ${highlight ? "text-[#4361ee]" : "text-slate-800"}`}>
                   {value}
                 </p>
                 <p className="text-slate-400 text-xs mt-0.5">{label}</p>
@@ -94,7 +94,7 @@ export default function HomePage() {
             </div>
             <Link
               href="/surveys"
-              className="flex items-center gap-1 text-[#00b8a9] text-xs font-semibold hover:underline"
+              className="flex items-center gap-1 text-[#4361ee] text-xs font-semibold hover:underline"
             >
               View all <ArrowRight size={12} />
             </Link>
@@ -108,11 +108,11 @@ export default function HomePage() {
                 <Link
                   key={survey.id}
                   href={`/surveys/${survey.id}/organizations`}
-                  className="block p-4 rounded-xl border border-slate-100 hover:border-[#00b8a9]/40 hover:bg-[#00b8a9]/[0.02] transition-all group"
+                  className="block p-4 rounded-xl border border-slate-100 hover:border-[#4361ee]/40 hover:bg-[#4361ee]/[0.02] transition-all group"
                 >
                   <div className="flex items-start justify-between mb-3">
                     <div>
-                      <p className="text-sm font-semibold text-slate-800 group-hover:text-[#00897b] transition-colors">
+                      <p className="text-sm font-semibold text-slate-800 group-hover:text-[#3147af] transition-colors">
                         {survey.name} · {survey.year}
                       </p>
                       <p className="text-xs text-slate-400 mt-0.5">
@@ -126,7 +126,7 @@ export default function HomePage() {
                   </div>
                   <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden mb-2">
                     <div
-                      className="h-full bg-[#00b8a9] rounded-full"
+                      className="h-full bg-[#4361ee] rounded-full"
                       style={{ width: `${pct}%` }}
                     />
                   </div>
@@ -143,7 +143,7 @@ export default function HomePage() {
                       <AlertCircle size={11} className="text-slate-300" />
                       {notStartedPct}% not started
                     </span>
-                    <span className="ml-auto text-[11px] font-semibold text-[#00b8a9]">
+                    <span className="ml-auto text-[11px] font-semibold text-[#4361ee]">
                       {pct}% complete
                     </span>
                   </div>
@@ -195,7 +195,7 @@ export default function HomePage() {
                   icon: FileText,
                   label: "GPs Complete Surveys",
                   desc: "GPs submit workforce, leadership, and ownership diversity data.",
-                  color: "bg-[#00b8a9]/10 text-[#00897b]",
+                  color: "bg-[#4361ee]/10 text-[#3147af]",
                 },
                 {
                   icon: TrendingUp,
@@ -218,15 +218,15 @@ export default function HomePage() {
           </div>
 
           {/* LPI callout */}
-          <div className="rounded-xl bg-[#00b8a9]/[0.07] border border-[#00b8a9]/20 p-4">
+          <div className="rounded-xl bg-[#4361ee]/[0.07] border border-[#4361ee]/20 p-4">
             <div className="flex items-center gap-2 mb-2">
-              <div className="w-5 h-5 rounded bg-[#00b8a9] flex items-center justify-center">
+              <div className="w-5 h-5 rounded bg-[#4361ee] flex items-center justify-center">
                 <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
                   <circle cx="5" cy="5" r="2" fill="white" />
                   <circle cx="5" cy="5" r="4" stroke="white" strokeWidth="1" fill="none" />
                 </svg>
               </div>
-              <p className="text-xs font-bold text-[#00897b] tracking-wide">LPI SCORE</p>
+              <p className="text-xs font-bold text-[#3147af] tracking-wide">LPI SCORE</p>
             </div>
             <p className="text-[11px] text-slate-500 leading-relaxed">
               The <span className="text-slate-800 font-semibold">LP Inclusion Index</span> is
@@ -236,7 +236,7 @@ export default function HomePage() {
             </p>
             <Link
               href="/surveys"
-              className="mt-3 inline-flex items-center gap-1 text-[#00897b] text-[11px] font-semibold hover:underline"
+              className="mt-3 inline-flex items-center gap-1 text-[#3147af] text-[11px] font-semibold hover:underline"
             >
               View survey reports <ArrowRight size={11} />
             </Link>

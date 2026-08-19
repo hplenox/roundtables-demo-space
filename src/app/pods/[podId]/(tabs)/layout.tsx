@@ -56,10 +56,10 @@ export default function PodTabsLayout({ children }: { children: React.ReactNode 
         <div className="flex items-center gap-1.5 text-[11.5px]">
           <Link
             href="/pods"
-            className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-[#0f1923] text-[#00b8a9] hover:bg-[#1a2d3d] transition-colors font-semibold text-[10.5px] tracking-wide"
+            className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-[#0f1923] text-[#4361ee] hover:bg-[#1a2d3d] transition-colors font-semibold text-[10.5px] tracking-wide"
           >
             <MessagesSquare size={10} strokeWidth={2} />
-            My PODs
+            My Community Pods
           </Link>
           <ChevronRight size={12} className="text-slate-300 shrink-0" />
           <span className="text-slate-700 font-medium truncate max-w-xs">{pod.name}</span>
@@ -115,7 +115,7 @@ export default function PodTabsLayout({ children }: { children: React.ReactNode 
                 </button>
                 <button
                   onClick={() => setShowInvite(true)}
-                  className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#00b8a9] text-white text-[13px] font-semibold hover:bg-[#00a89a] shadow-sm hover:shadow-md transition-all"
+                  className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#4361ee] text-white text-[13px] font-semibold hover:bg-[#3d58d9] shadow-sm hover:shadow-md transition-all"
                 >
                   <UserPlus size={15} />
                   Invite Members
@@ -136,10 +136,10 @@ export default function PodTabsLayout({ children }: { children: React.ReactNode 
 
             {/* Weekly insight */}
             {pod.weeklyInsight && (
-              <div className="flex items-start gap-2 mt-4 p-3 rounded-xl bg-[#00b8a9]/[0.06] border border-[#00b8a9]/15">
-                <Sparkles size={14} className="text-[#00897b] shrink-0 mt-0.5" />
+              <div className="flex items-start gap-2 mt-4 p-3 rounded-xl bg-[#4361ee]/[0.06] border border-[#4361ee]/15">
+                <Sparkles size={14} className="text-[#3147af] shrink-0 mt-0.5" />
                 <p className="text-[12.5px] text-slate-700 leading-snug">
-                  <span className="font-bold text-[#00897b]">This week in {pod.name}: </span>
+                  <span className="font-bold text-[#3147af]">This week in {pod.name}: </span>
                   {pod.weeklyInsight}
                 </p>
               </div>
@@ -153,7 +153,7 @@ export default function PodTabsLayout({ children }: { children: React.ReactNode 
                   href={`${baseHref}${tab.href}`}
                   className={`shrink-0 px-4 py-3 text-[13px] font-medium border-b-2 transition-all duration-150 flex items-center gap-1.5 ${
                     activeSub === tab.key
-                      ? "border-[#00b8a9] text-[#00897b]"
+                      ? "border-[#4361ee] text-[#3147af]"
                       : "border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300"
                   }`}
                 >
@@ -173,7 +173,7 @@ export default function PodTabsLayout({ children }: { children: React.ReactNode 
             <div className="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm">
               <div className="flex items-center justify-between mb-3">
                 <h3 className="text-[12.5px] font-bold text-slate-800">Members</h3>
-                <Link href={`${baseHref}/members`} className="text-[11.5px] font-semibold text-[#00897b] hover:underline">See all</Link>
+                <Link href={`${baseHref}/members`} className="text-[11.5px] font-semibold text-[#3147af] hover:underline">See all</Link>
               </div>
               <div className="space-y-2.5">
                 {pod.members.slice(0, 2).map((m) => (
@@ -212,7 +212,7 @@ export default function PodTabsLayout({ children }: { children: React.ReactNode 
               onClick={toggleDigest}
               className="w-full text-left flex items-start gap-3 bg-white rounded-2xl border border-slate-200 p-4 shadow-sm hover:border-slate-300 transition-colors"
             >
-              <span className={`shrink-0 w-9 h-5 rounded-full mt-0.5 relative transition-colors ${pod.digestEnabled ? "bg-[#00b8a9]" : "bg-slate-200"}`}>
+              <span className={`shrink-0 w-9 h-5 rounded-full mt-0.5 relative transition-colors ${pod.digestEnabled ? "bg-[#4361ee]" : "bg-slate-200"}`}>
                 <span className={`absolute top-0.5 w-4 h-4 rounded-full bg-white shadow transition-all ${pod.digestEnabled ? "left-4" : "left-0.5"}`} />
               </span>
               <span>

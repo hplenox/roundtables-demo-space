@@ -99,7 +99,7 @@ function KeyDatesForm({ cycle, onSave }: { cycle: ClientSurveyCycle; onSave: (pa
                     type="date"
                     value={value ?? ""}
                     onChange={(e) => handleChange(key, e.target.value)}
-                    className="h-9 px-3 rounded-lg border border-slate-200 text-[13px] text-slate-700 focus:outline-none focus:border-[#00b8a9] transition-colors"
+                    className="h-9 px-3 rounded-lg border border-slate-200 text-[13px] text-slate-700 focus:outline-none focus:border-[#4361ee] transition-colors"
                   />
                 </div>
               </div>

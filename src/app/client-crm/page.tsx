@@ -65,7 +65,7 @@ function AddClientModal({ onClose, onAdd }: { onClose: () => void; onAdd: (clien
         <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100">
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-lg bg-[#e8f5f3] flex items-center justify-center">
-              <Users size={15} className="text-[#00897b]" />
+              <Users size={15} className="text-[#3147af]" />
             </div>
             <div>
               <p className="text-[13.5px] font-semibold text-slate-800">Add Client</p>
@@ -86,7 +86,7 @@ function AddClientModal({ onClose, onAdd }: { onClose: () => void; onAdd: (clien
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="e.g. Wilshire Advisors"
-              className="w-full h-9 px-3 rounded-lg border border-slate-200 text-[13px] text-slate-700 placeholder:text-slate-400 focus:outline-none focus:border-[#00b8a9] transition-colors"
+              className="w-full h-9 px-3 rounded-lg border border-slate-200 text-[13px] text-slate-700 placeholder:text-slate-400 focus:outline-none focus:border-[#4361ee] transition-colors"
             />
           </div>
           <div className="grid grid-cols-2 gap-3">
@@ -97,7 +97,7 @@ function AddClientModal({ onClose, onAdd }: { onClose: () => void; onAdd: (clien
                 value={segment}
                 onChange={(e) => setSegment(e.target.value)}
                 placeholder="e.g. Investment Consultant"
-                className="w-full h-9 px-3 rounded-lg border border-slate-200 text-[13px] text-slate-700 placeholder:text-slate-400 focus:outline-none focus:border-[#00b8a9] transition-colors"
+                className="w-full h-9 px-3 rounded-lg border border-slate-200 text-[13px] text-slate-700 placeholder:text-slate-400 focus:outline-none focus:border-[#4361ee] transition-colors"
               />
             </div>
             <div>
@@ -105,7 +105,7 @@ function AddClientModal({ onClose, onAdd }: { onClose: () => void; onAdd: (clien
               <select
                 value={priority}
                 onChange={(e) => setPriority(e.target.value as ClientPriority)}
-                className="w-full h-9 px-2.5 rounded-lg border border-slate-200 text-[13px] text-slate-700 bg-white focus:outline-none focus:border-[#00b8a9] transition-colors"
+                className="w-full h-9 px-2.5 rounded-lg border border-slate-200 text-[13px] text-slate-700 bg-white focus:outline-none focus:border-[#4361ee] transition-colors"
               >
                 <option value="strategic">Strategic</option>
                 <option value="standard">Standard</option>
@@ -121,7 +121,7 @@ function AddClientModal({ onClose, onAdd }: { onClose: () => void; onAdd: (clien
               value={contactName}
               onChange={(e) => setContactName(e.target.value)}
               placeholder="Jane Smith"
-              className="w-full h-9 px-3 rounded-lg border border-slate-200 text-[13px] text-slate-700 placeholder:text-slate-400 focus:outline-none focus:border-[#00b8a9] transition-colors"
+              className="w-full h-9 px-3 rounded-lg border border-slate-200 text-[13px] text-slate-700 placeholder:text-slate-400 focus:outline-none focus:border-[#4361ee] transition-colors"
             />
           </div>
           <div className="grid grid-cols-2 gap-3">
@@ -132,7 +132,7 @@ function AddClientModal({ onClose, onAdd }: { onClose: () => void; onAdd: (clien
                 value={contactTitle}
                 onChange={(e) => setContactTitle(e.target.value)}
                 placeholder="Head of ESG"
-                className="w-full h-9 px-3 rounded-lg border border-slate-200 text-[13px] text-slate-700 placeholder:text-slate-400 focus:outline-none focus:border-[#00b8a9] transition-colors"
+                className="w-full h-9 px-3 rounded-lg border border-slate-200 text-[13px] text-slate-700 placeholder:text-slate-400 focus:outline-none focus:border-[#4361ee] transition-colors"
               />
             </div>
             <div>
@@ -142,7 +142,7 @@ function AddClientModal({ onClose, onAdd }: { onClose: () => void; onAdd: (clien
                 value={contactEmail}
                 onChange={(e) => setContactEmail(e.target.value)}
                 placeholder="jane@client.com"
-                className="w-full h-9 px-3 rounded-lg border border-slate-200 text-[13px] text-slate-700 placeholder:text-slate-400 focus:outline-none focus:border-[#00b8a9] transition-colors"
+                className="w-full h-9 px-3 rounded-lg border border-slate-200 text-[13px] text-slate-700 placeholder:text-slate-400 focus:outline-none focus:border-[#4361ee] transition-colors"
               />
             </div>
           </div>
@@ -186,7 +186,7 @@ function ClientRow({ client }: { client: Client }) {
           <span className="text-[10px] font-bold text-slate-600">{initials(client.name)}</span>
         </div>
         <div className="min-w-0">
-          <p className="text-[13px] font-semibold text-slate-800 group-hover:text-[#00897b] transition-colors truncate">{client.name}</p>
+          <p className="text-[13px] font-semibold text-slate-800 group-hover:text-[#3147af] transition-colors truncate">{client.name}</p>
           <p className="text-[11px] text-slate-400 truncate">{client.segment} · {client.accountOwner}</p>
         </div>
       </div>
@@ -241,7 +241,7 @@ function ClientRow({ client }: { client: Client }) {
         )}
       </div>
 
-      <ChevronRight size={14} className="shrink-0 text-slate-300 group-hover:text-[#00b8a9] group-hover:translate-x-0.5 transition-all" />
+      <ChevronRight size={14} className="shrink-0 text-slate-300 group-hover:text-[#4361ee] group-hover:translate-x-0.5 transition-all" />
     </Link>
   );
 }
@@ -308,12 +308,12 @@ export default function ClientCrmPage() {
 
       {/* Header band */}
       <div className="bg-white border-b border-slate-200 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
-        <div className="h-[3px] bg-gradient-to-r from-[#00b8a9] via-[#00b8a9]/70 to-transparent" />
+        <div className="h-[3px] bg-gradient-to-r from-[#4361ee] via-[#4361ee]/70 to-transparent" />
         <div className="max-w-6xl mx-auto px-6 py-6">
           <div className="flex items-start justify-between gap-4">
             <div className="flex items-start gap-3 min-w-0">
               <div className="shrink-0 w-11 h-11 rounded-xl bg-[#0f1923] flex items-center justify-center">
-                <Handshake size={18} className="text-[#00b8a9]" />
+                <Handshake size={18} className="text-[#4361ee]" />
               </div>
               <div className="min-w-0">
                 <h1 className="text-[18px] font-bold text-slate-900 leading-tight">Client CRM</h1>

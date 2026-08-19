@@ -47,7 +47,7 @@ export default function AddRecordModal({
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder={noun === "deal" ? "e.g. Bridgeway Logistics SPV" : "e.g. Lantern Ridge Capital"}
-                  className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 text-[13.5px] focus:outline-none focus:ring-2 focus:ring-[#00b8a9]/30 focus:border-[#00b8a9]"
+                  className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 text-[13.5px] focus:outline-none focus:ring-2 focus:ring-[#4361ee]/30 focus:border-[#4361ee]"
                 />
               </div>
               <div className="grid grid-cols-2 gap-4">
@@ -57,7 +57,7 @@ export default function AddRecordModal({
                     value={category}
                     onChange={(e) => setCategory(e.target.value)}
                     placeholder={noun === "deal" ? "Industrial real estate" : "Asset management"}
-                    className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 text-[13.5px] focus:outline-none focus:ring-2 focus:ring-[#00b8a9]/30 focus:border-[#00b8a9]"
+                    className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 text-[13.5px] focus:outline-none focus:ring-2 focus:ring-[#4361ee]/30 focus:border-[#4361ee]"
                   />
                 </div>
                 <div>
@@ -66,7 +66,7 @@ export default function AddRecordModal({
                     value={website}
                     onChange={(e) => setWebsite(e.target.value)}
                     placeholder="example.com"
-                    className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 text-[13.5px] focus:outline-none focus:ring-2 focus:ring-[#00b8a9]/30 focus:border-[#00b8a9]"
+                    className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 text-[13.5px] focus:outline-none focus:ring-2 focus:ring-[#4361ee]/30 focus:border-[#4361ee]"
                   />
                 </div>
               </div>
@@ -77,7 +77,7 @@ export default function AddRecordModal({
                     value={contactName}
                     onChange={(e) => setContactName(e.target.value)}
                     placeholder={`Who at ${confirmer.replace("the ", "")} should we notify?`}
-                    className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 text-[13.5px] focus:outline-none focus:ring-2 focus:ring-[#00b8a9]/30 focus:border-[#00b8a9]"
+                    className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 text-[13.5px] focus:outline-none focus:ring-2 focus:ring-[#4361ee]/30 focus:border-[#4361ee]"
                   />
                 </div>
                 <div>
@@ -86,7 +86,7 @@ export default function AddRecordModal({
                     value={contactEmail}
                     onChange={(e) => setContactEmail(e.target.value)}
                     placeholder="name@sponsor.com"
-                    className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 text-[13.5px] focus:outline-none focus:ring-2 focus:ring-[#00b8a9]/30 focus:border-[#00b8a9]"
+                    className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 text-[13.5px] focus:outline-none focus:ring-2 focus:ring-[#4361ee]/30 focus:border-[#4361ee]"
                   />
                 </div>
               </div>
@@ -99,7 +99,7 @@ export default function AddRecordModal({
                   onChange={(e) => setContext(e.target.value)}
                   placeholder="One or two lines on the opportunity and how you came across it."
                   rows={3}
-                  className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 text-[13.5px] resize-none focus:outline-none focus:ring-2 focus:ring-[#00b8a9]/30 focus:border-[#00b8a9]"
+                  className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 text-[13.5px] resize-none focus:outline-none focus:ring-2 focus:ring-[#4361ee]/30 focus:border-[#4361ee]"
                 />
               </div>
             </div>
@@ -110,7 +110,7 @@ export default function AddRecordModal({
                 <button
                   onClick={() => name.trim() && setStep(2)}
                   disabled={!name.trim()}
-                  className="px-4 py-2 rounded-lg bg-[#00b8a9] text-white text-[13px] font-semibold hover:bg-[#00a89a] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                  className="px-4 py-2 rounded-lg bg-[#4361ee] text-white text-[13px] font-semibold hover:bg-[#3d58d9] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                 >
                   Continue
                 </button>
@@ -135,7 +135,7 @@ export default function AddRecordModal({
               <button onClick={() => setStep(1)} className="text-[13px] font-medium text-slate-500 hover:text-slate-700 px-3 py-2">Back</button>
               <button
                 onClick={() => onSubmit({ name: name.trim(), category: category.trim() || "Uncategorized", website: website.trim() || undefined, contactName: contactName.trim() || undefined, contactEmail: contactEmail.trim() || undefined, context: context.trim() || undefined })}
-                className="px-4 py-2 rounded-lg bg-[#00b8a9] text-white text-[13px] font-semibold hover:bg-[#00a89a] transition-colors"
+                className="px-4 py-2 rounded-lg bg-[#4361ee] text-white text-[13px] font-semibold hover:bg-[#3d58d9] transition-colors"
               >
                 Send to {confirmer}
               </button>

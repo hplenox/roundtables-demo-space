@@ -63,7 +63,7 @@ export function initialsOf(name: string): string {
 // A small, fixed set of vivid-but-readable avatar colors — cycled by name so
 // the same person always renders the same color across the app.
 const AVATAR_PALETTE = [
-  { bg: "bg-[#00b8a9]", text: "text-white" },
+  { bg: "bg-[#4361ee]", text: "text-white" },
   { bg: "bg-[#4361ee]", text: "text-white" },
   { bg: "bg-[#7c3aed]", text: "text-white" },
   { bg: "bg-[#f59e0b]", text: "text-white" },

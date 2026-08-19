@@ -113,7 +113,7 @@ export default function PodsListPage() {
         {/* Header */}
         <div className="flex items-start justify-between flex-wrap gap-4 mb-6">
           <div>
-            <h1 className="text-[26px] font-bold text-slate-900 tracking-tight">My PODs</h1>
+            <h1 className="text-[26px] font-bold text-slate-900 tracking-tight">My Community Pods</h1>
             <p className="text-[13px] text-slate-500 mt-1">
               {pods.length} PODs{needsAttentionCount > 0 ? ` · ${needsAttentionCount} need your attention this week` : ""}
             </p>
@@ -124,11 +124,11 @@ export default function PodsListPage() {
               className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-slate-700 text-[13px] font-semibold hover:border-slate-300 hover:shadow-sm transition-all"
             >
               <Compass size={15} />
-              Discover PODs
+              Discover Community Pods
             </Link>
             <button
               onClick={() => setShowCreate(true)}
-              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#00b8a9] text-white text-[13px] font-semibold hover:bg-[#00a89a] shadow-sm hover:shadow-md transition-all"
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#4361ee] text-white text-[13px] font-semibold hover:bg-[#3d58d9] shadow-sm hover:shadow-md transition-all"
             >
               <Plus size={15} />
               Create POD
@@ -143,7 +143,7 @@ export default function PodsListPage() {
               <section className="mb-6">
                 <div className="flex items-center justify-between mb-3">
                   <h2 className="flex items-center gap-1.5 text-[12.5px] font-bold text-slate-500 uppercase tracking-wide">
-                    <Sparkles size={13} className="text-[#00b8a9]" />
+                    <Sparkles size={13} className="text-[#4361ee]" />
                     Needs you
                   </h2>
                   <button
@@ -174,7 +174,7 @@ export default function PodsListPage() {
                         <div className="flex items-center gap-3">
                           <Link
                             href={`/pods/${card.podId}`}
-                            className="text-[12px] font-semibold text-white bg-[#00b8a9] hover:bg-[#00a89a] px-3 py-1.5 rounded-lg transition-colors"
+                            className="text-[12px] font-semibold text-white bg-[#4361ee] hover:bg-[#3d58d9] px-3 py-1.5 rounded-lg transition-colors"
                           >
                             {card.primaryLabel}
                           </Link>
@@ -200,7 +200,7 @@ export default function PodsListPage() {
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
                   placeholder="Search PODs, people, files"
-                  className="w-full pl-9 pr-3 py-2.5 rounded-xl border border-slate-200 bg-white text-[13px] focus:outline-none focus:ring-2 focus:ring-[#00b8a9]/30 focus:border-[#00b8a9]"
+                  className="w-full pl-9 pr-3 py-2.5 rounded-xl border border-slate-200 bg-white text-[13px] focus:outline-none focus:ring-2 focus:ring-[#4361ee]/30 focus:border-[#4361ee]"
                 />
               </div>
               <div className="flex items-center gap-1.5 bg-white border border-slate-200 rounded-xl p-1">
@@ -266,10 +266,10 @@ export default function PodsListPage() {
             <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="flex items-center gap-1.5 text-[13px] font-bold text-slate-800">
-                  <Calendar size={14} className="text-[#00897b]" />
+                  <Calendar size={14} className="text-[#3147af]" />
                   Next 14 days
                 </h3>
-                <Link href="/calendar" className="text-[11.5px] font-semibold text-[#00897b] hover:underline">Calendar</Link>
+                <Link href="/calendar" className="text-[11.5px] font-semibold text-[#3147af] hover:underline">Calendar</Link>
               </div>
               <div className="space-y-3">
                 {next14.length === 0 && <p className="text-[12px] text-slate-400">Nothing scheduled in the next 14 days.</p>}
@@ -283,11 +283,11 @@ export default function PodsListPage() {
                       className="flex items-center gap-3 group"
                     >
                       <div className="shrink-0 w-10 h-10 rounded-lg bg-slate-50 border border-slate-200 flex flex-col items-center justify-center leading-none">
-                        <span className="text-[8.5px] font-bold text-[#00897b]">{month}</span>
+                        <span className="text-[8.5px] font-bold text-[#3147af]">{month}</span>
                         <span className="text-[13px] font-bold text-slate-800">{day}</span>
                       </div>
                       <div className="min-w-0 flex-1">
-                        <p className="text-[12.5px] font-semibold text-slate-800 truncate group-hover:text-[#00897b] transition-colors">{event.title}</p>
+                        <p className="text-[12.5px] font-semibold text-slate-800 truncate group-hover:text-[#3147af] transition-colors">{event.title}</p>
                         <p className="text-[11px] text-slate-400 truncate">{pod.name} · {event.startTime} {event.timezone === "Eastern Time" ? "ET" : ""}</p>
                       </div>
                       <span className={`shrink-0 w-2 h-2 rounded-full ${myStatus === "attending" ? "bg-emerald-500" : "bg-slate-200"}`} />
@@ -298,20 +298,20 @@ export default function PodsListPage() {
               <div className="mt-4 pt-4 border-t border-slate-100">
                 <p className="text-[11.5px] text-slate-500 mb-1.5">You attended 3 of 4 events this month</p>
                 <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden">
-                  <div className="h-full rounded-full bg-[#00b8a9]" style={{ width: "75%" }} />
+                  <div className="h-full rounded-full bg-[#4361ee]" style={{ width: "75%" }} />
                 </div>
               </div>
             </div>
 
             <Link
               href="/pods/discover"
-              className="flex items-center justify-between bg-white rounded-2xl border border-slate-200 p-4 shadow-sm hover:shadow-md hover:border-[#00b8a9]/40 transition-all group"
+              className="flex items-center justify-between bg-white rounded-2xl border border-slate-200 p-4 shadow-sm hover:shadow-md hover:border-[#4361ee]/40 transition-all group"
             >
               <div className="flex items-center gap-2.5">
-                <Sparkles size={15} className="text-[#00b8a9]" />
+                <Sparkles size={15} className="text-[#4361ee]" />
                 <p className="text-[12.5px] font-semibold text-slate-700">{DISCOVERABLE_PODS.length} PODs suggested for you</p>
               </div>
-              <ArrowRight size={15} className="text-slate-300 group-hover:text-[#00897b] group-hover:translate-x-0.5 transition-all" />
+              <ArrowRight size={15} className="text-slate-300 group-hover:text-[#3147af] group-hover:translate-x-0.5 transition-all" />
             </Link>
           </div>
         </div>
@@ -365,7 +365,7 @@ function PodRow({ pod, onRsvp, onPin }: { pod: Pod; onRsvp: (podId: string, even
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0">
               <div className="flex items-center gap-2 flex-wrap">
-                <Link href={`/pods/${pod.id}`} className="text-[15.5px] font-bold text-slate-900 hover:text-[#00897b] transition-colors">
+                <Link href={`/pods/${pod.id}`} className="text-[15.5px] font-bold text-slate-900 hover:text-[#3147af] transition-colors">
                   {pod.name}
                 </Link>
                 {newCount > 0 && (
@@ -414,7 +414,7 @@ function PodRow({ pod, onRsvp, onPin }: { pod: Pod; onRsvp: (podId: string, even
               {nextEvent && myRsvp === "no_response" && (
                 <button
                   onClick={() => onRsvp(pod.id, nextEvent.id)}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#00b8a9] text-white text-[12px] font-semibold hover:bg-[#00a89a] transition-colors"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#4361ee] text-white text-[12px] font-semibold hover:bg-[#3d58d9] transition-colors"
                 >
                   RSVP
                 </button>

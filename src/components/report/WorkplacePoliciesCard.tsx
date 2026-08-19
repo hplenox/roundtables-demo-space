@@ -31,8 +31,8 @@ export default function WorkplacePoliciesCard() {
           >
             {policy.uploaded ? (
               <svg width="16" height="16" viewBox="0 0 16 16" fill="none" className="shrink-0">
-                <circle cx="8" cy="8" r="7.25" fill="#00b8a9" fillOpacity="0.12" stroke="#00b8a9" strokeWidth="1.25"/>
-                <path d="M4.5 8.5L6.5 10.5L11 5.5" stroke="#00897b" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"/>
+                <circle cx="8" cy="8" r="7.25" fill="#4361ee" fillOpacity="0.12" stroke="#4361ee" strokeWidth="1.25"/>
+                <path d="M4.5 8.5L6.5 10.5L11 5.5" stroke="#3147af" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
             ) : (
               <svg width="16" height="16" viewBox="0 0 16 16" fill="none" className="shrink-0">

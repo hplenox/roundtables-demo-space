@@ -26,7 +26,7 @@ function SurveyLocatorVisual() {
           <span className="text-[10px] text-slate-400 whitespace-nowrap ml-4">Mar 1, 9:00 AM</span>
         </div>
         <div className="mt-3 flex items-center gap-2">
-          <div className="px-4 py-1.5 rounded-lg bg-[#00b8a9] text-white text-[12px] font-semibold">
+          <div className="px-4 py-1.5 rounded-lg bg-[#4361ee] text-white text-[12px] font-semibold">
             Open Survey
           </div>
           <div className="px-4 py-1.5 rounded-lg border border-slate-200 text-slate-600 text-[12px]">
@@ -35,14 +35,14 @@ function SurveyLocatorVisual() {
         </div>
       </div>
       {/* Fake dashboard card */}
-      <div className="bg-white rounded-lg border border-[#00b8a9]/40 p-4">
+      <div className="bg-white rounded-lg border border-[#4361ee]/40 p-4">
         <div className="flex items-center justify-between mb-2">
           <p className="text-[13px] font-semibold text-slate-800">2026 Lenox Park DEI Survey</p>
           <span className="bg-emerald-50 text-emerald-700 text-[10px] font-bold px-2 py-0.5 rounded-full">Active</span>
         </div>
         <p className="text-[11.5px] text-slate-500 mb-3">Lenox Park Solutions · Closes April 30, 2026</p>
         <div className="h-1.5 bg-slate-100 rounded-full mb-1">
-          <div className="h-full w-0 bg-[#00b8a9] rounded-full" />
+          <div className="h-full w-0 bg-[#4361ee] rounded-full" />
         </div>
         <p className="text-[10.5px] text-slate-400">0% complete · Not started</p>
       </div>
@@ -60,11 +60,11 @@ function LpiExplainerVisual() {
     <div className="pointer-events-none select-none space-y-4">
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-2">
-          <BarChart3 size={16} className="text-[#00b8a9]" />
+          <BarChart3 size={16} className="text-[#4361ee]" />
           <span className="text-[13px] font-semibold text-slate-800">LP Inclusion Index</span>
         </div>
         <div className="text-right">
-          <p className="text-[22px] font-bold text-[#00b8a9]">7.4</p>
+          <p className="text-[22px] font-bold text-[#4361ee]">7.4</p>
           <p className="text-[10px] text-slate-400">out of 10</p>
         </div>
       </div>
@@ -93,7 +93,7 @@ function LpiExplainerVisual() {
               <span className="text-[11px] font-semibold text-slate-600">{pct}%</span>
             </div>
             <div className="h-2 bg-slate-100 rounded-full">
-              <div className="h-full bg-[#00b8a9] rounded-full" style={{ width: `${pct}%` }} />
+              <div className="h-full bg-[#4361ee] rounded-full" style={{ width: `${pct}%` }} />
             </div>
           </div>
         ))}
@@ -138,7 +138,7 @@ function OwnershipFormVisual() {
           </div>
         ))}
       </div>
-      <button className="mt-3 text-[11.5px] text-[#00b8a9] font-semibold">+ Add another equity owner</button>
+      <button className="mt-3 text-[11.5px] text-[#4361ee] font-semibold">+ Add another equity owner</button>
     </div>
   );
 }
@@ -261,7 +261,7 @@ function UploadSubmitVisual() {
       </div>
       {/* Submit button */}
       <div className="flex justify-end">
-        <div className="px-6 py-2.5 rounded-lg bg-[#00b8a9] text-white text-[13px] font-semibold">
+        <div className="px-6 py-2.5 rounded-lg bg-[#4361ee] text-white text-[13px] font-semibold">
           Submit Survey
         </div>
       </div>
@@ -307,7 +307,7 @@ export default function WalkthroughGuide() {
                 onClick={() => setCurrentStep(step.stepNumber)}
                 className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left transition-colors
                   ${currentStep === step.stepNumber
-                    ? "bg-[#00b8a9]/10 text-[#00897b]"
+                    ? "bg-[#4361ee]/10 text-[#3147af]"
                     : "hover:bg-slate-50 text-slate-600"
                   }`}
               >
@@ -316,7 +316,7 @@ export default function WalkthroughGuide() {
                     ${completedSteps.has(step.stepNumber)
                       ? "bg-emerald-500 text-white"
                       : currentStep === step.stepNumber
-                        ? "bg-[#00b8a9] text-white"
+                        ? "bg-[#4361ee] text-white"
                         : "bg-slate-100 text-slate-400"
                     }`}
                 >
@@ -342,7 +342,7 @@ export default function WalkthroughGuide() {
           </div>
           <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden">
             <div
-              className="h-full bg-[#00b8a9] rounded-full transition-all duration-500"
+              className="h-full bg-[#4361ee] rounded-full transition-all duration-500"
               style={{ width: `${(completedSteps.size / 6) * 100}%` }}
             />
           </div>
@@ -352,7 +352,7 @@ export default function WalkthroughGuide() {
       {/* Step content */}
       <div className="bg-white rounded-xl border border-slate-200 flex flex-col overflow-hidden">
         <div className="flex-1 p-6 flex flex-col overflow-y-auto">
-          <p className="text-[11px] font-semibold text-[#00b8a9] uppercase tracking-wider mb-1">
+          <p className="text-[11px] font-semibold text-[#4361ee] uppercase tracking-wider mb-1">
             Step {activeStep.stepNumber} of 6
           </p>
           <h2 className="text-[20px] font-semibold text-slate-900 mb-1">{activeStep.title}</h2>

@@ -51,13 +51,13 @@ function ClientDetailShell({ clientId, children }: { clientId: string; children:
 
   return (
     <div className="min-h-full bg-slate-50">
-      <div className="h-[3px] bg-gradient-to-r from-[#00b8a9] via-[#00b8a9]/70 to-transparent" />
+      <div className="h-[3px] bg-gradient-to-r from-[#4361ee] via-[#4361ee]/70 to-transparent" />
       <div className="max-w-6xl mx-auto px-6 py-6 space-y-4">
       {/* Breadcrumb */}
       <div className="flex items-center gap-1.5 text-[11.5px]">
         <Link
           href="/client-crm"
-          className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-[#0f1923] text-[#00b8a9] hover:bg-[#1a2d3d] transition-colors font-semibold text-[10.5px] tracking-wide"
+          className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-[#0f1923] text-[#4361ee] hover:bg-[#1a2d3d] transition-colors font-semibold text-[10.5px] tracking-wide"
         >
           <Handshake size={10} strokeWidth={2} />
           Client CRM
@@ -72,7 +72,7 @@ function ClientDetailShell({ clientId, children }: { clientId: string; children:
           <div className="flex items-start justify-between gap-4 flex-wrap">
             <div className="flex items-start gap-3 min-w-0">
               <div className="shrink-0 w-11 h-11 rounded-xl bg-[#0f1923] flex items-center justify-center">
-                <Building2 size={18} className="text-[#00b8a9]" />
+                <Building2 size={18} className="text-[#4361ee]" />
               </div>
               <div className="min-w-0">
                 <div className="flex items-center gap-2 flex-wrap">
@@ -109,7 +109,7 @@ function ClientDetailShell({ clientId, children }: { clientId: string; children:
                   </p>
                   <div className="w-32 h-1.5 bg-slate-100 rounded-full overflow-hidden mt-1.5 ml-auto">
                     <div
-                      className="h-full rounded-full bg-[#00b8a9] transition-all duration-500"
+                      className="h-full rounded-full bg-[#4361ee] transition-all duration-500"
                       style={{ width: `${progress.pct}%` }}
                     />
                   </div>
@@ -129,7 +129,7 @@ function ClientDetailShell({ clientId, children }: { clientId: string; children:
               href={`${baseHref}${tab.href}`}
               className={`px-4 py-2.5 text-[13px] font-medium border-b-2 transition-all duration-150 ${
                 activeSub === tab.key
-                  ? "border-[#00b8a9] text-[#00897b]"
+                  ? "border-[#4361ee] text-[#3147af]"
                   : "border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300"
               }`}
             >

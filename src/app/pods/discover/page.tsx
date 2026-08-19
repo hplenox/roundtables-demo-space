@@ -35,10 +35,10 @@ export default function DiscoverPodsPage() {
       <div className="max-w-5xl mx-auto px-6 py-7">
         <Link href="/pods" className="inline-flex items-center gap-1.5 text-[12.5px] font-medium text-slate-500 hover:text-slate-700 mb-4">
           <ArrowLeft size={14} />
-          Back to My PODs
+          Back to My Community Pods
         </Link>
 
-        <h1 className="text-[26px] font-bold text-slate-900 tracking-tight">Discover PODs</h1>
+        <h1 className="text-[26px] font-bold text-slate-900 tracking-tight">Discover Community Pods</h1>
         <p className="text-[13px] text-slate-500 mt-1 mb-6">Networks and lists other RoundTables members have opened up beyond your organization.</p>
 
         <div className="relative max-w-md mb-6">
@@ -47,7 +47,7 @@ export default function DiscoverPodsPage() {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search discoverable PODs"
-            className="w-full pl-9 pr-3 py-2.5 rounded-xl border border-slate-200 bg-white text-[13px] focus:outline-none focus:ring-2 focus:ring-[#00b8a9]/30 focus:border-[#00b8a9]"
+            className="w-full pl-9 pr-3 py-2.5 rounded-xl border border-slate-200 bg-white text-[13px] focus:outline-none focus:ring-2 focus:ring-[#4361ee]/30 focus:border-[#4361ee]"
           />
         </div>
 
@@ -94,7 +94,7 @@ export default function DiscoverPodsPage() {
                     className={`px-3.5 py-2 rounded-lg text-[12.5px] font-semibold transition-colors ${
                       isRequested
                         ? "bg-slate-100 text-slate-400 cursor-default"
-                        : "bg-[#00b8a9] text-white hover:bg-[#00a89a]"
+                        : "bg-[#4361ee] text-white hover:bg-[#3d58d9]"
                     }`}
                   >
                     {isRequested ? "Request sent" : d.joinPolicy === "open" ? "Join POD" : "Request to join"}

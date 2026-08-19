@@ -65,7 +65,7 @@ function OrgAssignSelect({
           isSm ? "min-h-8 px-2.5 py-1" : "min-h-9 px-3 py-1.5"
         } ${
           open
-            ? "border-[#00b8a9] ring-1 ring-[#00b8a9]/20"
+            ? "border-[#4361ee] ring-1 ring-[#4361ee]/20"
             : !selectedOrg
               ? "border-dashed border-amber-300 bg-amber-50/40"
               : "border-slate-200 hover:border-slate-300"
@@ -74,7 +74,7 @@ function OrgAssignSelect({
         <div className="flex-1 flex items-center gap-1 min-w-0">
           {selectedOrg ? (
             <span
-              className={`inline-flex items-center gap-1 rounded font-medium bg-[#e8f5f3] text-[#00897b] max-w-full ${
+              className={`inline-flex items-center gap-1 rounded font-medium bg-[#e8f5f3] text-[#3147af] max-w-full ${
                 isSm ? "px-1.5 py-0.5 text-[10.5px]" : "px-1.5 py-0.5 text-[11.5px]"
               }`}
             >
@@ -85,7 +85,7 @@ function OrgAssignSelect({
                   e.stopPropagation();
                   onChange(null);
                 }}
-                className="hover:text-[#00695c] shrink-0"
+                className="hover:text-[#253685] shrink-0"
               >
                 <X size={10} />
               </span>
@@ -130,7 +130,7 @@ function OrgAssignSelect({
                 >
                   <span
                     className={`w-4 h-4 rounded border flex items-center justify-center shrink-0 transition-colors ${
-                      checked ? "bg-[#00b8a9] border-[#00b8a9]" : "border-slate-300"
+                      checked ? "bg-[#4361ee] border-[#4361ee]" : "border-slate-300"
                     }`}
                   >
                     {checked && <Check size={11} className="text-white" strokeWidth={2.5} />}

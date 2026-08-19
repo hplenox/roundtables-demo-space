@@ -52,11 +52,11 @@ const TYPE_CONFIG: Record<
   invitations_sent: {
     label: "Invitations Sent",
     icon: Mail,
-    color: "text-[#00897b]",
-    dot: "bg-[#00b8a9]",
-    bg: "bg-[#00b8a9]/15",
-    border: "border-[#00b8a9]",
-    unreadBg: "bg-[#00b8a9]/5",
+    color: "text-[#3147af]",
+    dot: "bg-[#4361ee]",
+    bg: "bg-[#4361ee]/15",
+    border: "border-[#4361ee]",
+    unreadBg: "bg-[#4361ee]/5",
   },
   email_bounce: {
     label: "Email Bounce",
@@ -149,13 +149,13 @@ const ROLE_CONFIG: Record<
     description:
       "Notifications for LP clients who administer surveys: CSV status, invitation delivery, submission alerts, and weekly progress digests.",
     icon: Building2,
-    headerBg: "bg-[#00b8a9]/8",
+    headerBg: "bg-[#4361ee]/8",
     headerText: "text-slate-900",
     headerSubText: "text-slate-500",
-    iconBg: "bg-[#00b8a9]/20",
-    iconColor: "text-[#00897b]",
-    badgeBg: "bg-[#00b8a9]/20",
-    badgeText: "text-[#00897b]",
+    iconBg: "bg-[#4361ee]/20",
+    iconColor: "text-[#3147af]",
+    badgeBg: "bg-[#4361ee]/20",
+    badgeText: "text-[#3147af]",
     chevronColor: "text-slate-400",
     dark: false,
   },
@@ -185,7 +185,7 @@ const ROLE_CONFIG: Record<
     headerText: "text-white",
     headerSubText: "text-white/50",
     iconBg: "bg-white/10",
-    iconColor: "text-[#00b8a9]",
+    iconColor: "text-[#4361ee]",
     badgeBg: "bg-white/15",
     badgeText: "text-white",
     chevronColor: "text-white/40",
@@ -344,7 +344,7 @@ function NotificationCard({
               <button
                 onClick={() => onToggleRead(notif.id)}
                 title={notif.read ? "Mark as unread" : "Mark as read"}
-                className="p-1.5 rounded-lg text-slate-400 hover:text-[#00b8a9] hover:bg-[#00b8a9]/10 transition-colors"
+                className="p-1.5 rounded-lg text-slate-400 hover:text-[#4361ee] hover:bg-[#4361ee]/10 transition-colors"
               >
                 {notif.read ? <Circle size={13} /> : <CheckCheck size={13} />}
               </button>
@@ -468,8 +468,8 @@ function ActivityDigest({ notifications }: { notifications: Notification[] }) {
   return (
     <div className="rounded-2xl bg-gradient-to-br from-[#0f1923] to-[#162332] p-5 text-white shadow-lg">
       <div className="flex items-center gap-2 mb-4">
-        <Sparkles size={13} className="text-[#00b8a9]" />
-        <span className="text-[10.5px] font-bold tracking-widest uppercase text-[#00b8a9]">
+        <Sparkles size={13} className="text-[#4361ee]" />
+        <span className="text-[10.5px] font-bold tracking-widest uppercase text-[#4361ee]">
           Activity Digest
         </span>
       </div>
@@ -566,7 +566,7 @@ export default function NotificationsPage() {
           <div className="flex items-center justify-between mb-5">
             <div className="flex items-center gap-3">
               <div className="w-9 h-9 rounded-xl bg-[#0f1923] flex items-center justify-center shrink-0">
-                <Bell size={17} className="text-[#00b8a9]" strokeWidth={1.75} />
+                <Bell size={17} className="text-[#4361ee]" strokeWidth={1.75} />
               </div>
               <div>
                 <div className="flex items-center gap-2">
@@ -585,7 +585,7 @@ export default function NotificationsPage() {
             {unreadCount > 0 && (
               <button
                 onClick={markAllRead}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12.5px] font-medium text-[#00897b] bg-[#00b8a9]/10 hover:bg-[#00b8a9]/20 transition-colors"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12.5px] font-medium text-[#3147af] bg-[#4361ee]/10 hover:bg-[#4361ee]/20 transition-colors"
               >
                 <CheckCheck size={13} />
                 Mark all read
@@ -604,7 +604,7 @@ export default function NotificationsPage() {
                   className={`
                     flex items-center gap-1.5 px-3.5 py-2 text-[12.5px] font-medium border-b-2 transition-all whitespace-nowrap
                     ${roleFilter === key
-                      ? "border-[#00b8a9] text-[#00897b]"
+                      ? "border-[#4361ee] text-[#3147af]"
                       : "border-transparent text-slate-500 hover:text-slate-700"
                     }
                   `}
@@ -612,7 +612,7 @@ export default function NotificationsPage() {
                   {roleLabels[key]}
                   {count > 0 && (
                     <span className={`inline-flex items-center justify-center min-w-[16px] h-4 px-1 rounded-full text-[9.5px] font-bold ${
-                      roleFilter === key ? "bg-[#00b8a9]/15 text-[#00897b]" : "bg-slate-100 text-slate-500"
+                      roleFilter === key ? "bg-[#4361ee]/15 text-[#3147af]" : "bg-slate-100 text-slate-500"
                     }`}>
                       {count}
                     </span>
@@ -653,7 +653,7 @@ export default function NotificationsPage() {
             </div>
             <button
               onClick={() => setSnoozed(new Set())}
-              className="text-[11.5px] font-medium text-[#00897b] hover:underline"
+              className="text-[11.5px] font-medium text-[#3147af] hover:underline"
             >
               Restore all
             </button>

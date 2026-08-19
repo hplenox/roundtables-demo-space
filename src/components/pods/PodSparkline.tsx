@@ -1,4 +1,4 @@
-export default function PodSparkline({ values, color = "#00b8a9" }: { values: number[]; color?: string }) {
+export default function PodSparkline({ values, color = "#4361ee" }: { values: number[]; color?: string }) {
   return (
     <div className="flex items-end gap-[3px] h-6">
       {values.map((v, i) => (

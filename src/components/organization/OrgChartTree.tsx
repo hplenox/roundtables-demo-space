@@ -32,7 +32,7 @@ function StaffBar({ pct, dark }: { pct: number; dark?: boolean }) {
   return (
     <div className={`h-1.5 w-full rounded-full overflow-hidden ${dark ? "bg-white/10" : "bg-slate-100"}`}>
       <div
-        className="h-full rounded-full bg-[#00b8a9] transition-all duration-500"
+        className="h-full rounded-full bg-[#4361ee] transition-all duration-500"
         style={{ width: `${Math.max(4, Math.min(100, pct))}%` }}
       />
     </div>
@@ -45,7 +45,7 @@ function RootCard({ unit }: { unit: OrgUnit }) {
     <div className="shrink-0 w-[220px] bg-[#0f1923] rounded-xl px-4 py-3">
       <div className="flex items-center gap-2.5 mb-2">
         <div className="shrink-0 w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center">
-          <Building2 size={15} className="text-[#00b8a9]" />
+          <Building2 size={15} className="text-[#4361ee]" />
         </div>
         <div className="min-w-0">
           <p className="text-[13px] font-bold text-white leading-tight truncate">{unit.name}</p>
@@ -80,7 +80,7 @@ function UnitCard({
     <div className={`shrink-0 bg-white rounded-xl border border-slate-200 p-3 ${contacts ? "w-[212px]" : "w-[176px]"}`}>
       <div className="flex items-center gap-2 mb-2">
         <div className="shrink-0 w-7 h-7 rounded-lg bg-[#0f1923] flex items-center justify-center">
-          <Building2 size={12} className="text-[#00b8a9]" />
+          <Building2 size={12} className="text-[#4361ee]" />
         </div>
         <div className="min-w-0">
           <p className="text-[12px] font-bold text-slate-900 leading-tight truncate">{unit.name}</p>
@@ -112,7 +112,7 @@ function UnitCard({
       {reportHref && (
         <Link
           href={reportHref}
-          className="mt-3 flex items-center justify-center gap-1 w-full py-1.5 rounded-lg bg-[#00b8a9]/10 text-[#00897b] text-[11px] font-semibold hover:bg-[#00b8a9]/20 transition-colors"
+          className="mt-3 flex items-center justify-center gap-1 w-full py-1.5 rounded-lg bg-[#4361ee]/10 text-[#3147af] text-[11px] font-semibold hover:bg-[#4361ee]/20 transition-colors"
         >
           View Report
           <ArrowUpRight size={11} />

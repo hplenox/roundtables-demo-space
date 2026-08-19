@@ -57,7 +57,7 @@ function MessageBubble({ message }: { message: TicketMessage }) {
   if (message.role === "admin") {
     return (
       <div className="flex gap-3 flex-row-reverse">
-        <div className="shrink-0 w-7 h-7 rounded-full bg-[#00b8a9] flex items-center justify-center text-[10px] font-bold text-white">
+        <div className="shrink-0 w-7 h-7 rounded-full bg-[#4361ee] flex items-center justify-center text-[10px] font-bold text-white">
           EF
         </div>
         <div className="flex-1 flex flex-col items-end">
@@ -65,7 +65,7 @@ function MessageBubble({ message }: { message: TicketMessage }) {
             <span className="text-[10.5px] text-slate-400">{formatTime(message.timestamp)}</span>
             <span className="text-[11px] font-semibold text-slate-600">{message.author}</span>
           </div>
-          <div className="bg-[#00b8a9]/[0.08] border border-[#00b8a9]/20 rounded-xl rounded-tr-sm p-3 max-w-[85%]">
+          <div className="bg-[#4361ee]/[0.08] border border-[#4361ee]/20 rounded-xl rounded-tr-sm p-3 max-w-[85%]">
             <p className="text-[12.5px] text-slate-800 leading-relaxed whitespace-pre-wrap">{message.body}</p>
           </div>
         </div>
@@ -183,7 +183,7 @@ export default function TicketDetail({ ticket, onStatusChange }: TicketDetailPro
           </button>
           <div className="ml-auto relative">
             <select
-              className="appearance-none pl-3 pr-7 py-1.5 text-[11.5px] bg-white border border-slate-200 rounded-lg text-slate-600 cursor-pointer focus:outline-none focus:border-[#00b8a9] transition-colors"
+              className="appearance-none pl-3 pr-7 py-1.5 text-[11.5px] bg-white border border-slate-200 rounded-lg text-slate-600 cursor-pointer focus:outline-none focus:border-[#4361ee] transition-colors"
               defaultValue=""
               onChange={(e) => {
                 const tmpl = MOCK_TEMPLATES.find((t) => t.id === e.target.value);
@@ -207,7 +207,7 @@ export default function TicketDetail({ ticket, onStatusChange }: TicketDetailPro
           className={`w-full text-[12.5px] p-3 rounded-lg border resize-none h-24 outline-none transition-colors
             ${isInternalNote
               ? "bg-amber-50 border-amber-200 focus:border-amber-400 placeholder-amber-400"
-              : "bg-white border-slate-200 focus:border-[#00b8a9]"
+              : "bg-white border-slate-200 focus:border-[#4361ee]"
             }`}
         />
 

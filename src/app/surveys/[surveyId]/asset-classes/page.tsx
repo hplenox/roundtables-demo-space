@@ -65,7 +65,7 @@ function BenchmarkGroupMultiSelect({
         onClick={toggleOpen}
         className={`w-full flex items-center gap-1.5 rounded-lg border bg-white transition-colors ${
           isSm ? "min-h-8 px-2.5 py-1" : "min-h-9 px-3 py-1.5"
-        } ${open ? "border-[#00b8a9] ring-1 ring-[#00b8a9]/20" : selected.length === 0 ? "border-amber-200 bg-amber-50/40" : "border-slate-200 hover:border-slate-300"}`}
+        } ${open ? "border-[#4361ee] ring-1 ring-[#4361ee]/20" : selected.length === 0 ? "border-amber-200 bg-amber-50/40" : "border-slate-200 hover:border-slate-300"}`}
       >
         <div className="flex-1 flex items-center gap-1 flex-wrap min-w-0">
           {selected.length === 0 ? (
@@ -74,7 +74,7 @@ function BenchmarkGroupMultiSelect({
             selected.map((key) => (
               <span
                 key={key}
-                className={`inline-flex items-center gap-1 rounded font-medium bg-[#e8f5f3] text-[#00897b] ${
+                className={`inline-flex items-center gap-1 rounded font-medium bg-[#e8f5f3] text-[#3147af] ${
                   isSm ? "px-1.5 py-0.5 text-[10.5px]" : "px-1.5 py-0.5 text-[11.5px]"
                 }`}
               >
@@ -85,7 +85,7 @@ function BenchmarkGroupMultiSelect({
                     e.stopPropagation();
                     toggle(key);
                   }}
-                  className="hover:text-[#00695c]"
+                  className="hover:text-[#253685]"
                 >
                   <X size={10} />
                 </span>
@@ -114,7 +114,7 @@ function BenchmarkGroupMultiSelect({
                 >
                   <span
                     className={`w-4 h-4 rounded border flex items-center justify-center shrink-0 transition-colors ${
-                      checked ? "bg-[#00b8a9] border-[#00b8a9]" : "border-slate-300"
+                      checked ? "bg-[#4361ee] border-[#4361ee]" : "border-slate-300"
                     }`}
                   >
                     {checked && <Check size={11} className="text-white" strokeWidth={2.5} />}
@@ -155,7 +155,7 @@ function AddAssetClassModal({
         <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100">
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-lg bg-[#e8f5f3] flex items-center justify-center">
-              <Layers size={15} className="text-[#00897b]" />
+              <Layers size={15} className="text-[#3147af]" />
             </div>
             <div>
               <p className="text-[13.5px] font-semibold text-slate-800">Add Asset Class</p>
@@ -178,7 +178,7 @@ function AddAssetClassModal({
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="e.g. Growth Buyout"
-              className="w-full h-9 px-3 rounded-lg border border-slate-200 text-[13px] text-slate-700 placeholder:text-slate-400 focus:outline-none focus:border-[#00b8a9] transition-colors"
+              className="w-full h-9 px-3 rounded-lg border border-slate-200 text-[13px] text-slate-700 placeholder:text-slate-400 focus:outline-none focus:border-[#4361ee] transition-colors"
             />
             {isDuplicate && (
               <p className="text-[11px] text-red-500 mt-1.5">An asset class with this name already exists.</p>

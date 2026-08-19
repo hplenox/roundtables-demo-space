@@ -32,7 +32,7 @@ function ProgressBar({ value, total }: { value: number; total: number }) {
     <div className="flex items-center gap-2.5">
       <div className="flex-1 h-1 bg-slate-100 rounded-full overflow-hidden">
         <div
-          className="h-full bg-[#00b8a9] rounded-full transition-all duration-500"
+          className="h-full bg-[#4361ee] rounded-full transition-all duration-500"
           style={{ width: `${pct}%` }}
         />
       </div>
@@ -66,7 +66,7 @@ function SurveyRow({ survey, index }: { survey: Survey; index: number }) {
         {/* Name + org */}
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2.5 mb-0.5">
-            <p className="text-[13.5px] font-semibold text-slate-800 truncate group-hover:text-[#00897b] transition-colors">
+            <p className="text-[13.5px] font-semibold text-slate-800 truncate group-hover:text-[#3147af] transition-colors">
               {survey.name}
             </p>
             <StatusPill status={survey.status} />
@@ -118,7 +118,7 @@ function SurveyRow({ survey, index }: { survey: Survey; index: number }) {
         {/* Arrow */}
         <ArrowRight
           size={15}
-          className="shrink-0 text-slate-300 group-hover:text-[#00b8a9] group-hover:translate-x-0.5 transition-all duration-150"
+          className="shrink-0 text-slate-300 group-hover:text-[#4361ee] group-hover:translate-x-0.5 transition-all duration-150"
         />
       </div>
     </Link>
@@ -168,7 +168,7 @@ export default function SurveysPage() {
                   flex items-center gap-2 px-5 py-3 text-[13px] font-medium
                   border-b-2 transition-all duration-150 -mb-px
                   ${activeTab === tab.key
-                    ? "border-[#00b8a9] text-[#00897b]"
+                    ? "border-[#4361ee] text-[#3147af]"
                     : "border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-200"
                   }
                 `}
@@ -176,7 +176,7 @@ export default function SurveysPage() {
                 {tab.label}
                 <span className={`
                   inline-flex items-center justify-center w-5 h-5 rounded-full text-[10.5px] font-semibold
-                  ${activeTab === tab.key ? "bg-[#00b8a9]/15 text-[#00897b]" : "bg-slate-100 text-slate-500"}
+                  ${activeTab === tab.key ? "bg-[#4361ee]/15 text-[#3147af]" : "bg-slate-100 text-slate-500"}
                 `}>
                   {tab.count}
                 </span>

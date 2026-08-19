@@ -20,9 +20,9 @@ type Status = "building" | "planned" | "exploring";
 const STATUS_CONFIG: Record<Status, { label: string; color: string; bg: string; dot: string }> = {
   building: {
     label: "In Development",
-    color: "text-[#00897b]",
-    bg: "bg-[#00b8a9]/10",
-    dot: "bg-[#00b8a9]",
+    color: "text-[#3147af]",
+    bg: "bg-[#4361ee]/10",
+    dot: "bg-[#4361ee]",
   },
   planned: {
     label: "Planned",
@@ -124,8 +124,8 @@ export default function RoadmapPage() {
       <div className="bg-[#0f1923] px-8 py-12">
         <div className="max-w-4xl mx-auto">
           <div className="flex items-center gap-2 mb-4">
-            <Sparkles size={13} className="text-[#00b8a9]" />
-            <span className="text-[11px] font-bold tracking-widest uppercase text-[#00b8a9]">
+            <Sparkles size={13} className="text-[#4361ee]" />
+            <span className="text-[11px] font-bold tracking-widest uppercase text-[#4361ee]">
               Product Roadmap
             </span>
           </div>
@@ -140,7 +140,7 @@ export default function RoadmapPage() {
           {/* Stats row */}
           <div className="mt-8 flex items-center gap-6">
             {[
-              { icon: Zap, label: "In development", value: building.length, color: "text-[#00b8a9]" },
+              { icon: Zap, label: "In development", value: building.length, color: "text-[#4361ee]" },
               { icon: Clock, label: "Planned", value: planned.length, color: "text-violet-400" },
               { icon: Sparkles, label: "Exploring", value: exploring.length, color: "text-slate-400" },
             ].map(({ icon: Icon, label, value, color }) => (
@@ -185,8 +185,8 @@ export default function RoadmapPage() {
                     >
                       {/* Top row */}
                       <div className="flex items-start justify-between gap-3 mb-3">
-                        <div className="w-9 h-9 rounded-xl bg-slate-100 flex items-center justify-center shrink-0 group-hover:bg-[#00b8a9]/10 transition-colors">
-                          <Icon size={17} className="text-slate-500 group-hover:text-[#00b8a9] transition-colors" strokeWidth={1.75} />
+                        <div className="w-9 h-9 rounded-xl bg-slate-100 flex items-center justify-center shrink-0 group-hover:bg-[#4361ee]/10 transition-colors">
+                          <Icon size={17} className="text-slate-500 group-hover:text-[#4361ee] transition-colors" strokeWidth={1.75} />
                         </div>
                         <div className="flex items-center gap-1.5 shrink-0">
                           <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold ${cfg.bg} ${cfg.color}`}>
@@ -231,7 +231,7 @@ export default function RoadmapPage() {
           </div>
           <a
             href="/support"
-            className="shrink-0 px-4 py-2 rounded-lg bg-[#00b8a9] text-white text-[12.5px] font-semibold hover:bg-[#00a99b] transition-colors"
+            className="shrink-0 px-4 py-2 rounded-lg bg-[#4361ee] text-white text-[12.5px] font-semibold hover:bg-[#3d58d9] transition-colors"
           >
             Share feedback
           </a>

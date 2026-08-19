@@ -115,13 +115,13 @@ function StepBar({ current }: { current: number }) {
             <div
               key={`node-${step.id}`}
               className={`w-8 h-8 rounded-full shrink-0 flex items-center justify-center text-[12px] font-bold transition-all
-                ${done ? "bg-[#00b8a9] text-white" : active ? "bg-[#0f1923] text-white" : "bg-slate-100 text-slate-400"}`}
+                ${done ? "bg-[#4361ee] text-white" : active ? "bg-[#0f1923] text-white" : "bg-slate-100 text-slate-400"}`}
             >
               {done ? <Check size={13} strokeWidth={2.5} /> : step.id}
             </div>
           );
           const line = i < UPLOAD_STEPS.length - 1 ? (
-            <div key={`line-${step.id}`} className={`flex-1 h-px transition-colors ${done ? "bg-[#00b8a9]" : "bg-slate-200"}`} />
+            <div key={`line-${step.id}`} className={`flex-1 h-px transition-colors ${done ? "bg-[#4361ee]" : "bg-slate-200"}`} />
           ) : null;
           return line ? [node, line] : [node];
         })}
@@ -135,7 +135,7 @@ function StepBar({ current }: { current: number }) {
             <p
               key={step.id}
               className={`text-[9.5px] font-medium text-center leading-tight max-w-[62px]
-                ${active ? "text-slate-800 font-semibold" : done ? "text-[#00897b]" : "text-slate-400"}`}
+                ${active ? "text-slate-800 font-semibold" : done ? "text-[#3147af]" : "text-slate-400"}`}
             >
               {step.label}
             </p>
@@ -174,7 +174,7 @@ function StepUpload({ onContinue }: { onContinue: (contacts: UploadedContact[]) 
         <div
           className={`border-2 border-dashed rounded-xl py-12 text-center cursor-pointer transition-all
             ${isDragging
-              ? "border-[#00b8a9] bg-[#00b8a9]/5"
+              ? "border-[#4361ee] bg-[#4361ee]/5"
               : "border-slate-200 hover:border-slate-300 hover:bg-slate-50/60"}`}
           onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
           onDragLeave={() => setIsDragging(false)}
@@ -521,7 +521,7 @@ function StepEdit({
         {/* Add row */}
         <button
           onClick={addRow}
-          className="flex items-center gap-2 w-full px-4 py-2.5 text-[12px] font-medium text-slate-400 hover:text-[#00897b] hover:bg-slate-50 transition-colors border-t border-slate-50"
+          className="flex items-center gap-2 w-full px-4 py-2.5 text-[12px] font-medium text-slate-400 hover:text-[#3147af] hover:bg-slate-50 transition-colors border-t border-slate-50"
         >
           <Plus size={13} />
           Add contact
@@ -585,8 +585,8 @@ function StepSubmit({
         <div className="p-6 max-w-lg mx-auto space-y-5">
           {/* Summary card */}
           <div className="flex items-center gap-4 p-4 bg-slate-50 rounded-xl border border-slate-100">
-            <div className="w-12 h-12 rounded-xl bg-[#00b8a9]/10 flex items-center justify-center shrink-0">
-              <Users size={22} className="text-[#00b8a9]" />
+            <div className="w-12 h-12 rounded-xl bg-[#4361ee]/10 flex items-center justify-center shrink-0">
+              <Users size={22} className="text-[#4361ee]" />
             </div>
             <div>
               <p className="text-[15px] font-bold text-slate-800">{contacts.length} contacts</p>
@@ -701,7 +701,7 @@ function StepPendingApproval({ count, onApprove }: { count: number; onApprove: (
           </p>
           <button
             onClick={onApprove}
-            className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border-2 border-dashed border-[#00b8a9]/40 text-[#00897b] text-[12.5px] font-semibold hover:bg-[#00b8a9]/5 transition-colors"
+            className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border-2 border-dashed border-[#4361ee]/40 text-[#3147af] text-[12.5px] font-semibold hover:bg-[#4361ee]/5 transition-colors"
           >
             <Check size={14} />
             Mark as Approved by LPS
@@ -857,7 +857,7 @@ function ProgressCell({ value }: { value: number }) {
           className="h-full rounded-full transition-all duration-500"
           style={{
             width: `${value}%`,
-            backgroundColor: value === 100 ? "#00b8a9" : value > 0 ? "#fbbf24" : "transparent",
+            backgroundColor: value === 100 ? "#4361ee" : value > 0 ? "#fbbf24" : "transparent",
           }}
         />
       </div>
@@ -918,7 +918,7 @@ Survey Administration Team`;
         <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100">
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-lg bg-[#e8f5f3] flex items-center justify-center shrink-0">
-              <Mail size={15} className="text-[#00897b]" />
+              <Mail size={15} className="text-[#3147af]" />
             </div>
             <div>
               <p className="text-[13.5px] font-semibold text-slate-800">
@@ -1061,10 +1061,10 @@ function OrgRow({ org, surveyId, onNudge }: { org: InvitedOrg; surveyId: string;
             <div className="w-6 h-6 rounded-md bg-slate-100 flex items-center justify-center shrink-0">
               <span className="text-[9px] font-bold text-slate-600">{org.name.substring(0, 2).toUpperCase()}</span>
             </div>
-            <p className="text-[13px] font-semibold text-slate-800 group-hover:text-[#00897b] transition-colors truncate">{org.name}</p>
+            <p className="text-[13px] font-semibold text-slate-800 group-hover:text-[#3147af] transition-colors truncate">{org.name}</p>
             <span className="shrink-0 text-[10px] font-medium px-1.5 py-0.5 rounded bg-slate-100 text-slate-500">{org.type}</span>
             {org.customAssetClass ? (
-              <span className="shrink-0 text-[10px] font-medium px-1.5 py-0.5 rounded bg-[#e8f5f3] text-[#00897b]">
+              <span className="shrink-0 text-[10px] font-medium px-1.5 py-0.5 rounded bg-[#e8f5f3] text-[#3147af]">
                 {org.customAssetClass}
               </span>
             ) : (
@@ -1100,14 +1100,14 @@ function OrgRow({ org, surveyId, onNudge }: { org: InvitedOrg; surveyId: string;
           <p className="text-[11.5px] text-slate-400">{org.lastActivity ?? "No activity"}</p>
         </div>
         <div className="w-6 shrink-0" />
-        <ArrowRight size={14} className="shrink-0 text-slate-300 group-hover:text-[#00b8a9] group-hover:translate-x-0.5 transition-all" />
+        <ArrowRight size={14} className="shrink-0 text-slate-300 group-hover:text-[#4361ee] group-hover:translate-x-0.5 transition-all" />
       </Link>
       {canNudge && (
         <div className="absolute right-10 top-1/2 -translate-y-1/2 hidden group-hover:flex items-center">
           <button
             onClick={() => onNudge(org)}
             title={`Send nudge to ${org.contactName} (${org.progress}% complete)`}
-            className="w-6 h-6 rounded-md flex items-center justify-center text-slate-400 hover:text-[#00897b] hover:bg-[#e8f5f3] transition-all"
+            className="w-6 h-6 rounded-md flex items-center justify-center text-slate-400 hover:text-[#3147af] hover:bg-[#e8f5f3] transition-all"
           >
             <Mail size={13} />
           </button>

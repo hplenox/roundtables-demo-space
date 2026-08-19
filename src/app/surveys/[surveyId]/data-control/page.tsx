@@ -212,7 +212,7 @@ function AuditCard({ audit, isExpanded, onToggleExpand, onToggleInclude, onSendR
             onClick={onToggleInclude}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-medium border transition-all ${
               audit.includedInReport
-                ? "bg-[#00b8a9]/8 text-[#00897b] border-[#00b8a9]/25 hover:bg-[#00b8a9]/15"
+                ? "bg-[#4361ee]/8 text-[#3147af] border-[#4361ee]/25 hover:bg-[#4361ee]/15"
                 : "bg-slate-50 text-slate-400 border-slate-200 hover:bg-slate-100"
             }`}
           >
@@ -260,7 +260,7 @@ function AuditCard({ audit, isExpanded, onToggleExpand, onToggleInclude, onSendR
           className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-medium border transition-colors ${
             reminderSent
               ? "bg-emerald-50 text-emerald-600 border-emerald-200 cursor-default"
-              : "bg-white text-slate-600 border-slate-200 hover:border-[#00b8a9]/40 hover:text-[#00897b]"
+              : "bg-white text-slate-600 border-slate-200 hover:border-[#4361ee]/40 hover:text-[#3147af]"
           }`}
         >
           {reminderSent ? <CheckCircle2 size={11} /> : <Mail size={11} />}
@@ -322,7 +322,7 @@ function EmailModal({ audit, subject, body, onSend, onClose }: EmailModalProps) 
         <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-xl bg-[#0f1923] flex items-center justify-center">
-              <Mail size={14} className="text-[#00b8a9]" />
+              <Mail size={14} className="text-[#4361ee]" />
             </div>
             <div>
               <p className="text-[13px] font-bold text-slate-900">Send Data Reminder</p>
@@ -347,7 +347,7 @@ function EmailModal({ audit, subject, body, onSend, onClose }: EmailModalProps) 
             <input
               value={emailSubject}
               onChange={(e) => setEmailSubject(e.target.value)}
-              className="w-full px-3 py-2 border border-slate-200 rounded-lg text-[12px] text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-[#00b8a9]/30 focus:border-[#00b8a9] transition-colors"
+              className="w-full px-3 py-2 border border-slate-200 rounded-lg text-[12px] text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-[#4361ee]/30 focus:border-[#4361ee] transition-colors"
             />
           </div>
           <div>
@@ -356,7 +356,7 @@ function EmailModal({ audit, subject, body, onSend, onClose }: EmailModalProps) 
               value={emailBody}
               onChange={(e) => setEmailBody(e.target.value)}
               rows={16}
-              className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-[12px] text-slate-700 font-mono leading-relaxed bg-white focus:outline-none focus:ring-2 focus:ring-[#00b8a9]/30 focus:border-[#00b8a9] resize-none transition-colors"
+              className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-[12px] text-slate-700 font-mono leading-relaxed bg-white focus:outline-none focus:ring-2 focus:ring-[#4361ee]/30 focus:border-[#4361ee] resize-none transition-colors"
             />
           </div>
 
@@ -538,15 +538,15 @@ export default function DataControlPage() {
 
         <div className="min-h-[500px] flex flex-col items-center justify-center py-20 select-none">
           <div className="relative mb-10 w-32 h-32 flex items-center justify-center">
-            <div className="absolute inset-0 rounded-full border border-[#00b8a9]/25"
+            <div className="absolute inset-0 rounded-full border border-[#4361ee]/25"
               style={{ animation: "scanRing 2.2s ease-out infinite" }} />
-            <div className="absolute inset-0 rounded-full border border-[#00b8a9]/15"
+            <div className="absolute inset-0 rounded-full border border-[#4361ee]/15"
               style={{ animation: "scanRing 2.2s ease-out infinite 0.7s" }} />
-            <div className="absolute inset-0 rounded-full border border-[#00b8a9]/10"
+            <div className="absolute inset-0 rounded-full border border-[#4361ee]/10"
               style={{ animation: "scanRing 2.2s ease-out infinite 1.4s" }} />
-            <div className="relative z-10 w-20 h-20 rounded-full bg-[#0f1923] border-2 border-[#00b8a9]/35 flex items-center justify-center shadow-xl">
+            <div className="relative z-10 w-20 h-20 rounded-full bg-[#0f1923] border-2 border-[#4361ee]/35 flex items-center justify-center shadow-xl">
               <div style={{ animation: "scanGlass 2.6s ease-in-out infinite" }}>
-                <Search size={30} className="text-[#00b8a9]" strokeWidth={2.2} />
+                <Search size={30} className="text-[#4361ee]" strokeWidth={2.2} />
               </div>
             </div>
           </div>
@@ -566,14 +566,14 @@ export default function DataControlPage() {
             <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden">
               <div
                 className="h-full rounded-full transition-all duration-200"
-                style={{ width: `${scanProgress}%`, background: "linear-gradient(90deg, #00b8a9, #00b8a9cc)" }}
+                style={{ width: `${scanProgress}%`, background: "linear-gradient(90deg, #4361ee, #4361eecc)" }}
               />
             </div>
           </div>
 
           <div className="flex items-center gap-2">
             <span
-              className="inline-block w-1.5 h-1.5 rounded-full bg-[#00b8a9]"
+              className="inline-block w-1.5 h-1.5 rounded-full bg-[#4361ee]"
               style={{ animation: "scanDot 0.9s ease-in-out infinite" }}
             />
             <p className="text-[13px] font-semibold text-slate-700">{SCAN_STEPS[scanStepIdx]}</p>
@@ -586,7 +586,7 @@ export default function DataControlPage() {
                 className="h-0.5 rounded-full transition-all duration-300"
                 style={{
                   width: i <= scanStepIdx ? "28px" : "12px",
-                  background: i <= scanStepIdx ? "#00b8a9" : "#e2e8f0",
+                  background: i <= scanStepIdx ? "#4361ee" : "#e2e8f0",
                 }}
               />
             ))}
@@ -624,7 +624,7 @@ export default function DataControlPage() {
 
       {toast && (
         <div className="fixed top-5 right-5 z-50 flex items-center gap-2.5 bg-[#0f1923] text-white px-4 py-2.5 rounded-xl shadow-xl border border-white/10 text-[13px] font-medium">
-          <CheckCircle2 size={14} className="text-[#00b8a9]" />
+          <CheckCircle2 size={14} className="text-[#4361ee]" />
           {toast}
         </div>
       )}
@@ -643,7 +643,7 @@ export default function DataControlPage() {
       <div className="dc-fadein flex items-start justify-between gap-4">
         <div>
           <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
-            <Shield size={18} className="text-[#00b8a9]" />
+            <Shield size={18} className="text-[#4361ee]" />
             Data Control
           </h2>
           <p className="text-sm text-slate-500 mt-0.5">
@@ -662,7 +662,7 @@ export default function DataControlPage() {
               setScanStepIdx(0);
               setScanProgress(0);
             }}
-            className="flex items-center gap-1.5 text-[11px] font-semibold text-[#00897b] bg-[#00b8a9]/8 border border-[#00b8a9]/25 px-3 py-1.5 rounded-lg hover:bg-[#00b8a9]/15 transition-colors shadow-sm"
+            className="flex items-center gap-1.5 text-[11px] font-semibold text-[#3147af] bg-[#4361ee]/8 border border-[#4361ee]/25 px-3 py-1.5 rounded-lg hover:bg-[#4361ee]/15 transition-colors shadow-sm"
           >
             <RefreshCw size={11} />
             Re-scan

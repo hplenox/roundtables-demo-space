@@ -203,7 +203,7 @@ export default function BenchmarkDistributionChart({ pool, animate = true }: Ben
 
   }, [pool, animate]);
 
-  const pctColor = pool.managerPercentile >= 70 ? "#00897b" : pool.managerPercentile >= 40 ? "#b45309" : "#dc2626";
+  const pctColor = pool.managerPercentile >= 70 ? "#3147af" : pool.managerPercentile >= 40 ? "#b45309" : "#dc2626";
 
   return (
     <div ref={containerRef} className="relative w-full">

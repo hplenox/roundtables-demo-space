@@ -93,7 +93,7 @@ export default function GeographyBenchmarkWidget({ geography, benchmarks, orgNam
               }`}
             >
               {isHome && (
-                <span className="w-1.5 h-1.5 rounded-full bg-[#00b8a9] shrink-0" />
+                <span className="w-1.5 h-1.5 rounded-full bg-[#4361ee] shrink-0" />
               )}
               {region}
             </button>

@@ -75,12 +75,12 @@ function GenderBar({ men, women }: { men: number; women: number }) {
   return (
     <div className="space-y-1.5">
       <div className="flex h-3 rounded-full overflow-hidden bg-slate-100">
-        <div className="h-full bg-[#00b8a9]" style={{ width: `${wPct}%` }} />
+        <div className="h-full bg-[#4361ee]" style={{ width: `${wPct}%` }} />
         <div className="h-full bg-slate-300" style={{ width: `${mPct}%` }} />
       </div>
       <div className="flex items-center justify-between text-[10.5px]">
-        <span className="flex items-center gap-1 text-[#00897b] font-medium">
-          <span className="w-2 h-2 rounded-full bg-[#00b8a9] inline-block" />
+        <span className="flex items-center gap-1 text-[#3147af] font-medium">
+          <span className="w-2 h-2 rounded-full bg-[#4361ee] inline-block" />
           Women {wPct}% ({women})
         </span>
         <span className="flex items-center gap-1 text-slate-500 font-medium">
@@ -155,7 +155,7 @@ export default function StaffReportPage() {
           <p className="text-slate-400 text-sm">This organization has not completed the survey.</p>
           <Link
             href={`/surveys/${surveyId}/organizations/${orgId}`}
-            className="mt-4 inline-flex items-center gap-1.5 text-[12px] text-[#00897b] hover:underline"
+            className="mt-4 inline-flex items-center gap-1.5 text-[12px] text-[#3147af] hover:underline"
           >
             <ChevronRight size={13} className="rotate-180" /> Back to {org.name}
           </Link>
@@ -198,7 +198,7 @@ export default function StaffReportPage() {
           <nav className="flex items-center gap-1.5 text-[11px] min-w-0 overflow-hidden">
             <Link
               href="/surveys"
-              className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-[#0f1923] text-[#00b8a9] hover:bg-[#1a2d3d] transition-colors font-semibold text-[9.5px] tracking-wide shrink-0"
+              className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-[#0f1923] text-[#4361ee] hover:bg-[#1a2d3d] transition-colors font-semibold text-[9.5px] tracking-wide shrink-0"
             >
               <LayoutDashboard size={9} strokeWidth={2} />
               Survey Admin
@@ -235,11 +235,11 @@ export default function StaffReportPage() {
 
         {/* ── Report header ─────────────────────────────────────────── */}
         <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
-          <div className="h-1.5 bg-gradient-to-r from-violet-500 via-indigo-500 to-[#00b8a9]" />
+          <div className="h-1.5 bg-gradient-to-r from-violet-500 via-indigo-500 to-[#4361ee]" />
           <div className="p-6 flex items-start justify-between gap-5">
             <div className="flex items-center gap-4">
               <div className="w-14 h-14 rounded-2xl bg-[#0f1923] flex items-center justify-center shrink-0 shadow-md">
-                <span className="text-[18px] font-black text-[#00b8a9]">
+                <span className="text-[18px] font-black text-[#4361ee]">
                   {org.name.substring(0, 2).toUpperCase()}
                 </span>
               </div>
@@ -304,8 +304,8 @@ export default function StaffReportPage() {
         {/* ── Gender breakdown ──────────────────────────────────────── */}
         <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
           <div className="flex items-center gap-2.5 px-6 py-4 border-b border-slate-100 bg-slate-50/60">
-            <div className="w-6 h-6 rounded-lg bg-[#00b8a9]/10 flex items-center justify-center">
-              <TrendingUp size={13} className="text-[#00b8a9]" strokeWidth={2} />
+            <div className="w-6 h-6 rounded-lg bg-[#4361ee]/10 flex items-center justify-center">
+              <TrendingUp size={13} className="text-[#4361ee]" strokeWidth={2} />
             </div>
             <p className="text-[12px] font-bold text-slate-700">Gender Representation</p>
             <span className="ml-auto text-[10.5px] text-slate-400">by investment staff tier</span>
@@ -326,7 +326,7 @@ export default function StaffReportPage() {
                   {/* Big numbers */}
                   <div className="flex items-end gap-4">
                     <div>
-                      <p className="text-[28px] font-black text-[#00897b] tabular-nums leading-none">
+                      <p className="text-[28px] font-black text-[#3147af] tabular-nums leading-none">
                         {pct(women, total)}%
                       </p>
                       <p className="text-[10.5px] text-slate-400 mt-0.5">Women</p>
@@ -344,7 +344,7 @@ export default function StaffReportPage() {
                   {/* Raw counts */}
                   <div className="pt-2 border-t border-slate-50 grid grid-cols-2 gap-2 text-center">
                     <div>
-                      <p className="text-[14px] font-bold text-[#00b8a9]">{women}</p>
+                      <p className="text-[14px] font-bold text-[#4361ee]">{women}</p>
                       <p className="text-[10px] text-slate-400">Women</p>
                     </div>
                     <div>
@@ -430,7 +430,7 @@ export default function StaffReportPage() {
                 <tr className="border-b border-slate-100">
                   <th className="text-left px-5 py-2.5 text-[10px] font-semibold text-slate-400 uppercase tracking-wider w-32">Tier</th>
                   <th className="text-center px-4 py-2.5 text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Total</th>
-                  <th className="text-center px-4 py-2.5 text-[10px] font-semibold text-[#00897b] uppercase tracking-wider">Women %</th>
+                  <th className="text-center px-4 py-2.5 text-[10px] font-semibold text-[#3147af] uppercase tracking-wider">Women %</th>
                   <th className="text-center px-4 py-2.5 text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Men %</th>
                   <th className="text-center px-4 py-2.5 text-[10px] font-semibold text-violet-700 uppercase tracking-wider">POC %</th>
                   <th className="text-center px-4 py-2.5 text-[10px] font-semibold text-slate-400 uppercase tracking-wider">White %</th>
@@ -449,7 +449,7 @@ export default function StaffReportPage() {
                         <TierBadge tier={tier} />
                       </td>
                       <td className="text-center px-4 py-3 font-semibold text-slate-700">{total}</td>
-                      <td className="text-center px-4 py-3 font-bold text-[#00897b]">
+                      <td className="text-center px-4 py-3 font-bold text-[#3147af]">
                         {pct(gTier.women, total)}%
                         <span className="block text-[10px] font-normal text-slate-400">{gTier.women}</span>
                       </td>

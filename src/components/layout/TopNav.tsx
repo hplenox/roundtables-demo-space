@@ -71,7 +71,7 @@ export default function TopNav() {
           >
             {/* Avatar */}
             <div className="w-7 h-7 rounded-full bg-[#0f1923] flex items-center justify-center shrink-0">
-              <span className="text-[10.5px] font-semibold text-[#00b8a9] tracking-wide">
+              <span className="text-[10.5px] font-semibold text-[#4361ee] tracking-wide">
                 {USER.initials}
               </span>
             </div>

@@ -204,7 +204,7 @@ export default function BadgeManagementPage() {
       {/* Toast */}
       {toast && (
         <div className="fixed top-5 right-5 z-50 flex items-center gap-2.5 bg-[#0f1923] text-white px-4 py-2.5 rounded-xl shadow-xl border border-white/10 text-[13px] font-medium">
-          <CheckCircle2 size={14} className="text-[#00b8a9]" />
+          <CheckCircle2 size={14} className="text-[#4361ee]" />
           {toast}
         </div>
       )}
@@ -237,7 +237,7 @@ export default function BadgeManagementPage() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search badges…"
-            className="w-full pl-8 pr-3 py-2 rounded-lg border border-slate-200 bg-white text-sm text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#00b8a9]/30 focus:border-[#00b8a9]"
+            className="w-full pl-8 pr-3 py-2 rounded-lg border border-slate-200 bg-white text-sm text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#4361ee]/30 focus:border-[#4361ee]"
           />
         </div>
         <div className="flex items-center gap-1.5 flex-wrap">
@@ -337,7 +337,7 @@ export default function BadgeManagementPage() {
                       setAssigningBadge(isAssigning ? null : badge.id);
                       setAssignOrgId("");
                     }}
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#00b8a9]/10 text-[#00897b] border border-[#00b8a9]/25 text-[11px] font-semibold hover:bg-[#00b8a9]/20 transition-colors"
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#4361ee]/10 text-[#3147af] border border-[#4361ee]/25 text-[11px] font-semibold hover:bg-[#4361ee]/20 transition-colors"
                   >
                     <Plus size={11} />
                     Assign org
@@ -353,7 +353,7 @@ export default function BadgeManagementPage() {
                     <select
                       value={assignOrgId}
                       onChange={(e) => setAssignOrgId(e.target.value)}
-                      className="flex-1 text-[12px] border border-slate-200 rounded-lg px-2 py-1.5 bg-white text-slate-700 focus:outline-none focus:ring-2 focus:ring-[#00b8a9]/30"
+                      className="flex-1 text-[12px] border border-slate-200 rounded-lg px-2 py-1.5 bg-white text-slate-700 focus:outline-none focus:ring-2 focus:ring-[#4361ee]/30"
                     >
                       <option value="">Select organization…</option>
                       {orgsNotYetAwarded.map((org) => (
@@ -365,7 +365,7 @@ export default function BadgeManagementPage() {
                     <button
                       onClick={() => assignBadge(badge.id, assignOrgId)}
                       disabled={!assignOrgId}
-                      className="px-3 py-1.5 rounded-lg bg-[#00b8a9] text-white text-[11px] font-semibold disabled:opacity-40 hover:bg-[#00a398] transition-colors"
+                      className="px-3 py-1.5 rounded-lg bg-[#4361ee] text-white text-[11px] font-semibold disabled:opacity-40 hover:bg-[#3d58d9] transition-colors"
                     >
                       Assign
                     </button>

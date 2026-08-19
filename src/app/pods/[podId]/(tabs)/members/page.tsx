@@ -31,7 +31,7 @@ export default function PodMembersPage() {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search members"
-            className="w-full pl-9 pr-3 py-2.5 rounded-xl border border-slate-200 bg-white text-[13px] focus:outline-none focus:ring-2 focus:ring-[#00b8a9]/30"
+            className="w-full pl-9 pr-3 py-2.5 rounded-xl border border-slate-200 bg-white text-[13px] focus:outline-none focus:ring-2 focus:ring-[#4361ee]/30"
           />
         </div>
         <button className="inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl border border-slate-200 bg-white text-slate-600 text-[12.5px] font-semibold hover:border-slate-300 transition-colors">
@@ -39,7 +39,7 @@ export default function PodMembersPage() {
         </button>
         <button
           onClick={() => setShowInvite(true)}
-          className="inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-[#00b8a9] text-white text-[12.5px] font-semibold hover:bg-[#00a89a] transition-colors"
+          className="inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-[#4361ee] text-white text-[12.5px] font-semibold hover:bg-[#3d58d9] transition-colors"
         >
           <UserPlus size={14} /> Invite members
         </button>
@@ -64,7 +64,7 @@ export default function PodMembersPage() {
                 <span className={`inline-flex items-center gap-1 text-[11.5px] font-medium ${inv.opened ? "text-emerald-600" : "text-slate-400"}`}>
                   {inv.opened ? "Opened" : "Not opened"}
                 </span>
-                <button onClick={() => remindInvitation(inv.email)} className="inline-flex items-center gap-1 text-[12px] font-semibold text-[#00897b] hover:underline">
+                <button onClick={() => remindInvitation(inv.email)} className="inline-flex items-center gap-1 text-[12px] font-semibold text-[#3147af] hover:underline">
                   <Send size={11} /> Remind
                 </button>
                 <button onClick={() => revokeInvitation(inv.id)} className="inline-flex items-center gap-1 text-[12px] font-semibold text-rose-600 hover:underline">
@@ -111,7 +111,7 @@ export default function PodMembersPage() {
             )}
             <span className="text-[12px] text-slate-400">{m.lastActive}</span>
             <div className="flex items-center justify-end gap-2 relative">
-              <button className="inline-flex items-center gap-1 text-[12px] font-medium text-[#00897b] hover:underline">
+              <button className="inline-flex items-center gap-1 text-[12px] font-medium text-[#3147af] hover:underline">
                 <MessageSquare size={12} /> Message
               </button>
               {m.email !== CURRENT_USER.email && (
