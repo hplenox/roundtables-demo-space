@@ -1,6 +1,6 @@
 import Link from "next/link";
 import {
-  ClipboardList, ArrowLeft, ArrowUpRight, CheckCircle2, Circle, Users, Compass,
+  ClipboardList, ChevronRight, ArrowUpRight, CheckCircle2, Circle, Users, Compass,
   MessageSquare, CalendarClock, FolderOpen, Handshake, ShieldCheck, Sparkles,
 } from "lucide-react";
 
@@ -393,10 +393,11 @@ export default function PodsRequirementsPage() {
   return (
     <div className="min-h-full bg-slate-50">
       <div className="max-w-5xl mx-auto px-6 py-7">
-        <Link href="/pods" className="inline-flex items-center gap-1.5 text-[12.5px] font-medium text-slate-500 hover:text-slate-700 mb-4">
-          <ArrowLeft size={14} />
-          Back to My PODs
-        </Link>
+        <div className="flex items-center gap-1.5 text-[12.5px] mb-4">
+          <Link href="/requirements" className="font-medium text-slate-500 hover:text-slate-700">All Requirements</Link>
+          <ChevronRight size={13} className="text-slate-300 shrink-0" />
+          <span className="text-slate-700 font-semibold">PODs</span>
+        </div>
 
         <div className="flex items-start justify-between flex-wrap gap-4 mb-2">
           <div>
@@ -412,6 +413,10 @@ export default function PodsRequirementsPage() {
               and (for vendor &amp; deal PODs) a curated record list, all under one roof. This page breaks the
               product into bite-sized requirements grouped by phase, each linked to the working design for that piece.
             </p>
+            <Link href="/pods" className="inline-flex items-center gap-1.5 mt-3 text-[12.5px] font-semibold text-[#3650d4] hover:text-[#2a3fb0] hover:underline">
+              Open the PODs product
+              <ArrowUpRight size={12} />
+            </Link>
           </div>
           <div className="shrink-0 bg-white rounded-2xl border border-slate-200 p-4 shadow-sm text-center">
             <p className="text-[22px] font-bold text-slate-900 leading-none">{shippedCount}<span className="text-slate-300 font-medium">/{totalCount}</span></p>
