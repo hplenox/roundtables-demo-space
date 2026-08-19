@@ -20,6 +20,7 @@ import {
   MessageSquare,
   ChevronLeft,
   Sparkles,
+  ListChecks,
 } from "lucide-react";
 import { getClientById } from "@/lib/mock-clients";
 
@@ -226,6 +227,16 @@ export default function Sidebar() {
 
       {/* Bottom: Help + Support */}
       <div className="px-2.5 pb-4 pt-3 space-y-2">
+        <Link
+          href="/requirements"
+          title={collapsed ? "Requirements" : undefined}
+          className={`flex items-center gap-3 px-2.5 py-2 rounded-lg text-[13px] font-medium whitespace-nowrap transition-all duration-150 ${
+            pathname.startsWith("/requirements") ? "bg-[#4361ee] text-white shadow-sm" : "text-white/70 hover:text-white hover:bg-white/[0.07]"
+          }`}
+        >
+          <ListChecks size={16} className="shrink-0" strokeWidth={1.75} />
+          {!collapsed && <span>Requirements</span>}
+        </Link>
         <Link
           href="/help"
           title={collapsed ? "Help Center" : undefined}
