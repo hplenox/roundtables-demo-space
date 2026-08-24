@@ -2,7 +2,7 @@
 
 import { usePathname } from "next/navigation";
 import Link from "next/link";
-import { UserCog, Award, LayoutDashboard, ChevronRight } from "lucide-react";
+import { LayoutGrid } from "lucide-react";
 
 const TABS = [
   { key: "overview",     label: "Overview",           href: "/admin" },
@@ -23,58 +23,39 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     return "overview";
   })();
 
-  return (
-    <div className="min-h-full bg-slate-50">
-      <div className="bg-white border-b border-slate-200 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
-        <div className="h-[3px] bg-gradient-to-r from-[#00b8a9] via-[#00b8a9]/70 to-transparent" />
+  const activeLabel = TABS.find((t) => t.key === activeTab)?.label ?? "Administrator";
 
+  return (
+    <div className="min-h-full bg-gray-50">
+      <div className="bg-white border-b border-gray-200">
         <div className="max-w-6xl mx-auto px-6 pt-5 pb-0">
           {/* Breadcrumb */}
-          <div className="flex items-center gap-1.5 text-[11.5px] mb-4">
-            <Link
-              href="/"
-              className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-[#0f1923] text-[#00b8a9] hover:bg-[#1a2d3d] transition-colors font-semibold text-[10.5px] tracking-wide"
-            >
-              <LayoutDashboard size={10} strokeWidth={2} />
-              Home
+          <div className="flex items-center gap-1.5 text-[13px] mb-3">
+            <Link href="/" className="text-gray-400 hover:text-gray-600 transition-colors">
+              <LayoutGrid size={14} />
             </Link>
-            <ChevronRight size={12} className="text-slate-300 shrink-0" />
-            <span className="text-slate-700 font-medium">Administrator</span>
+            <span className="text-gray-300">/</span>
+            <Link href="/admin" className="text-blue-600 font-medium hover:underline">
+              RoundTables Administrator
+            </Link>
+            <span className="text-gray-300">/</span>
+            <span className="text-gray-500">{activeLabel}</span>
           </div>
 
-          {/* Header row */}
-          <div className="flex items-center justify-between gap-4 mb-5">
-            <div className="flex items-center gap-3">
-              <div className="shrink-0 w-10 h-10 rounded-xl bg-[#0f1923] flex items-center justify-center shadow-sm">
-                <UserCog size={16} className="text-[#00b8a9]" />
-              </div>
-              <div>
-                <h1 className="text-[18px] font-bold text-slate-900 leading-tight">Administrator</h1>
-                <p className="text-[12px] text-slate-400 mt-0.5">
-                  Lenox Park Solutions, Inc. · Platform configuration and badge management
-                </p>
-              </div>
-            </div>
+          {/* Page title */}
+          <h1 className="font-serif text-[26px] font-bold text-gray-900 mb-4">{activeLabel}</h1>
 
-            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#00b8a9]/8 border border-[#00b8a9]/25 text-[#00897b]">
-              <Award size={13} strokeWidth={2} />
-              <span className="text-[11.5px] font-semibold">Admin Access</span>
-            </div>
-          </div>
-
-          {/* Sub-tabs */}
-          <div className="flex items-end gap-0 -mb-px">
+          {/* Tabs */}
+          <div className="flex items-center gap-6 -mb-px overflow-x-auto">
             {TABS.map((tab) => (
               <Link
                 key={tab.key}
                 href={tab.href}
-                className={`
-                  px-5 py-2.5 text-[13px] font-medium border-b-2 transition-all duration-150
-                  ${activeTab === tab.key
-                    ? "border-[#00b8a9] text-[#00897b]"
-                    : "border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300"
-                  }
-                `}
+                className={`pb-2.5 text-[13.5px] font-medium whitespace-nowrap border-b-2 transition-colors ${
+                  activeTab === tab.key
+                    ? "border-blue-600 text-blue-600"
+                    : "border-transparent text-gray-500 hover:text-gray-800"
+                }`}
               >
                 {tab.label}
               </Link>
