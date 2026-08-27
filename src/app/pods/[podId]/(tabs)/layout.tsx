@@ -4,12 +4,14 @@ import { useState } from "react";
 import { useParams, usePathname } from "next/navigation";
 import Link from "next/link";
 import {
-  ChevronRight, UserPlus, Pin, Award, MessagesSquare, Sparkles,
+  UserPlus, Pin, Award, Sparkles,
 } from "lucide-react";
 import { getPodById, CURRENT_USER, POD_KIND_LABEL, POD_KIND_RECORD_LABEL } from "@/lib/mock-pods";
 import { KIND_STYLE } from "@/components/pods/kindStyles";
 import PodAvatar from "@/components/pods/PodAvatar";
 import InviteMembersModal from "@/components/pods/InviteMembersModal";
+import PodBreadcrumb from "@/components/pods/PodBreadcrumb";
+import PodInfoTags from "@/components/pods/PodInfoTags";
 import { usePodCtx } from "../pod-context";
 
 export default function PodTabsLayout({ children }: { children: React.ReactNode }) {
@@ -52,18 +54,7 @@ export default function PodTabsLayout({ children }: { children: React.ReactNode 
   return (
     <div className="min-h-full bg-slate-50">
       <div className="max-w-6xl mx-auto px-6 py-6 space-y-4">
-        {/* Breadcrumb */}
-        <div className="flex items-center gap-1.5 text-[11.5px]">
-          <Link
-            href="/pods"
-            className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-[#0f1923] text-[#4361ee] hover:bg-[#1a2d3d] transition-colors font-semibold text-[10.5px] tracking-wide"
-          >
-            <MessagesSquare size={10} strokeWidth={2} />
-            My PODs
-          </Link>
-          <ChevronRight size={12} className="text-slate-300 shrink-0" />
-          <span className="text-slate-700 font-medium truncate max-w-xs">{pod.name}</span>
-        </div>
+        <PodBreadcrumb items={[{ label: "My PODs", href: "/pods" }, { label: pod.name }]} />
 
         {/* Header card */}
         <div className="relative overflow-hidden bg-white rounded-2xl border border-slate-200 shadow-sm">
@@ -170,6 +161,14 @@ export default function PodTabsLayout({ children }: { children: React.ReactNode 
           <div className="min-w-0 space-y-4">{children}</div>
 
           <div className="space-y-4">
+            <div className="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm">
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="text-[12.5px] font-bold text-slate-800">POD Details</h3>
+                <Link href={baseHref} className="text-[11.5px] font-semibold text-[#3650d4] hover:underline">See all</Link>
+              </div>
+              <PodInfoTags hostedBy={pod.hostedBy} administeredBy={pod.administeredBy} type={pod.category} />
+            </div>
+
             <div className="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm">
               <div className="flex items-center justify-between mb-3">
                 <h3 className="text-[12.5px] font-bold text-slate-800">Members</h3>

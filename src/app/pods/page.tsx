@@ -16,6 +16,8 @@ import { KIND_STYLE } from "@/components/pods/kindStyles";
 import PodAvatar, { AvatarStack } from "@/components/pods/PodAvatar";
 import PodSparkline from "@/components/pods/PodSparkline";
 import CreatePodModal from "@/components/pods/CreatePodModal";
+import PodBreadcrumb from "@/components/pods/PodBreadcrumb";
+import PodInfoTags from "@/components/pods/PodInfoTags";
 
 type SortKey = "active" | "recent" | "next_event" | "az";
 type FilterKey = "all" | "new" | "admin" | "advisory" | "rsvp" | "vendor_deal";
@@ -110,6 +112,10 @@ export default function PodsListPage() {
   return (
     <div className="min-h-full bg-slate-50">
       <div className="max-w-6xl mx-auto px-6 py-7">
+        <div className="mb-4">
+          <PodBreadcrumb items={[{ label: "My PODs" }]} />
+        </div>
+
         {/* Header */}
         <div className="flex items-start justify-between flex-wrap gap-4 mb-6">
           <div>
@@ -389,6 +395,7 @@ function PodRow({ pod, onRsvp, onPin }: { pod: Pod; onRsvp: (podId: string, even
                 <span>·</span>
                 <span>{pod.members.length} members</span>
               </div>
+              <PodInfoTags hostedBy={pod.hostedBy} administeredBy={pod.administeredBy} layout="inline" className="mt-2.5" />
             </div>
 
             <div className="shrink-0 text-right">
