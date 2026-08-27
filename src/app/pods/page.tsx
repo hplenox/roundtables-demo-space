@@ -20,7 +20,6 @@ import PodBreadcrumb from "@/components/pods/PodBreadcrumb";
 import PodInfoTags from "@/components/pods/PodInfoTags";
 
 type SortKey = "active" | "recent" | "next_event" | "az";
-type FilterKey = "all" | "new" | "admin" | "advisory" | "rsvp" | "vendor_deal";
 
 const NEEDS_YOU_STYLE: Record<string, { icon: typeof CalendarClock; iconBg: string; iconColor: string; label: string }> = {
   rsvp: { icon: CalendarClock, iconBg: "bg-amber-50", iconColor: "text-amber-600", label: "RSVP due" },
@@ -36,39 +35,18 @@ function isAdmin(pod: Pod): boolean {
   return pod.members.some((m) => m.email === CURRENT_USER.email && m.role === "admin");
 }
 
-function awaitingMyRsvp(pod: Pod): boolean {
-  return pod.events.some(
-    (e) => isUpcoming(e.dateISO) && e.invitees.some((i) => i.email === CURRENT_USER.email && i.status === "no_response")
-  );
-}
-
 export default function PodsListPage() {
   const router = useRouter();
   const [pods, setPods] = useState<Pod[]>(() => getAllPods());
   const [dismissedNeeds, setDismissedNeeds] = useState<string[]>([]);
   const [query, setQuery] = useState("");
   const [sort, setSort] = useState<SortKey>("active");
-  const [filter, setFilter] = useState<FilterKey>("all");
   const [showCreate, setShowCreate] = useState(false);
 
   const needsYou = getNeedsYouCards().filter((c) => !dismissedNeeds.includes(c.id));
 
-  const counts = useMemo(() => ({
-    all: pods.length,
-    new: pods.filter((p) => newActivityCount(p) > 0).length,
-    admin: pods.filter(isAdmin).length,
-    advisory: pods.filter((p) => p.category === "Advisory & Governance").length,
-    rsvp: pods.filter(awaitingMyRsvp).length,
-    vendor_deal: pods.filter((p) => p.kind === "vendor" || p.kind === "deal").length,
-  }), [pods]);
-
   const filtered = useMemo(() => {
     let list = pods;
-    if (filter === "new") list = list.filter((p) => newActivityCount(p) > 0);
-    if (filter === "admin") list = list.filter(isAdmin);
-    if (filter === "advisory") list = list.filter((p) => p.category === "Advisory & Governance");
-    if (filter === "rsvp") list = list.filter(awaitingMyRsvp);
-    if (filter === "vendor_deal") list = list.filter((p) => p.kind === "vendor" || p.kind === "deal");
     if (query.trim()) {
       const q = query.trim().toLowerCase();
       list = list.filter((p) => p.name.toLowerCase().includes(q) || p.category.toLowerCase().includes(q) || p.members.some((m) => m.name.toLowerCase().includes(q)));
@@ -84,7 +62,7 @@ export default function PodsListPage() {
     if (sort === "az") sorted.sort((a, b) => a.name.localeCompare(b.name));
     sorted.sort((a, b) => Number(!!b.pinned) - Number(!!a.pinned));
     return sorted;
-  }, [pods, filter, query, sort]);
+  }, [pods, query, sort]);
 
   const next14 = useMemo(() => {
     const all = pods.flatMap((p) => p.events.map((e) => ({ event: e, pod: p })));
@@ -199,7 +177,7 @@ export default function PodsListPage() {
             )}
 
             {/* Search + sort */}
-            <div className="flex items-center gap-3 mb-3 flex-wrap">
+            <div className="flex items-center gap-3 mb-5 flex-wrap">
               <div className="relative flex-1 min-w-[220px]">
                 <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
                 <input
@@ -229,31 +207,6 @@ export default function PodsListPage() {
               </div>
             </div>
 
-            {/* Filter chips */}
-            <div className="flex items-center gap-2 flex-wrap mb-5">
-              {([
-                { key: "all", label: "All PODs", count: counts.all },
-                { key: "new", label: "New activity", count: counts.new },
-                { key: "admin", label: "I'm admin", count: counts.admin },
-                { key: "advisory", label: "Advisory & Governance", count: counts.advisory },
-                { key: "rsvp", label: "Awaiting my RSVP", count: counts.rsvp },
-                { key: "vendor_deal", label: "Vendor & Deal PODs", count: counts.vendor_deal },
-              ] as { key: FilterKey; label: string; count: number }[]).map((chip) => (
-                <button
-                  key={chip.key}
-                  onClick={() => setFilter(chip.key)}
-                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[12.5px] font-medium border transition-colors ${
-                    filter === chip.key
-                      ? "bg-[#0f1923] border-[#0f1923] text-white"
-                      : "bg-white border-slate-200 text-slate-600 hover:border-slate-300"
-                  }`}
-                >
-                  {chip.label}
-                  <span className={`text-[10.5px] font-bold ${filter === chip.key ? "text-white/60" : "text-slate-400"}`}>{chip.count}</span>
-                </button>
-              ))}
-            </div>
-
             {/* Pod cards */}
             <div className="space-y-3">
               {filtered.map((pod) => (
@@ -261,7 +214,7 @@ export default function PodsListPage() {
               ))}
               {filtered.length === 0 && (
                 <div className="bg-white rounded-lg border border-dashed border-slate-200 p-10 text-center">
-                  <p className="text-[13px] text-slate-400">No PODs match this filter.</p>
+                  <p className="text-[13px] text-slate-400">No PODs match your search.</p>
                 </div>
               )}
             </div>

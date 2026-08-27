@@ -12,6 +12,7 @@ import PodAvatar from "@/components/pods/PodAvatar";
 import InviteMembersModal from "@/components/pods/InviteMembersModal";
 import PodBreadcrumb from "@/components/pods/PodBreadcrumb";
 import PodInfoTags from "@/components/pods/PodInfoTags";
+import PodSubTabs from "@/components/pods/PodSubTabs";
 import { usePodCtx } from "../pod-context";
 
 export default function PodTabsLayout({ children }: { children: React.ReactNode }) {
@@ -137,21 +138,11 @@ export default function PodTabsLayout({ children }: { children: React.ReactNode 
             )}
 
             {/* Sub-tabs */}
-            <div className="flex items-center gap-0.5 mt-4 -mb-5 border-t border-slate-100 pt-1 overflow-x-auto">
-              {SUB_TABS.map((tab) => (
-                <Link
-                  key={tab.key}
-                  href={`${baseHref}${tab.href}`}
-                  className={`shrink-0 px-4 py-3 text-[13px] font-medium border-b-2 transition-all duration-150 flex items-center gap-1.5 ${
-                    activeSub === tab.key
-                      ? "border-[#4361ee] text-[#3650d4]"
-                      : "border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300"
-                  }`}
-                >
-                  {tab.label}
-                  {tab.count !== null && <span className="text-[11px] text-slate-400">{tab.count}</span>}
-                </Link>
-              ))}
+            <div className="mt-4 -mb-5">
+              <PodSubTabs
+                activeKey={activeSub}
+                tabs={SUB_TABS.map((tab) => ({ key: tab.key, label: tab.label, href: `${baseHref}${tab.href}` }))}
+              />
             </div>
           </div>
         </div>

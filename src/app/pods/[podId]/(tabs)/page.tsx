@@ -6,6 +6,7 @@ import { usePodCtx } from "../pod-context";
 import { getEventById, CURRENT_USER, fmtEventDate } from "@/lib/mock-pods";
 import { RSVP_STYLE } from "@/components/pods/kindStyles";
 import PodAvatar, { AvatarStack } from "@/components/pods/PodAvatar";
+import EventBanner from "@/components/pods/EventBanner";
 
 const LOCATION_ICON = { zoom: Video, in_person: MapPin, phone: Phone };
 
@@ -32,7 +33,9 @@ export default function PodActivityPage() {
           const myStatus = event.invitees.find((i) => i.email === CURRENT_USER.email)?.status ?? "no_response";
           const LocationIcon = LOCATION_ICON[event.location.type];
           return (
-            <div key={item.id} className="bg-white rounded-lg border border-slate-200 p-4 shadow-sm">
+            <div key={item.id} className="bg-white rounded-lg border border-slate-200 shadow-sm overflow-hidden">
+              <EventBanner heightClassName="h-28" rounded={false} />
+              <div className="p-4">
               <div className="flex items-center gap-2 mb-3">
                 <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200 text-[10.5px] font-semibold">
                   <CalendarClock size={11} />
@@ -72,6 +75,7 @@ export default function PodActivityPage() {
                     </span>
                   )}
                 </div>
+              </div>
               </div>
             </div>
           );
