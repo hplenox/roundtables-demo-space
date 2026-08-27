@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useRef, useState } from "react";
+import Link from "next/link";
 import { Search, X, ChevronDown, SlidersHorizontal } from "lucide-react";
 import { ORG_REGISTRY, OrgRegistryRow } from "@/lib/mock-organizations";
 
@@ -88,7 +89,9 @@ function TopActiveOrgsCard({ rows }: { rows: OrgRegistryRow[] }) {
       <div className="space-y-2">
         {top.map((row) => (
           <div key={row.orgId} className="flex items-center justify-between gap-2 text-[12.5px]">
-            <span className="text-blue-600 font-medium truncate">{row.name}</span>
+            <Link href={`/admin/organizations/${row.orgId}`} className="text-blue-600 font-medium truncate hover:underline">
+              {row.name}
+            </Link>
             <span className="shrink-0 bg-blue-50 text-blue-700 font-semibold rounded px-2 py-0.5 text-[11px] tabular-nums">
               {row.lpiScore !== null ? row.lpiScore.toFixed(3) : "N/A"}
             </span>
@@ -191,8 +194,9 @@ export default function AdminOrganizationsPage() {
                 </div>
               ) : (
                 filtered.map((row) => (
-                  <div
+                  <Link
                     key={row.orgId}
+                    href={`/admin/organizations/${row.orgId}`}
                     className="flex items-center gap-2 px-4 py-2.5 border-b border-gray-100 last:border-0 hover:bg-gray-50/70 transition-colors text-[13px]"
                   >
                     <div className="w-14 shrink-0 text-gray-400 tabular-nums">{row.displayId}</div>
@@ -210,7 +214,7 @@ export default function AdminOrganizationsPage() {
                     <div className="w-28 shrink-0 text-gray-400">{formatDate(row.lastUpdated)}</div>
                     <div className="w-24 shrink-0 text-gray-700 tabular-nums">{row.totalUsers}</div>
                     <div className="w-20 shrink-0 text-gray-600">{row.status}</div>
-                  </div>
+                  </Link>
                 ))
               )}
             </div>
