@@ -29,7 +29,7 @@ export default function InviteMembersModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-[2px] px-4" onClick={onClose}>
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg" onClick={(e) => e.stopPropagation()}>
+      <div className="bg-white rounded-lg shadow-2xl w-full max-w-lg" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-start justify-between px-6 pt-6">
           <div>
             <h2 className="text-lg font-bold text-slate-900">Invite members</h2>
@@ -63,7 +63,7 @@ export default function InviteMembersModal({
                   <button
                     key={opt.role}
                     onClick={() => setRole(opt.role)}
-                    className={`text-left p-3 rounded-xl border-2 transition-all ${
+                    className={`text-left p-3 rounded-lg border-2 transition-all ${
                       active ? "border-[#4361ee] bg-[#4361ee]/5" : "border-slate-200 hover:border-slate-300"
                     }`}
                   >

@@ -50,7 +50,7 @@ export default function CreatePodModal({ onClose, onCreated }: { onClose: () => 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-[2px] px-4" onClick={onClose}>
       <div
-        className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto"
+        className="bg-white rounded-lg shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-start justify-between px-6 pt-6">
@@ -75,7 +75,7 @@ export default function CreatePodModal({ onClose, onCreated }: { onClose: () => 
                     onClick={() => !opt.disabled && setKind(opt.kind)}
                     disabled={opt.disabled}
                     title={opt.disabled ? "Coming soon" : undefined}
-                    className={`relative text-left p-4 rounded-xl border-2 transition-all ${
+                    className={`relative text-left p-4 rounded-lg border-2 transition-all ${
                       opt.disabled
                         ? "border-slate-200 opacity-50 cursor-not-allowed"
                         : active

@@ -43,7 +43,7 @@ export default function AddEventModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-[2px] px-4" onClick={onClose}>
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg" onClick={(e) => e.stopPropagation()}>
+      <div className="bg-white rounded-lg shadow-2xl w-full max-w-lg" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-start justify-between px-6 pt-6">
           <div>
             <h2 className="text-lg font-bold text-slate-900">Add an event</h2>
@@ -129,7 +129,7 @@ export default function AddEventModal({
           <>
             <div className="px-6 pt-5">
               <p className="text-[12px] font-medium text-slate-500 mb-2">Invite POD members</p>
-              <div className="max-h-64 overflow-y-auto space-y-1 border border-slate-200 rounded-xl p-2">
+              <div className="max-h-64 overflow-y-auto space-y-1 border border-slate-200 rounded-lg p-2">
                 {members.map((m) => (
                   <label key={m.id} className="flex items-center gap-2.5 px-2 py-2 rounded-lg hover:bg-slate-50 cursor-pointer">
                     <input type="checkbox" checked={selectedEmails.includes(m.email)} onChange={() => toggleInvitee(m.email)} className="accent-[#4361ee]" />

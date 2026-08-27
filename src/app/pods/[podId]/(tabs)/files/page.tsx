@@ -20,7 +20,7 @@ export default function PodFilesPage() {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between gap-3 flex-wrap">
-        <div className="flex items-center gap-1.5 bg-white border border-slate-200 rounded-xl p-1">
+        <div className="flex items-center gap-1.5 bg-white border border-slate-200 rounded-lg p-1">
           {([
             { key: "all", label: "All files" },
             { key: "event", label: "From events" },
@@ -43,7 +43,7 @@ export default function PodFilesPage() {
         </button>
       </div>
 
-      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+      <div className="bg-white rounded-lg border border-slate-200 shadow-sm overflow-hidden">
         {files.map((f) => {
           const tag = SOURCE_TAG[f.source];
           const TagIcon = tag.icon;

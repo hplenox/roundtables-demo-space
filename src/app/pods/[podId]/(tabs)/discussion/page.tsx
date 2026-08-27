@@ -41,7 +41,7 @@ export default function PodDiscussionPage() {
   return (
     <div className="space-y-4">
       {/* Composer */}
-      <div className="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm">
+      <div className="bg-white rounded-lg border border-slate-200 p-4 shadow-sm">
         <p className="text-[12px] text-slate-400 mb-2">
           Posting to <span className="font-semibold text-slate-600">everyone in {pod.name}</span> · {pod.members.length} members
         </p>
@@ -61,7 +61,7 @@ export default function PodDiscussionPage() {
         )}
 
         {showPoll && (
-          <div className="mb-3 p-3 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
+          <div className="mb-3 p-3 rounded-lg bg-slate-50 border border-slate-200 space-y-2">
             <input
               value={pollQuestion}
               onChange={(e) => setPollQuestion(e.target.value)}
@@ -111,7 +111,7 @@ export default function PodDiscussionPage() {
       ))}
 
       {pod.discussion.length === 0 && (
-        <div className="bg-white rounded-2xl border border-dashed border-slate-200 p-10 text-center">
+        <div className="bg-white rounded-lg border border-dashed border-slate-200 p-10 text-center">
           <p className="text-[13px] text-slate-400">No posts yet — start the conversation.</p>
         </div>
       )}
@@ -132,7 +132,7 @@ function DiscussionPost({ post, podId }: { post: PodDiscussionPost; podId: strin
   }
 
   return (
-    <div className="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm">
+    <div className="bg-white rounded-lg border border-slate-200 p-4 shadow-sm">
       <div className="flex items-start gap-3">
         <PodAvatar name={post.author} size="md" />
         <div className="min-w-0 flex-1">
@@ -165,7 +165,7 @@ function DiscussionPost({ post, podId }: { post: PodDiscussionPost; podId: strin
           <p className="text-[13.5px] text-slate-700 leading-relaxed mt-1.5">{post.body}</p>
 
           {post.attachment && (
-            <div className="flex items-center justify-between mt-3 p-3 rounded-xl bg-slate-50 border border-slate-200">
+            <div className="flex items-center justify-between mt-3 p-3 rounded-lg bg-slate-50 border border-slate-200">
               <div className="flex items-center gap-2.5 min-w-0">
                 <div className="shrink-0 w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center text-blue-600">
                   <Paperclip size={13} />
@@ -224,7 +224,7 @@ function PollCard({
 }) {
   const best = [...poll.options].sort((a, b) => b.votes - a.votes)[0];
   return (
-    <div className="mt-3 rounded-xl border border-slate-200 overflow-hidden">
+    <div className="mt-3 rounded-lg border border-slate-200 overflow-hidden">
       <div className="flex items-center justify-between px-3.5 py-2.5 bg-slate-50 border-b border-slate-200">
         <p className="text-[12.5px] font-bold text-slate-700 flex items-center gap-1.5"><CalendarPlus size={13} className="text-[#3650d4]" /> {poll.question}</p>
         <span className="text-[11.5px] text-slate-400">{poll.votedCount} of {poll.totalVoters} voted</span>

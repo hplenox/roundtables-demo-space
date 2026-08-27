@@ -22,7 +22,7 @@ export default function PodEventsPage() {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between gap-3">
-        <div className="flex items-center gap-1.5 bg-white border border-slate-200 rounded-xl p-1">
+        <div className="flex items-center gap-1.5 bg-white border border-slate-200 rounded-lg p-1">
           <button onClick={() => setTab("upcoming")} className={`px-3 py-1.5 rounded-lg text-[12.5px] font-medium transition-colors ${tab === "upcoming" ? "bg-[#0f1923] text-white" : "text-slate-500 hover:text-slate-700"}`}>Upcoming</button>
           <button onClick={() => setTab("past")} className={`px-3 py-1.5 rounded-lg text-[12.5px] font-medium transition-colors ${tab === "past" ? "bg-[#0f1923] text-white" : "text-slate-500 hover:text-slate-700"}`}>Past</button>
         </div>
@@ -40,9 +40,9 @@ export default function PodEventsPage() {
           const myStatus = event.invitees.find((i) => i.email === CURRENT_USER.email)?.status ?? "no_response";
           const LocationIcon = LOCATION_ICON[event.location.type];
           return (
-            <div key={event.id} className="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm">
+            <div key={event.id} className="bg-white rounded-lg border border-slate-200 p-4 shadow-sm">
               <div className="flex items-start gap-4">
-                <div className="shrink-0 w-12 h-12 rounded-xl bg-slate-50 border border-slate-200 flex flex-col items-center justify-center leading-none">
+                <div className="shrink-0 w-12 h-12 rounded-lg bg-slate-50 border border-slate-200 flex flex-col items-center justify-center leading-none">
                   <span className="text-[9px] font-bold text-[#3650d4]">{month}</span>
                   <span className="text-[15px] font-bold text-slate-800">{day}</span>
                 </div>
@@ -82,7 +82,7 @@ export default function PodEventsPage() {
           );
         })}
         {events.length === 0 && (
-          <div className="bg-white rounded-2xl border border-dashed border-slate-200 p-10 text-center">
+          <div className="bg-white rounded-lg border border-dashed border-slate-200 p-10 text-center">
             <p className="text-[13px] text-slate-400">No {tab} events.</p>
           </div>
         )}

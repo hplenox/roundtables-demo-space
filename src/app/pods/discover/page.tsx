@@ -47,12 +47,12 @@ export default function DiscoverPodsPage() {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search discoverable PODs"
-            className="w-full pl-9 pr-3 py-2.5 rounded-xl border border-slate-200 bg-white text-[13px] focus:outline-none focus:ring-2 focus:ring-[#4361ee]/30 focus:border-[#4361ee]"
+            className="w-full pl-9 pr-3 py-2.5 rounded-lg border border-slate-200 bg-white text-[13px] focus:outline-none focus:ring-2 focus:ring-[#4361ee]/30 focus:border-[#4361ee]"
           />
         </div>
 
         {joinedId && (
-          <div className="flex items-center justify-between gap-3 bg-emerald-50 border border-emerald-200 rounded-xl px-4 py-3 mb-6">
+          <div className="flex items-center justify-between gap-3 bg-emerald-50 border border-emerald-200 rounded-lg px-4 py-3 mb-6">
             <p className="text-[13px] text-emerald-800 font-medium flex items-center gap-2">
               <Check size={15} />
               You joined the POD.
@@ -72,9 +72,9 @@ export default function DiscoverPodsPage() {
             const Icon = style.icon;
             const isRequested = requested.includes(d.id);
             return (
-              <div key={d.id} className="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm hover:shadow-md transition-shadow flex flex-col">
+              <div key={d.id} className="bg-white rounded-lg border border-slate-200 p-5 shadow-sm hover:shadow-md transition-shadow flex flex-col">
                 <div className="flex items-start gap-3 mb-3">
-                  <div className={`shrink-0 w-11 h-11 rounded-xl flex items-center justify-center ${style.iconBg}`}>
+                  <div className={`shrink-0 w-11 h-11 rounded-lg flex items-center justify-center ${style.iconBg}`}>
                     <Icon size={18} className={style.iconColor} />
                   </div>
                   <div className="min-w-0">
@@ -104,7 +104,7 @@ export default function DiscoverPodsPage() {
             );
           })}
           {filtered.length === 0 && (
-            <div className="sm:col-span-2 bg-white rounded-2xl border border-dashed border-slate-200 p-10 text-center">
+            <div className="sm:col-span-2 bg-white rounded-lg border border-dashed border-slate-200 p-10 text-center">
               <p className="text-[13px] text-slate-400">No discoverable PODs match your search.</p>
             </div>
           )}

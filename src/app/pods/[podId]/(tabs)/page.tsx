@@ -14,7 +14,7 @@ export default function PodActivityPage() {
 
   if (pod.activity.length === 0) {
     return (
-      <div className="bg-white rounded-2xl border border-dashed border-slate-200 p-10 text-center">
+      <div className="bg-white rounded-lg border border-dashed border-slate-200 p-10 text-center">
         <Moon size={22} className="text-slate-300 mx-auto mb-3" />
         <p className="text-[13.5px] font-semibold text-slate-600">It&rsquo;s quiet in here.</p>
         <p className="text-[12.5px] text-slate-400 mt-1">{pod.isDormant ? `Dormant for ${pod.dormantLabel}.` : "Nothing has happened yet — post an update or schedule an event to get started."}</p>
@@ -32,7 +32,7 @@ export default function PodActivityPage() {
           const myStatus = event.invitees.find((i) => i.email === CURRENT_USER.email)?.status ?? "no_response";
           const LocationIcon = LOCATION_ICON[event.location.type];
           return (
-            <div key={item.id} className="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm">
+            <div key={item.id} className="bg-white rounded-lg border border-slate-200 p-4 shadow-sm">
               <div className="flex items-center gap-2 mb-3">
                 <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200 text-[10.5px] font-semibold">
                   <CalendarClock size={11} />
@@ -41,7 +41,7 @@ export default function PodActivityPage() {
                 <span className="text-[11px] text-slate-400">Created {event.createdDateLabel} by {event.createdBy}</span>
               </div>
               <div className="flex items-start gap-4">
-                <div className="shrink-0 w-12 h-12 rounded-xl bg-slate-50 border border-slate-200 flex flex-col items-center justify-center leading-none">
+                <div className="shrink-0 w-12 h-12 rounded-lg bg-slate-50 border border-slate-200 flex flex-col items-center justify-center leading-none">
                   <span className="text-[9px] font-bold text-[#3650d4]">{month}</span>
                   <span className="text-[15px] font-bold text-slate-800">{day}</span>
                 </div>
@@ -79,7 +79,7 @@ export default function PodActivityPage() {
 
         if (item.type === "file_share") {
           return (
-            <div key={item.id} className="bg-white rounded-2xl border border-slate-200 px-4 py-3.5 shadow-sm flex items-start gap-3">
+            <div key={item.id} className="bg-white rounded-lg border border-slate-200 px-4 py-3.5 shadow-sm flex items-start gap-3">
               <div className="shrink-0 w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center text-blue-600">
                 <FileText size={14} />
               </div>
@@ -96,7 +96,7 @@ export default function PodActivityPage() {
         }
 
         return (
-          <div key={item.id} className="bg-white rounded-2xl border border-slate-200 px-4 py-3.5 shadow-sm flex items-start gap-3">
+          <div key={item.id} className="bg-white rounded-lg border border-slate-200 px-4 py-3.5 shadow-sm flex items-start gap-3">
             <div className="shrink-0">
               <PodAvatar name={item.memberName} size="sm" />
             </div>

@@ -29,7 +29,7 @@ export default function PodRecordsPage() {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between gap-3 flex-wrap">
-        <div className="flex items-center gap-1.5 bg-white border border-slate-200 rounded-xl p-1">
+        <div className="flex items-center gap-1.5 bg-white border border-slate-200 rounded-lg p-1">
           <button
             onClick={() => setTab("listed")}
             className={`px-3 py-1.5 rounded-lg text-[12.5px] font-medium transition-colors flex items-center gap-1.5 ${tab === "listed" ? "bg-[#0f1923] text-white" : "text-slate-500 hover:text-slate-700"}`}
@@ -69,7 +69,7 @@ export default function PodRecordsPage() {
         </div>
       </div>
 
-      <div className="flex items-start gap-2 p-3 rounded-xl bg-slate-50 border border-slate-200 text-[12px] text-slate-500 leading-snug">
+      <div className="flex items-start gap-2 p-3 rounded-lg bg-slate-50 border border-slate-200 text-[12px] text-slate-500 leading-snug">
         <ShieldCheck size={14} className="shrink-0 mt-0.5 text-slate-400" />
         <p>
           {pod.kind === "deal"
@@ -80,7 +80,7 @@ export default function PodRecordsPage() {
 
       {tab === "listed" ? (
         <>
-          <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
+          <div className="bg-white rounded-lg border border-slate-200 overflow-hidden shadow-sm">
             <div className="grid grid-cols-[2.1fr_0.9fr_0.7fr_0.9fr_1.1fr_0.6fr] gap-2 px-4 py-2.5 text-[10.5px] font-bold text-slate-400 uppercase tracking-wide border-b border-slate-100">
               <span>{POD_KIND_RECORD_LABEL[pod.kind]}</span>
               <span>Category</span>
@@ -139,7 +139,7 @@ export default function PodRecordsPage() {
           )}
         </>
       ) : (
-        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm">
+        <div className="bg-white rounded-lg border border-slate-200 shadow-sm">
           <div className="flex items-center gap-2 px-4 py-3 border-b border-slate-100">
             <span className="text-[12.5px] font-bold text-slate-700">Awaiting {pod.kind === "deal" ? "sponsor confirmation" : "permission"}</span>
             <span className="text-[11px] text-slate-400">visible only to the member who suggested it and POD admins</span>
@@ -195,7 +195,7 @@ function RecordDetail({
   setNoteDraft: (v: string) => void;
 }) {
   return (
-    <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
+    <div className="bg-white rounded-lg border border-slate-200 p-5 shadow-sm">
       <div className="flex items-start justify-between gap-3 flex-wrap mb-4">
         <div className="flex items-center gap-3">
           <PodAvatar name={record.name} size="md" />
@@ -218,7 +218,7 @@ function RecordDetail({
       </div>
 
       {record.aiSummary && (
-        <div className="flex items-start gap-2.5 p-3.5 rounded-xl bg-[#4361ee]/[0.06] border border-[#4361ee]/15 mb-4">
+        <div className="flex items-start gap-2.5 p-3.5 rounded-lg bg-[#4361ee]/[0.06] border border-[#4361ee]/15 mb-4">
           <Sparkles size={14} className="text-[#3650d4] shrink-0 mt-0.5" />
           <p className="text-[12.5px] text-slate-700 leading-snug">
             <span className="font-bold text-[#3650d4]">Members say — </span>

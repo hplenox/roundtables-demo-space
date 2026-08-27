@@ -31,22 +31,22 @@ export default function PodMembersPage() {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search members"
-            className="w-full pl-9 pr-3 py-2.5 rounded-xl border border-slate-200 bg-white text-[13px] focus:outline-none focus:ring-2 focus:ring-[#4361ee]/30"
+            className="w-full pl-9 pr-3 py-2.5 rounded-lg border border-slate-200 bg-white text-[13px] focus:outline-none focus:ring-2 focus:ring-[#4361ee]/30"
           />
         </div>
-        <button className="inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl border border-slate-200 bg-white text-slate-600 text-[12.5px] font-semibold hover:border-slate-300 transition-colors">
+        <button className="inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-lg border border-slate-200 bg-white text-slate-600 text-[12.5px] font-semibold hover:border-slate-300 transition-colors">
           <Upload size={14} /> Upload CSV
         </button>
         <button
           onClick={() => setShowInvite(true)}
-          className="inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-[#4361ee] text-white text-[12.5px] font-semibold hover:bg-[#3650d4] transition-colors"
+          className="inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-lg bg-[#4361ee] text-white text-[12.5px] font-semibold hover:bg-[#3650d4] transition-colors"
         >
           <UserPlus size={14} /> Invite members
         </button>
       </div>
 
       {pod.pendingInvitations.length > 0 && (
-        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+        <div className="bg-white rounded-lg border border-slate-200 shadow-sm overflow-hidden">
           <div className="flex items-center gap-2 px-4 py-3 bg-amber-50/60 border-b border-amber-100">
             <span className="text-[12.5px] font-bold text-amber-800">Pending invitations</span>
             <span className="text-[11px] text-amber-600">{pod.pendingInvitations.length} sent, not yet accepted</span>
@@ -76,7 +76,7 @@ export default function PodMembersPage() {
         </div>
       )}
 
-      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+      <div className="bg-white rounded-lg border border-slate-200 shadow-sm overflow-hidden">
         <div className="grid grid-cols-[1.6fr_1fr_0.9fr_0.7fr_1fr] gap-2 px-4 py-2.5 text-[10.5px] font-bold text-slate-400 uppercase tracking-wide border-b border-slate-100">
           <span>Member</span>
           <span>Organization</span>
@@ -120,7 +120,7 @@ export default function PodMembersPage() {
                 </button>
               )}
               {openMenuId === m.id && (
-                <div className="absolute right-0 top-full mt-1 w-36 bg-white rounded-xl border border-slate-200 shadow-lg py-1.5 z-10">
+                <div className="absolute right-0 top-full mt-1 w-36 bg-white rounded-lg border border-slate-200 shadow-lg py-1.5 z-10">
                   <button
                     onClick={() => { removeMember(m.id); setOpenMenuId(null); }}
                     className="w-full text-left px-3 py-2 text-[12.5px] text-rose-600 hover:bg-rose-50"

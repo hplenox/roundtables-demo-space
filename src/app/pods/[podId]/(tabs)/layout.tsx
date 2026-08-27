@@ -57,12 +57,12 @@ export default function PodTabsLayout({ children }: { children: React.ReactNode 
         <PodBreadcrumb items={[{ label: "My PODs", href: "/pods" }, { label: pod.name }]} />
 
         {/* Header card */}
-        <div className="relative overflow-hidden bg-white rounded-2xl border border-slate-200 shadow-sm">
+        <div className="relative overflow-hidden bg-white rounded-lg border border-slate-200 shadow-sm">
           <div className={`absolute inset-x-0 top-0 h-24 bg-gradient-to-br ${style.gradient} pointer-events-none`} />
           <div className="relative p-5">
             <div className="flex items-start justify-between gap-4 flex-wrap">
               <div className="flex items-start gap-3.5 min-w-0">
-                <div className={`shrink-0 w-12 h-12 rounded-xl flex items-center justify-center shadow-sm ${style.iconBg}`}>
+                <div className={`shrink-0 w-12 h-12 rounded-lg flex items-center justify-center shadow-sm ${style.iconBg}`}>
                   <Icon size={20} className={style.iconColor} />
                 </div>
                 <div className="min-w-0">
@@ -97,7 +97,7 @@ export default function PodTabsLayout({ children }: { children: React.ReactNode 
               <div className="shrink-0 flex items-center gap-2">
                 <button
                   onClick={togglePin}
-                  className={`w-9 h-9 rounded-xl border flex items-center justify-center transition-colors ${
+                  className={`w-9 h-9 rounded-lg border flex items-center justify-center transition-colors ${
                     pod.pinned ? "bg-amber-50 border-amber-200 text-amber-600" : "border-slate-200 text-slate-400 hover:text-amber-500 hover:border-amber-200"
                   }`}
                   title={pod.pinned ? "Unpin POD" : "Pin POD"}
@@ -106,7 +106,7 @@ export default function PodTabsLayout({ children }: { children: React.ReactNode 
                 </button>
                 <button
                   onClick={() => setShowInvite(true)}
-                  className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#4361ee] text-white text-[13px] font-semibold hover:bg-[#3650d4] shadow-sm hover:shadow-md transition-all"
+                  className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-[#4361ee] text-white text-[13px] font-semibold hover:bg-[#3650d4] shadow-sm hover:shadow-md transition-all"
                 >
                   <UserPlus size={15} />
                   Invite Members
@@ -117,7 +117,7 @@ export default function PodTabsLayout({ children }: { children: React.ReactNode 
             {/* Stat cards */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-5">
               {statCards.map((s) => (
-                <div key={s.label} className="bg-slate-50/80 rounded-xl border border-slate-100 p-3.5">
+                <div key={s.label} className="bg-slate-50/80 rounded-lg border border-slate-100 p-3.5">
                   <p className="text-[10px] text-slate-400 font-semibold uppercase tracking-wide mb-1">{s.label}</p>
                   <p className="text-[19px] font-bold text-slate-800 leading-none">{s.value}</p>
                   {s.hint && <p className="text-[11px] text-slate-400 mt-1">{s.hint}</p>}
@@ -127,7 +127,7 @@ export default function PodTabsLayout({ children }: { children: React.ReactNode 
 
             {/* Weekly insight */}
             {pod.weeklyInsight && (
-              <div className="flex items-start gap-2 mt-4 p-3 rounded-xl bg-[#4361ee]/[0.06] border border-[#4361ee]/15">
+              <div className="flex items-start gap-2 mt-4 p-3 rounded-lg bg-[#4361ee]/[0.06] border border-[#4361ee]/15">
                 <Sparkles size={14} className="text-[#3650d4] shrink-0 mt-0.5" />
                 <p className="text-[12.5px] text-slate-700 leading-snug">
                   <span className="font-bold text-[#3650d4]">This week in {pod.name}: </span>
@@ -161,7 +161,7 @@ export default function PodTabsLayout({ children }: { children: React.ReactNode 
           <div className="min-w-0 space-y-4">{children}</div>
 
           <div className="space-y-4">
-            <div className="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm">
+            <div className="bg-white rounded-lg border border-slate-200 p-4 shadow-sm">
               <div className="flex items-center justify-between mb-3">
                 <h3 className="text-[12.5px] font-bold text-slate-800">POD Details</h3>
                 <Link href={baseHref} className="text-[11.5px] font-semibold text-[#3650d4] hover:underline">See all</Link>
@@ -169,7 +169,7 @@ export default function PodTabsLayout({ children }: { children: React.ReactNode 
               <PodInfoTags hostedBy={pod.hostedBy} administeredBy={pod.administeredBy} type={pod.category} />
             </div>
 
-            <div className="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm">
+            <div className="bg-white rounded-lg border border-slate-200 p-4 shadow-sm">
               <div className="flex items-center justify-between mb-3">
                 <h3 className="text-[12.5px] font-bold text-slate-800">Members</h3>
                 <Link href={`${baseHref}/members`} className="text-[11.5px] font-semibold text-[#3650d4] hover:underline">See all</Link>
@@ -193,7 +193,7 @@ export default function PodTabsLayout({ children }: { children: React.ReactNode 
             </div>
 
             {isAdmin && (
-              <div className="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm">
+              <div className="bg-white rounded-lg border border-slate-200 p-4 shadow-sm">
                 <div className="flex items-center gap-1.5 mb-3">
                   <Award size={13} className="text-violet-500" />
                   <h3 className="text-[12.5px] font-bold text-slate-800">Engagement Audit</h3>
@@ -209,7 +209,7 @@ export default function PodTabsLayout({ children }: { children: React.ReactNode 
 
             <button
               onClick={toggleDigest}
-              className="w-full text-left flex items-start gap-3 bg-white rounded-2xl border border-slate-200 p-4 shadow-sm hover:border-slate-300 transition-colors"
+              className="w-full text-left flex items-start gap-3 bg-white rounded-lg border border-slate-200 p-4 shadow-sm hover:border-slate-300 transition-colors"
             >
               <span className={`shrink-0 w-9 h-5 rounded-full mt-0.5 relative transition-colors ${pod.digestEnabled ? "bg-[#4361ee]" : "bg-slate-200"}`}>
                 <span className={`absolute top-0.5 w-4 h-4 rounded-full bg-white shadow transition-all ${pod.digestEnabled ? "left-4" : "left-0.5"}`} />

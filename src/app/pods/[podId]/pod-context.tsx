@@ -244,7 +244,7 @@ export function PodProvider({ initialPod, children }: { initialPod: Pod; childre
         {toasts.map((t) => (
           <div
             key={t.id}
-            className={`flex items-start gap-2.5 px-4 py-3 rounded-xl shadow-lg border text-[12.5px] ${
+            className={`flex items-start gap-2.5 px-4 py-3 rounded-lg shadow-lg border text-[12.5px] ${
               t.tone === "success"
                 ? "bg-emerald-50 border-emerald-200 text-emerald-800"
                 : t.tone === "warning"

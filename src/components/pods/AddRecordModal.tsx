@@ -27,7 +27,7 @@ export default function AddRecordModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-[2px] px-4" onClick={onClose}>
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg" onClick={(e) => e.stopPropagation()}>
+      <div className="bg-white rounded-lg shadow-2xl w-full max-w-lg" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-start justify-between px-6 pt-6">
           <div>
             <h2 className="text-lg font-bold text-slate-900">Add a {noun}</h2>
@@ -120,7 +120,7 @@ export default function AddRecordModal({
         ) : (
           <>
             <div className="px-6 pt-5 space-y-3">
-              <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-1.5">
+              <div className="p-4 rounded-lg bg-slate-50 border border-slate-200 space-y-1.5">
                 <p className="text-[14px] font-bold text-slate-900">{name}</p>
                 {category && <p className="text-[12px] text-slate-500">{category}</p>}
                 {contactName && <p className="text-[12px] text-slate-500">Contact: {contactName}{contactEmail ? ` · ${contactEmail}` : ""}</p>}

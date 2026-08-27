@@ -127,14 +127,14 @@ export default function PodsListPage() {
           <div className="flex items-center gap-2.5">
             <Link
               href="/pods/discover"
-              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-slate-700 text-[13px] font-semibold hover:border-slate-300 hover:shadow-sm transition-all"
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg border border-slate-200 bg-white text-slate-700 text-[13px] font-semibold hover:border-slate-300 hover:shadow-sm transition-all"
             >
               <Compass size={15} />
               Discover PODs
             </Link>
             <button
               onClick={() => setShowCreate(true)}
-              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#4361ee] text-white text-[13px] font-semibold hover:bg-[#3650d4] shadow-sm hover:shadow-md transition-all"
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-[#4361ee] text-white text-[13px] font-semibold hover:bg-[#3650d4] shadow-sm hover:shadow-md transition-all"
             >
               <Plus size={15} />
               Create POD
@@ -164,7 +164,7 @@ export default function PodsListPage() {
                     const style = NEEDS_YOU_STYLE[card.kind];
                     const Icon = style.icon;
                     return (
-                      <div key={card.id} className="relative bg-white rounded-2xl border border-slate-200 p-4 shadow-sm hover:shadow-md transition-shadow">
+                      <div key={card.id} className="relative bg-white rounded-lg border border-slate-200 p-4 shadow-sm hover:shadow-md transition-shadow">
                         <button
                           onClick={() => setDismissedNeeds((prev) => [...prev, card.id])}
                           className="absolute top-3 right-3 text-slate-300 hover:text-slate-500"
@@ -206,10 +206,10 @@ export default function PodsListPage() {
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
                   placeholder="Search PODs, people, files"
-                  className="w-full pl-9 pr-3 py-2.5 rounded-xl border border-slate-200 bg-white text-[13px] focus:outline-none focus:ring-2 focus:ring-[#4361ee]/30 focus:border-[#4361ee]"
+                  className="w-full pl-9 pr-3 py-2.5 rounded-lg border border-slate-200 bg-white text-[13px] focus:outline-none focus:ring-2 focus:ring-[#4361ee]/30 focus:border-[#4361ee]"
                 />
               </div>
-              <div className="flex items-center gap-1.5 bg-white border border-slate-200 rounded-xl p-1">
+              <div className="flex items-center gap-1.5 bg-white border border-slate-200 rounded-lg p-1">
                 {([
                   { key: "active", label: "Most active" },
                   { key: "recent", label: "Recent activity" },
@@ -260,7 +260,7 @@ export default function PodsListPage() {
                 <PodRow key={pod.id} pod={pod} onRsvp={handleRsvp} onPin={handlePin} />
               ))}
               {filtered.length === 0 && (
-                <div className="bg-white rounded-2xl border border-dashed border-slate-200 p-10 text-center">
+                <div className="bg-white rounded-lg border border-dashed border-slate-200 p-10 text-center">
                   <p className="text-[13px] text-slate-400">No PODs match this filter.</p>
                 </div>
               )}
@@ -269,7 +269,7 @@ export default function PodsListPage() {
 
           {/* Sidebar */}
           <div className="space-y-4">
-            <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
+            <div className="bg-white rounded-lg border border-slate-200 p-5 shadow-sm">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="flex items-center gap-1.5 text-[13px] font-bold text-slate-800">
                   <Calendar size={14} className="text-[#3650d4]" />
@@ -311,7 +311,7 @@ export default function PodsListPage() {
 
             <Link
               href="/pods/discover"
-              className="flex items-center justify-between bg-white rounded-2xl border border-slate-200 p-4 shadow-sm hover:shadow-md hover:border-[#4361ee]/40 transition-all group"
+              className="flex items-center justify-between bg-white rounded-lg border border-slate-200 p-4 shadow-sm hover:shadow-md hover:border-[#4361ee]/40 transition-all group"
             >
               <div className="flex items-center gap-2.5">
                 <Sparkles size={15} className="text-[#4361ee]" />
@@ -361,9 +361,9 @@ function PodRow({ pod, onRsvp, onPin }: { pod: Pod; onRsvp: (podId: string, even
   const avatarNames = recentNames.length ? recentNames : pod.members.slice(0, 3).map((m) => m.name);
 
   return (
-    <div className="group bg-white rounded-2xl border border-slate-200 p-5 shadow-sm hover:shadow-md hover:border-slate-300 transition-all">
+    <div className="group bg-white rounded-lg border border-slate-200 p-5 shadow-sm hover:shadow-md hover:border-slate-300 transition-all">
       <div className="flex items-start gap-4">
-        <div className={`shrink-0 w-12 h-12 rounded-xl flex items-center justify-center ${style.iconBg}`}>
+        <div className={`shrink-0 w-12 h-12 rounded-lg flex items-center justify-center ${style.iconBg}`}>
           <Icon size={20} className={style.iconColor} />
         </div>
 

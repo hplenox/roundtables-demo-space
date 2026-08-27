@@ -23,7 +23,7 @@ export default function PodEventDetailPage() {
   const [visibility, setVisibility] = useState<"event" | "pod">("event");
 
   const event = pod.events.find((e) => e.id === eventId);
-  if (!event) return <div className="bg-white rounded-2xl border border-dashed border-slate-200 p-10 text-center text-[13px] text-slate-400">Event not found.</div>;
+  if (!event) return <div className="bg-white rounded-lg border border-dashed border-slate-200 p-10 text-center text-[13px] text-slate-400">Event not found.</div>;
 
   const LocationIcon = LOCATION_ICON[event.location.type];
   const myStatus = event.invitees.find((i) => i.email === CURRENT_USER.email)?.status ?? "no_response";
@@ -54,10 +54,10 @@ export default function PodEventDetailPage() {
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_280px] gap-5">
       <div className="min-w-0 space-y-4">
 
-        <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
+        <div className="bg-white rounded-lg border border-slate-200 p-5 shadow-sm">
           <div className="flex items-start justify-between gap-4 flex-wrap">
             <div className="flex items-start gap-4">
-              <div className="shrink-0 w-14 h-14 rounded-xl bg-slate-50 border border-slate-200 flex flex-col items-center justify-center leading-none">
+              <div className="shrink-0 w-14 h-14 rounded-lg bg-slate-50 border border-slate-200 flex flex-col items-center justify-center leading-none">
                 <span className="text-[10px] font-bold text-[#3650d4]">{event.dateISO.slice(5, 7) === "07" ? "JUL" : event.dateISO.slice(5, 7) === "08" ? "AUG" : event.dateISO.slice(5, 7)}</span>
                 <span className="text-[19px] font-bold text-slate-800">{event.dateISO.slice(8, 10)}</span>
               </div>
@@ -76,7 +76,7 @@ export default function PodEventDetailPage() {
             <div className="relative shrink-0">
               <button
                 onClick={() => setRsvpMenuOpen((o) => !o)}
-                className={`inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-[13px] font-semibold transition-colors ${
+                className={`inline-flex items-center gap-1.5 px-4 py-2.5 rounded-lg text-[13px] font-semibold transition-colors ${
                   myStatus === "no_response" ? "bg-[#4361ee] text-white hover:bg-[#3650d4]" : `border ${RSVP_STYLE[myStatus]}`
                 }`}
               >
@@ -85,7 +85,7 @@ export default function PodEventDetailPage() {
                 <ChevronDown size={13} />
               </button>
               {rsvpMenuOpen && (
-                <div className="absolute right-0 top-full mt-1.5 w-36 bg-white rounded-xl border border-slate-200 shadow-lg py-1.5 z-10">
+                <div className="absolute right-0 top-full mt-1.5 w-36 bg-white rounded-lg border border-slate-200 shadow-lg py-1.5 z-10">
                   {(["attending", "maybe", "declined"] as const).map((s) => (
                     <button
                       key={s}
@@ -102,7 +102,7 @@ export default function PodEventDetailPage() {
         </div>
 
         {/* Invitees */}
-        <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
+        <div className="bg-white rounded-lg border border-slate-200 p-5 shadow-sm">
           <div className="flex items-center justify-between mb-3">
             <h2 className="text-[13.5px] font-bold text-slate-800">Invitees <span className="font-normal text-slate-400">{attendingCount} of {event.invitees.length} attending</span></h2>
           </div>
@@ -148,7 +148,7 @@ export default function PodEventDetailPage() {
         </div>
 
         {/* Documents */}
-        <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
+        <div className="bg-white rounded-lg border border-slate-200 p-5 shadow-sm">
           <div className="flex items-center justify-between mb-1 flex-wrap gap-2">
             <h2 className="text-[13.5px] font-bold text-slate-800">Documents <span className="font-normal text-slate-400">{event.documents.length}</span></h2>
             <div className="flex items-center gap-1.5 bg-slate-50 border border-slate-200 rounded-lg p-1">
@@ -183,7 +183,7 @@ export default function PodEventDetailPage() {
       </div>
 
       <div className="space-y-4">
-        <div className="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm">
+        <div className="bg-white rounded-lg border border-slate-200 p-4 shadow-sm">
           <div className="flex items-center gap-1.5 mb-3">
             <h3 className="text-[12.5px] font-bold text-slate-800">Invitation emails</h3>
             <span className="text-[10px] font-semibold text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded-full">Admin only</span>
@@ -199,7 +199,7 @@ export default function PodEventDetailPage() {
           </div>
         </div>
 
-        <div className="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm">
+        <div className="bg-white rounded-lg border border-slate-200 p-4 shadow-sm">
           <h3 className="text-[12.5px] font-bold text-slate-800 mb-3">Host</h3>
           <div className="flex items-center gap-2.5">
             <PodAvatar name={event.createdBy} />
