@@ -14,6 +14,7 @@ import {
   getOrgById,
   getUserFullName,
 } from "@/lib/mock-org-associations";
+import { useEffectiveUsers, persistSecondaryOrgIds } from "@/lib/org-association-store";
 
 const CURRENT_ADMIN = "You (Super Admin)";
 
@@ -476,7 +477,10 @@ function AuditTrailModal({
 type StatusFilter = "all" | "multi-org";
 
 export default function AdminUsersPage() {
-  const [users, setUsers] = useState<PlatformUser[]>(PLATFORM_USERS);
+  // Reads through localStorage (see org-association-store) so a grant made
+  // here is still in effect after navigating to /my-surveys, and re-renders
+  // this page automatically the moment handleAdd/handleRemove persist a change.
+  const users = useEffectiveUsers();
   const [audit, setAudit] = useState<OrgAssociationAuditEntry[]>(ORG_ASSOCIATION_AUDIT);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
@@ -512,9 +516,8 @@ export default function AdminUsersPage() {
       showToast("This user is already associated with that organization.");
       return;
     }
-    setUsers((prev) =>
-      prev.map((u) => (u.id === userId ? { ...u, secondaryOrgIds: [...u.secondaryOrgIds, orgId] } : u))
-    );
+    const nextSecondaryOrgIds = [...user.secondaryOrgIds, orgId];
+    persistSecondaryOrgIds(userId, nextSecondaryOrgIds);
     logAudit(userId, orgId, "added");
     showToast(`${org.name} added as a secondary organization for ${getUserFullName(user)}.`);
   }
@@ -523,11 +526,8 @@ export default function AdminUsersPage() {
     const user = users.find((u) => u.id === userId);
     const org = getOrgById(orgId);
     if (!user || !org) return;
-    setUsers((prev) =>
-      prev.map((u) =>
-        u.id === userId ? { ...u, secondaryOrgIds: u.secondaryOrgIds.filter((id) => id !== orgId) } : u
-      )
-    );
+    const nextSecondaryOrgIds = user.secondaryOrgIds.filter((id) => id !== orgId);
+    persistSecondaryOrgIds(userId, nextSecondaryOrgIds);
     logAudit(userId, orgId, "removed");
     showToast(`${org.name} removed as a secondary organization for ${getUserFullName(user)}.`);
   }
