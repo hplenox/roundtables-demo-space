@@ -258,33 +258,34 @@ function UserRow({
     <div>
       <div
         onClick={onToggle}
-        className="flex items-center gap-3 px-4 py-2.5 border-b border-gray-100 hover:bg-gray-50/70 transition-colors text-[13px] cursor-pointer"
+        className="flex items-center gap-2 px-4 py-2.5 border-b border-gray-100 hover:bg-gray-50/70 transition-colors text-[13px] cursor-pointer"
       >
-        <div className="w-14 shrink-0 text-gray-400 tabular-nums">{DISPLAY_ID.get(user.id)}</div>
-        <div className="flex-1 min-w-[160px]">
+        <div className="w-11 shrink-0 text-gray-400 tabular-nums">{DISPLAY_ID.get(user.id)}</div>
+        <div className="flex-1 min-w-[110px]">
           <span className="text-blue-600 font-medium truncate block hover:underline">{getUserFullName(user)}</span>
         </div>
-        <div className="w-52 shrink-0 text-gray-600 truncate">{user.email}</div>
-        <div className="w-44 shrink-0 text-blue-600 truncate">{primaryOrg?.name ?? "—"}</div>
-        {showSecondaryColumn && (
-          <div className="w-56 shrink-0">
-            {secondaryOrgs.length === 0 ? (
+        <div className="w-40 shrink-0 text-gray-600 truncate" title={user.email}>{user.email}</div>
+        <div className="w-40 shrink-0 text-blue-600 truncate" title={primaryOrg?.name}>{primaryOrg?.name ?? "—"}</div>
+        <div className="w-40 shrink-0">
+          {showSecondaryColumn ? (
+            secondaryOrgs.length === 0 ? (
               <span className="text-[11px] text-gray-300 italic">None</span>
             ) : (
               <div className="flex flex-wrap gap-1">
                 {secondaryOrgs.map((org) => (
                   <span
                     key={org.id}
-                    className="inline-flex items-center text-[10.5px] font-semibold px-1.5 py-0.5 rounded bg-blue-50 text-blue-700 border border-blue-100"
+                    className="inline-flex items-center text-[10px] font-semibold px-1.5 py-0.5 rounded bg-blue-50 text-blue-700 border border-blue-100"
                   >
                     {org.name}
                   </span>
                 ))}
               </div>
-            )}
-          </div>
-        )}
-        <div className="w-24 shrink-0 text-gray-400">{formatDate(user.registeredDate)}</div>
+            )
+          ) : (
+            <span className="text-gray-400">{formatDate(user.registeredDate)}</span>
+          )}
+        </div>
         <div className="w-5 shrink-0 flex justify-end text-gray-400">
           {expanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
         </div>
@@ -579,7 +580,7 @@ export default function AdminUsersPage() {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_300px] gap-5 items-start">
+      <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_280px] gap-4 items-start">
         {/* Main column */}
         <div className="min-w-0 bg-white rounded-lg border border-gray-200">
           {/* Card title row */}
@@ -634,17 +635,17 @@ export default function AdminUsersPage() {
             </div>
           </div>
 
-          {/* Table (horizontally scrollable so fixed-width columns never squish) */}
+          {/* Table — Secondary Orgs replaces Registered (rather than adding a column) so
+              the row never grows wider than the card, and desktop never needs to scroll. */}
           <div className="overflow-x-auto">
-            <div className="min-w-[1020px]">
+            <div className="min-w-[560px]">
               {/* Table header */}
-              <div className="flex items-center gap-3 px-4 py-2.5 border-b border-gray-200 bg-gray-50/60 text-[13px] font-semibold text-gray-900">
-                <div className="w-14 shrink-0">ID</div>
-                <div className="flex-1 min-w-[160px]">Name</div>
-                <div className="w-52 shrink-0">Email</div>
-                <div className="w-44 shrink-0">Organization</div>
-                {statusFilter === "multi-org" && <div className="w-56 shrink-0">Secondary Orgs</div>}
-                <div className="w-24 shrink-0">Registered</div>
+              <div className="flex items-center gap-2 px-4 py-2.5 border-b border-gray-200 bg-gray-50/60 text-[13px] font-semibold text-gray-900">
+                <div className="w-11 shrink-0">ID</div>
+                <div className="flex-1 min-w-[110px]">Name</div>
+                <div className="w-40 shrink-0">Email</div>
+                <div className="w-40 shrink-0">Organization</div>
+                <div className="w-40 shrink-0">{statusFilter === "multi-org" ? "Secondary Orgs" : "Registered"}</div>
                 <div className="w-5 shrink-0" />
               </div>
 
