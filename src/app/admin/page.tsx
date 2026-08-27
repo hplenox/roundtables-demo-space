@@ -1,10 +1,11 @@
 import Link from "next/link";
 import {
   Award, ArrowRight, Building2, Users, TrendingUp,
-  ShieldCheck, BarChart3, CheckCircle2, LayoutDashboard,
+  ShieldCheck, BarChart3, CheckCircle2, LayoutDashboard, Users2,
 } from "lucide-react";
 import { BADGE_TYPES, ORG_BADGES, getAllBadgeAwardees } from "@/lib/mock-badges";
 import { MOCK_ORGS, MOCK_SURVEYS } from "@/lib/mock-data";
+import { PLATFORM_USERS } from "@/lib/mock-org-associations";
 import { MiniBadgeIcon } from "@/components/BadgeCard";
 
 export default function AdminPage() {
@@ -12,6 +13,7 @@ export default function AdminPage() {
   const uniqueOrgsWithBadges = [...new Set(ORG_BADGES.map((ob) => ob.orgId))].length;
   const totalOrgs = MOCK_ORGS.length;
   const activeSurveys = MOCK_SURVEYS.filter((s) => s.status === "active").length;
+  const multiOrgUsers = PLATFORM_USERS.filter((u) => u.secondaryOrgIds.length > 0).length;
 
   // Badge type breakdown
   const categoryCount = BADGE_TYPES.reduce<Record<string, number>>((acc, bt) => {
@@ -132,6 +134,16 @@ export default function AdminPage() {
           <div className="bg-white rounded-xl border border-slate-200 p-5">
             <h3 className="text-sm font-semibold text-slate-900 mb-3">Quick Actions</h3>
             <div className="space-y-2">
+              <Link
+                href="/admin/users"
+                className="flex items-center gap-3 p-3 rounded-lg bg-slate-50 hover:bg-[#00b8a9]/5 border border-slate-100 hover:border-[#00b8a9]/30 transition-colors group"
+              >
+                <Users2 size={14} className="text-[#00897b]" />
+                <span className="text-[12px] font-medium text-slate-700 group-hover:text-[#00897b]">
+                  Users {multiOrgUsers > 0 && <span className="text-slate-400">· {multiOrgUsers} multi-org</span>}
+                </span>
+                <ArrowRight size={11} className="ml-auto text-slate-300 group-hover:text-[#00b8a9]" />
+              </Link>
               <Link
                 href="/"
                 className="flex items-center gap-3 p-3 rounded-lg bg-slate-50 hover:bg-[#00b8a9]/5 border border-slate-100 hover:border-[#00b8a9]/30 transition-colors group"

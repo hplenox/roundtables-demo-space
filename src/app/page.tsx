@@ -1,8 +1,13 @@
+"use client";
+
 import Link from "next/link";
-import { ArrowRight, Users, FileText, TrendingUp, Clock, CheckCircle2, AlertCircle } from "lucide-react";
+import { ArrowRight, Users, FileText, TrendingUp, Clock, CheckCircle2, AlertCircle, Building2 } from "lucide-react";
 import { MOCK_SURVEYS } from "@/lib/mock-data";
 import { ORG_BADGES, BADGE_TYPES } from "@/lib/mock-badges";
 import { MiniBadgeIcon } from "@/components/BadgeCard";
+import { CURRENT_TEST_USER_ID, getCurrentTestUser } from "@/lib/mock-my-surveys";
+import { getOrgById, PlatformOrg } from "@/lib/mock-org-associations";
+import { useEffectiveUser } from "@/lib/org-association-store";
 
 export default function HomePage() {
   const activeSurveys = MOCK_SURVEYS.filter((s) => s.status === "active");
@@ -18,6 +23,15 @@ export default function HomePage() {
     ...ob,
     badge: BADGE_TYPES.find((bt) => bt.id === ob.badgeId)!,
   })).filter((ob) => ob.badge);
+
+  // Multi-Org Support: surface any secondary-organization associations a
+  // Super Admin has granted this account. Renders nothing at all when there
+  // are none — most users only ever belong to their one primary org.
+  const currentSurveyUser = useEffectiveUser(CURRENT_TEST_USER_ID) ?? getCurrentTestUser();
+  const primaryOrg = getOrgById(currentSurveyUser.primaryOrgId);
+  const secondaryOrgs = currentSurveyUser.secondaryOrgIds
+    .map((id) => getOrgById(id))
+    .filter(Boolean) as PlatformOrg[];
 
 
   return (
@@ -216,6 +230,40 @@ export default function HomePage() {
               ))}
             </div>
           </div>
+
+          {/* Multi-Org Support: only appears when secondary orgs exist */}
+          {secondaryOrgs.length > 0 && (
+            <div className="bg-white rounded-xl border border-slate-200 p-4">
+              <div className="flex items-center justify-between mb-1">
+                <h2 className="text-sm font-semibold text-slate-900">Your Organizations</h2>
+                <Link
+                  href="/my-surveys"
+                  className="flex items-center gap-1 text-[#00b8a9] text-[11px] font-semibold hover:underline"
+                >
+                  View <ArrowRight size={10} />
+                </Link>
+              </div>
+              <p className="text-[11px] text-slate-400 mb-3 leading-relaxed">
+                A Super Admin has authorized {currentSurveyUser.firstName} to respond to surveys on behalf of{" "}
+                {secondaryOrgs.length} additional organization{secondaryOrgs.length !== 1 ? "s" : ""}.
+              </p>
+              <div className="space-y-1.5">
+                <div className="flex items-center gap-2 text-[12px]">
+                  <Building2 size={11} className="text-[#00b8a9] shrink-0" />
+                  <span className="font-medium text-slate-700 truncate">{primaryOrg?.name}</span>
+                  <span className="shrink-0 text-[9.5px] font-semibold text-[#00897b] bg-[#00b8a9]/10 px-1.5 py-0.5 rounded-full">
+                    Primary
+                  </span>
+                </div>
+                {secondaryOrgs.map((org) => (
+                  <div key={org.id} className="flex items-center gap-2 text-[12px]">
+                    <Building2 size={11} className="text-slate-300 shrink-0" />
+                    <span className="text-slate-600 truncate">{org.name}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* LPI callout */}
           <div className="rounded-xl bg-[#00b8a9]/[0.07] border border-[#00b8a9]/20 p-4">
