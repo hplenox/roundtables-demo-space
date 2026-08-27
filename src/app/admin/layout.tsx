@@ -7,6 +7,7 @@ import { LayoutGrid } from "lucide-react";
 const TABS = [
   { key: "overview",     label: "Overview",           href: "/admin" },
   { key: "users",        label: "Users",               href: "/admin/users" },
+  { key: "responses",    label: "Response Review",     href: "/admin/responses" },
   { key: "benchmark",    label: "Benchmark",           href: "/admin/benchmark" },
   { key: "badges",       label: "Badge Management",    href: "/admin/badges" },
   { key: "help-center",  label: "Help Center & AI",    href: "/admin/help-center" },
@@ -17,6 +18,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   const activeTab = (() => {
     if (pathname.startsWith("/admin/users"))       return "users";
+    if (pathname.startsWith("/admin/responses"))   return "responses";
     if (pathname.startsWith("/admin/benchmark"))   return "benchmark";
     if (pathname.startsWith("/admin/badges"))      return "badges";
     if (pathname.startsWith("/admin/help-center")) return "help-center";
