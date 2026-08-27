@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import {
-  Building2, ChevronDown, Check, ArrowRight, CheckCircle2, Clock, Circle, Info, ClipboardList,
+  Building2, ChevronDown, Check, ArrowRight, CheckCircle2, Info, ClipboardList, User,
 } from "lucide-react";
 import {
   MY_SURVEY_ASSIGNMENTS,
@@ -18,23 +18,24 @@ function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
 }
 
-// ─── Status presentation ────────────────────────────────────────────────────
+// ─── Status presentation (plain text + dot — no competing pill/border) ─────
 
-const STATUS_CONFIG: Record<SurveyOrgStatus, { label: string; dot: string; cls: string; icon: typeof Circle }> = {
-  not_started: { label: "Not started", dot: "bg-slate-300", cls: "bg-slate-100 text-slate-500 border-slate-200", icon: Circle },
-  in_progress: { label: "In progress", dot: "bg-amber-400", cls: "bg-amber-50 text-amber-700 border-amber-200", icon: Clock },
-  submitted: { label: "Submitted", dot: "bg-emerald-500", cls: "bg-emerald-50 text-emerald-700 border-emerald-200", icon: CheckCircle2 },
+const STATUS_CONFIG: Record<SurveyOrgStatus, { label: string; dot: string }> = {
+  not_started: { label: "Not started", dot: "bg-slate-300" },
+  in_progress: { label: "In progress", dot: "bg-amber-400" },
+  submitted: { label: "Submitted", dot: "bg-emerald-500" },
 };
 
-function OrgStatusPill({ ctx }: { ctx: MySurveyOrgContext }) {
+function StatusText({ ctx }: { ctx: MySurveyOrgContext }) {
   const cfg = STATUS_CONFIG[ctx.status];
-  const Icon = cfg.icon;
   return (
-    <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10.5px] font-medium border ${cfg.cls}`}>
-      <Icon size={10} />
-      {cfg.label}
-      {ctx.status === "in_progress" && typeof ctx.progress === "number" ? ` · ${ctx.progress}%` : ""}
-      {ctx.status === "submitted" && ctx.submittedDate ? ` · ${formatDate(ctx.submittedDate)}` : ""}
+    <span className="flex items-center gap-1.5 text-[12px] font-medium text-slate-600 min-w-0">
+      <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${cfg.dot}`} />
+      <span className="truncate min-w-0">
+        {cfg.label}
+        {ctx.status === "in_progress" && typeof ctx.progress === "number" ? ` · ${ctx.progress}%` : ""}
+        {ctx.status === "submitted" && ctx.submittedDate ? ` · ${formatDate(ctx.submittedDate)}` : ""}
+      </span>
     </span>
   );
 }
@@ -45,7 +46,7 @@ const SURVEY_STATUS_CLS: Record<MySurveyAssignment["surveyStatus"], string> = {
   closed: "bg-slate-100 text-slate-500 border-slate-200",
 };
 
-// ─── Org switcher (the multi-org selection dropdown, lives on the card — not the sidebar) ──
+// ─── Org switcher — the multi-org selection control, lives on the row, not the sidebar ──
 
 function OrgSwitcher({
   options,
@@ -65,10 +66,10 @@ function OrgSwitcher({
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}
-        className="h-8 flex items-center gap-2 pl-3 pr-2.5 rounded-lg border border-slate-200 bg-white hover:border-slate-300 transition-colors text-[12.5px] font-semibold text-slate-800"
+        className="h-8 flex items-center gap-1.5 pl-2.5 pr-2 rounded-lg border border-slate-200 bg-white hover:border-slate-300 transition-colors text-[12.5px] font-semibold text-slate-800 w-full max-w-[220px]"
       >
         <Building2 size={12} className="text-slate-400 shrink-0" />
-        <span className="truncate max-w-[180px]">{selected.org.name}</span>
+        <span className="truncate flex-1 text-left">{selected.org.name}</span>
         <span className="shrink-0 text-[10px] font-normal text-slate-400">
           {selectedIdx + 1}/{options.length}
         </span>
@@ -122,7 +123,7 @@ function OrgSwitcher({
   );
 }
 
-// ─── Survey card ─────────────────────────────────────────────────────────
+// ─── Survey row ──────────────────────────────────────────────────────────
 
 function ctaLabel(ctx: MySurveyOrgContext, orgName: string) {
   if (ctx.status === "submitted") return "View submission";
@@ -130,7 +131,7 @@ function ctaLabel(ctx: MySurveyOrgContext, orgName: string) {
   return `Start as ${orgName}`;
 }
 
-function SurveyCard({
+function SurveyRow({
   assignment,
   onContinue,
 }: {
@@ -144,76 +145,54 @@ function SurveyCard({
   const disabled = assignment.surveyStatus === "closed" && active.ctx.status !== "submitted";
 
   return (
-    <div className="px-5 py-4 border-b border-slate-100 last:border-0">
-      <div className="flex items-start gap-4">
-        <div className="shrink-0 w-10 h-10 rounded-xl bg-slate-900 flex items-center justify-center text-white text-[11px] font-bold">
-          {assignment.year}
-        </div>
-
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 flex-wrap">
-            <p className="text-[14px] font-semibold text-slate-900">{assignment.name}</p>
-            <span
-              className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10.5px] font-medium border ${SURVEY_STATUS_CLS[assignment.surveyStatus]}`}
-            >
-              {assignment.surveyStatus === "active" ? "Active" : assignment.surveyStatus === "upcoming" ? "Upcoming" : "Closed"}
-            </span>
-          </div>
-          <p className="text-[12px] text-slate-400 mt-0.5">
-            Hosted by {assignment.hostOrg} · Due {formatDate(assignment.targetCloseDate)}
-          </p>
-
-          {/* Org indication + selection */}
-          <div className="mt-3 flex items-center gap-3 flex-wrap">
-            {multiOrg ? (
-              <OrgSwitcher options={rows} selectedOrgId={selectedOrgId} onSelect={setSelectedOrgId} />
-            ) : (
-              <span className="inline-flex items-center gap-1.5 h-8 px-3 rounded-lg bg-slate-50 border border-slate-200 text-[12.5px] font-medium text-slate-600">
-                <Building2 size={12} className="text-slate-400" />
-                {rows[0].org.name}
-              </span>
-            )}
-            <OrgStatusPill ctx={active.ctx} />
-          </div>
-
-          {/* At-a-glance status across every affiliated org invited into this survey */}
-          {multiOrg && (
-            <div className="mt-2.5 flex flex-wrap gap-1.5">
-              {rows.map(({ org, ctx }) => {
-                const cfg = STATUS_CONFIG[ctx.status];
-                const isSelected = org.id === selectedOrgId;
-                return (
-                  <button
-                    key={org.id}
-                    type="button"
-                    onClick={() => setSelectedOrgId(org.id)}
-                    className={`inline-flex items-center gap-1.5 px-2 py-1 rounded-full text-[10.5px] font-medium border transition-colors ${
-                      isSelected
-                        ? "border-[#00b8a9] bg-[#00b8a9]/10 text-[#00897b]"
-                        : "border-slate-200 bg-white text-slate-500 hover:border-slate-300"
-                    }`}
-                  >
-                    <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${cfg.dot}`} />
-                    {org.name}
-                  </button>
-                );
-              })}
-            </div>
-          )}
-
-          <div className="mt-3.5">
-            <button
-              type="button"
-              disabled={disabled}
-              onClick={() => onContinue(assignment, active.org.name)}
-              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-[#0f1923] text-white text-[12px] font-semibold hover:bg-slate-800 transition-colors disabled:opacity-40 disabled:pointer-events-none"
-            >
-              {ctaLabel(active.ctx, active.org.name)}
-              <ArrowRight size={12} />
-            </button>
-          </div>
-        </div>
+    <div className="flex items-center gap-4 px-5 py-4 border-b border-slate-100 last:border-0 hover:bg-slate-50/60 transition-colors">
+      {/* Year badge */}
+      <div className="shrink-0 w-10 h-10 rounded-xl bg-slate-900 flex items-center justify-center text-white text-[11px] font-bold">
+        {assignment.year}
       </div>
+
+      {/* Name + host */}
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center gap-2">
+          <p className="text-[13.5px] font-semibold text-slate-900 truncate" title={assignment.name}>{assignment.name}</p>
+          <span
+            className={`shrink-0 inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium border ${SURVEY_STATUS_CLS[assignment.surveyStatus]}`}
+          >
+            {assignment.surveyStatus === "active" ? "Active" : assignment.surveyStatus === "upcoming" ? "Upcoming" : "Closed"}
+          </span>
+        </div>
+        <p className="text-[11.5px] text-slate-400 truncate mt-0.5">
+          {assignment.hostOrg} · Due {formatDate(assignment.targetCloseDate)}
+        </p>
+      </div>
+
+      {/* Organization: dropdown when multiple orgs apply, plain text otherwise */}
+      <div className="hidden md:block shrink-0 w-56">
+        {multiOrg ? (
+          <OrgSwitcher options={rows} selectedOrgId={selectedOrgId} onSelect={setSelectedOrgId} />
+        ) : (
+          <span className="inline-flex items-center gap-1.5 text-[12.5px] text-slate-600 truncate">
+            <Building2 size={12} className="text-slate-400 shrink-0" />
+            <span className="truncate">{rows[0].org.name}</span>
+          </span>
+        )}
+      </div>
+
+      {/* Status for the currently-selected org */}
+      <div className="hidden sm:block shrink-0 w-44 overflow-hidden">
+        <StatusText ctx={active.ctx} />
+      </div>
+
+      {/* CTA */}
+      <button
+        type="button"
+        disabled={disabled}
+        onClick={() => onContinue(assignment, active.org.name)}
+        className="shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#0f1923] text-white text-[11.5px] font-semibold hover:bg-slate-800 transition-colors disabled:opacity-40 disabled:pointer-events-none whitespace-nowrap"
+      >
+        {ctaLabel(active.ctx, active.org.name)}
+        <ArrowRight size={11} />
+      </button>
     </div>
   );
 }
@@ -252,29 +231,17 @@ export default function MySurveysPage() {
           <p className="text-[13px] text-slate-500 mt-1">
             Surveys you&rsquo;ve been invited to respond to, across every organization you&rsquo;re authorized for.
           </p>
-
-          {/* Identity / affiliation strip */}
-          <div className="mt-5 flex items-center gap-3 bg-slate-50 border border-slate-200 rounded-xl px-4 py-3">
-            <div className="shrink-0 w-9 h-9 rounded-full bg-slate-200 flex items-center justify-center text-[11px] font-bold text-slate-600">
-              {currentUser.firstName[0]}
-              {currentUser.lastName[0]}
-            </div>
-            <div className="min-w-0">
-              <p className="text-[12.5px] font-semibold text-slate-800">{getUserFullName(currentUser)}</p>
-              <p className="text-[11.5px] text-slate-500 mt-0.5">
-                Primary: <span className="font-medium text-slate-700">{primaryOrg?.name}</span>
-                {secondaryOrgs.length > 0 && (
-                  <>
-                    {" "}
-                    · Also authorized for:{" "}
-                    <span className="font-medium text-slate-700">
-                      {secondaryOrgs.map((o) => o.name).join(", ")}
-                    </span>
-                  </>
-                )}
-              </p>
-            </div>
-          </div>
+          <p className="text-[12px] text-slate-400 mt-2.5 flex items-center gap-1.5 flex-wrap">
+            <User size={12} className="text-slate-300 shrink-0" />
+            Signed in as <span className="font-medium text-slate-600">{getUserFullName(currentUser)}</span> — primary{" "}
+            <span className="font-medium text-slate-600">{primaryOrg?.name}</span>
+            {secondaryOrgs.length > 0 && (
+              <>
+                , also authorized for{" "}
+                <span className="font-medium text-slate-600">{secondaryOrgs.map((o) => o.name).join(", ")}</span>
+              </>
+            )}
+          </p>
         </div>
       </div>
 
@@ -291,7 +258,7 @@ export default function MySurveysPage() {
             </div>
           ) : (
             MY_SURVEY_ASSIGNMENTS.map((assignment) => (
-              <SurveyCard key={assignment.id} assignment={assignment} onContinue={handleContinue} />
+              <SurveyRow key={assignment.id} assignment={assignment} onContinue={handleContinue} />
             ))
           )}
         </div>
