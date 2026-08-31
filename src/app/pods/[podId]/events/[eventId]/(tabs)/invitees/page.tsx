@@ -35,11 +35,11 @@ export default function EventInviteesPage() {
           value={inviteInput}
           onChange={(e) => setInviteInput(e.target.value)}
           placeholder="Add invitees by name or email — POD members auto-suggest"
-          className="flex-1 px-3.5 py-2.5 rounded-lg border border-slate-200 text-[13px] focus:outline-none focus:ring-2 focus:ring-[#4361ee]/30"
+          className="flex-1 px-3.5 py-2.5 rounded-lg border border-slate-200 text-[13px] focus:outline-none focus:ring-2 focus:ring-[#0066f3]/30"
           onKeyDown={(e) => e.key === "Enter" && handleAddInvitee()}
         />
         <button className="inline-flex items-center gap-1.5 px-3 py-2.5 rounded-lg border border-slate-200 text-slate-600 text-[12.5px] font-semibold hover:border-slate-300 transition-colors">CSV</button>
-        <button onClick={handleAddInvitee} className="inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-lg bg-[#4361ee] text-white text-[12.5px] font-semibold hover:bg-[#3650d4] transition-colors">
+        <button onClick={handleAddInvitee} className="inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-lg bg-[#0066f3] text-white text-[12.5px] font-semibold hover:bg-[#0052c2] transition-colors">
           <UserPlus size={14} /> Add
         </button>
       </div>
@@ -61,7 +61,7 @@ export default function EventInviteesPage() {
                 {inv.status === "no_response" ? "No response" : RSVP_LABEL[inv.status]}
               </span>
               {inv.status === "no_response" && inv.email !== CURRENT_USER.email && (
-                <button className="inline-flex items-center gap-1 text-[12px] font-semibold text-[#3650d4] hover:underline">
+                <button className="inline-flex items-center gap-1 text-[12px] font-semibold text-[#0052c2] hover:underline">
                   <Send size={11} /> Remind
                 </button>
               )}

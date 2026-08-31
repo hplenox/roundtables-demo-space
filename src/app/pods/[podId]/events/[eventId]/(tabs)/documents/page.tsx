@@ -23,7 +23,7 @@ export default function EventDocumentsPage() {
         </div>
         <button
           onClick={() => uploadEventDocument(event.id, "New Upload.pdf", visibility)}
-          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#4361ee] text-white text-[12px] font-semibold hover:bg-[#3650d4] transition-colors"
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#0066f3] text-white text-[12px] font-semibold hover:bg-[#0052c2] transition-colors"
         >
           <Upload size={13} /> Upload
         </button>

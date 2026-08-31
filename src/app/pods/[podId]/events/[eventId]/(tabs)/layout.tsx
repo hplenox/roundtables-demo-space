@@ -67,7 +67,7 @@ export default function EventTabsLayout({ children }: { children: React.ReactNod
               <button
                 onClick={() => setRsvpMenuOpen((o) => !o)}
                 className={`inline-flex items-center gap-1.5 px-4 py-2.5 rounded-lg text-[13px] font-semibold transition-colors ${
-                  myStatus === "no_response" ? "bg-[#4361ee] text-white hover:bg-[#3650d4]" : `border ${RSVP_STYLE[myStatus]}`
+                  myStatus === "no_response" ? "bg-[#0066f3] text-white hover:bg-[#0052c2]" : `border ${RSVP_STYLE[myStatus]}`
                 }`}
               >
                 {myStatus !== "no_response" && <Check size={13} />}
@@ -131,13 +131,13 @@ export default function EventTabsLayout({ children }: { children: React.ReactNod
                     <p className="text-slate-500">{event.location.detail}</p>
                   </div>
                 </div>
-                <span className="flex items-center gap-1.5 text-[#3650d4] font-semibold">
+                <span className="flex items-center gap-1.5 text-[#0052c2] font-semibold">
                   <Download size={12} /> Download iCal
                 </span>
               </div>
             </SectionCard>
 
-            <SectionCard title="Invitees" badge="Top 3" action={<Link href={`${baseHref}/invitees`} className="text-[11.5px] font-semibold text-[#3650d4] hover:underline">See all</Link>}>
+            <SectionCard title="Invitees" badge="Top 3" action={<Link href={`${baseHref}/invitees`} className="text-[11.5px] font-semibold text-[#0052c2] hover:underline">See all</Link>}>
               <div className="space-y-2.5">
                 {event.invitees.slice(0, 3).map((inv) => (
                   <div key={inv.email} className="flex items-center gap-2.5">

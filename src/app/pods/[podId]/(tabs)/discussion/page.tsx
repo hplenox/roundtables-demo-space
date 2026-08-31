@@ -66,7 +66,7 @@ export default function PodDiscussionPage() {
               value={pollQuestion}
               onChange={(e) => setPollQuestion(e.target.value)}
               placeholder="Ask a question, e.g. Pick a time for the walkthrough"
-              className="w-full px-3 py-2 rounded-lg border border-slate-200 text-[12.5px] focus:outline-none focus:ring-2 focus:ring-[#4361ee]/30"
+              className="w-full px-3 py-2 rounded-lg border border-slate-200 text-[12.5px] focus:outline-none focus:ring-2 focus:ring-[#0066f3]/30"
             />
             {pollOptions.map((opt, i) => (
               <input
@@ -74,12 +74,12 @@ export default function PodDiscussionPage() {
                 value={opt}
                 onChange={(e) => setPollOptions((prev) => prev.map((p, pi) => (pi === i ? e.target.value : p)))}
                 placeholder={`Option ${i + 1}, e.g. Tue Jul 28 · 10:00 am ET`}
-                className="w-full px-3 py-2 rounded-lg border border-slate-200 text-[12.5px] focus:outline-none focus:ring-2 focus:ring-[#4361ee]/30"
+                className="w-full px-3 py-2 rounded-lg border border-slate-200 text-[12.5px] focus:outline-none focus:ring-2 focus:ring-[#0066f3]/30"
               />
             ))}
             <div className="flex justify-end gap-2 pt-1">
               <button onClick={() => setShowPoll(false)} className="text-[12px] font-medium text-slate-500 px-2 py-1">Cancel</button>
-              <button onClick={handlePostPoll} className="text-[12px] font-semibold text-white bg-[#4361ee] hover:bg-[#3650d4] px-3 py-1.5 rounded-lg transition-colors">Post poll</button>
+              <button onClick={handlePostPoll} className="text-[12px] font-semibold text-white bg-[#0066f3] hover:bg-[#0052c2] px-3 py-1.5 rounded-lg transition-colors">Post poll</button>
             </div>
           </div>
         )}
@@ -99,7 +99,7 @@ export default function PodDiscussionPage() {
           <button
             onClick={handlePost}
             disabled={!body.trim()}
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-[#4361ee] text-white text-[12.5px] font-semibold hover:bg-[#3650d4] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-[#0066f3] text-white text-[12.5px] font-semibold hover:bg-[#0052c2] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
           >
             <Send size={13} /> Post
           </button>
@@ -184,7 +184,7 @@ function DiscussionPost({ post, podId }: { post: PodDiscussionPost; podId: strin
           <div className="flex items-center gap-4 mt-3">
             <button
               onClick={() => toggleLikePost(post.id)}
-              className={`inline-flex items-center gap-1.5 text-[12px] font-medium transition-colors ${post.liked ? "text-[#3650d4]" : "text-slate-400 hover:text-slate-600"}`}
+              className={`inline-flex items-center gap-1.5 text-[12px] font-medium transition-colors ${post.liked ? "text-[#0052c2]" : "text-slate-400 hover:text-slate-600"}`}
             >
               <ThumbsUp size={13} fill={post.liked ? "currentColor" : "none"} /> {post.likes}
             </button>
@@ -202,10 +202,10 @@ function DiscussionPost({ post, podId }: { post: PodDiscussionPost; podId: strin
                 value={replyText}
                 onChange={(e) => setReplyText(e.target.value)}
                 placeholder={`Reply to ${post.author.split(" ")[0]}`}
-                className="flex-1 px-3 py-1.5 rounded-lg border border-slate-200 text-[12.5px] focus:outline-none focus:ring-2 focus:ring-[#4361ee]/30"
+                className="flex-1 px-3 py-1.5 rounded-lg border border-slate-200 text-[12.5px] focus:outline-none focus:ring-2 focus:ring-[#0066f3]/30"
                 onKeyDown={(e) => e.key === "Enter" && submitReply()}
               />
-              <button onClick={submitReply} className="text-[12px] font-semibold text-white bg-[#4361ee] hover:bg-[#3650d4] px-3 py-1.5 rounded-lg transition-colors">Send</button>
+              <button onClick={submitReply} className="text-[12px] font-semibold text-white bg-[#0066f3] hover:bg-[#0052c2] px-3 py-1.5 rounded-lg transition-colors">Send</button>
             </div>
           )}
         </div>
@@ -226,7 +226,7 @@ function PollCard({
   return (
     <div className="mt-3 rounded-lg border border-slate-200 overflow-hidden">
       <div className="flex items-center justify-between px-3.5 py-2.5 bg-slate-50 border-b border-slate-200">
-        <p className="text-[12.5px] font-bold text-slate-700 flex items-center gap-1.5"><CalendarPlus size={13} className="text-[#3650d4]" /> {poll.question}</p>
+        <p className="text-[12.5px] font-bold text-slate-700 flex items-center gap-1.5"><CalendarPlus size={13} className="text-[#0052c2]" /> {poll.question}</p>
         <span className="text-[11.5px] text-slate-400">{poll.votedCount} of {poll.totalVoters} voted</span>
       </div>
       <div className="divide-y divide-slate-100">
@@ -239,13 +239,13 @@ function PollCard({
               onClick={() => onVote(opt.id)}
               className="w-full relative flex items-center justify-between px-3.5 py-2.5 text-left hover:bg-slate-50/60 transition-colors"
             >
-              <div className="absolute inset-y-0 left-0 bg-[#4361ee]/10" style={{ width: `${pct}%` }} />
+              <div className="absolute inset-y-0 left-0 bg-[#0066f3]/10" style={{ width: `${pct}%` }} />
               <span className="relative flex items-center gap-2 text-[12.5px] text-slate-700 font-medium">
                 {opt.label}
                 {opt.id === best.id && opt.votes > 0 && (
                   <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-1.5 py-0.5 rounded-full">Best time</span>
                 )}
-                {mine && <span className="text-[10px] font-bold text-[#3650d4]">(your vote)</span>}
+                {mine && <span className="text-[10px] font-bold text-[#0052c2]">(your vote)</span>}
               </span>
               <span className="relative text-[11.5px] text-slate-400">{opt.votes} vote{opt.votes === 1 ? "" : "s"}</span>
             </button>
@@ -256,7 +256,7 @@ function PollCard({
         {poll.createdEventId ? (
           <span className="text-[12px] font-semibold text-emerald-600 flex items-center gap-1.5"><CalendarCheck size={13} /> Event created</span>
         ) : (
-          <button onClick={onCreateEvent} className="inline-flex items-center gap-1.5 text-[12px] font-semibold text-white bg-[#4361ee] hover:bg-[#3650d4] px-3 py-1.5 rounded-lg transition-colors">
+          <button onClick={onCreateEvent} className="inline-flex items-center gap-1.5 text-[12px] font-semibold text-white bg-[#0066f3] hover:bg-[#0052c2] px-3 py-1.5 rounded-lg transition-colors">
             <CalendarPlus size={13} /> Create event · {best?.label.split("·")[1]?.trim() ?? best?.label}
           </button>
         )}

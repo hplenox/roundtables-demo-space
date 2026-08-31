@@ -6,7 +6,7 @@ type StatColor = "green" | "amber" | "blue" | "violet" | "navy" | "slate";
 const COLOR_TEXT: Record<StatColor, string> = {
   green: "text-emerald-600",
   amber: "text-amber-600",
-  blue: "text-[#3650d4]",
+  blue: "text-[#0052c2]",
   violet: "text-violet-600",
   navy: "text-slate-900",
   slate: "text-slate-700",

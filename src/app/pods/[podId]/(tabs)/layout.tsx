@@ -109,7 +109,7 @@ export default function PodTabsLayout({ children }: { children: React.ReactNode 
               </button>
               <button
                 onClick={() => setShowInvite(true)}
-                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-[#4361ee] text-white text-[13px] font-semibold hover:bg-[#3650d4] shadow-sm hover:shadow-md transition-all"
+                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-[#0066f3] text-white text-[13px] font-semibold hover:bg-[#0052c2] shadow-sm hover:shadow-md transition-all"
               >
                 <UserPlus size={15} />
                 Invite Members
@@ -134,10 +134,10 @@ export default function PodTabsLayout({ children }: { children: React.ReactNode 
 
         {/* Weekly insight */}
         {pod.weeklyInsight && (
-          <div className="flex items-start gap-2 p-3 rounded-lg bg-[#4361ee]/[0.06] border border-[#4361ee]/15">
-            <Sparkles size={14} className="text-[#3650d4] shrink-0 mt-0.5" />
+          <div className="flex items-start gap-2 p-3 rounded-lg bg-[#0066f3]/[0.06] border border-[#0066f3]/15">
+            <Sparkles size={14} className="text-[#0052c2] shrink-0 mt-0.5" />
             <p className="text-[12.5px] text-slate-700 leading-snug">
-              <span className="font-bold text-[#3650d4]">This week in {pod.name}: </span>
+              <span className="font-bold text-[#0052c2]">This week in {pod.name}: </span>
               {pod.weeklyInsight}
             </p>
           </div>
@@ -148,11 +148,11 @@ export default function PodTabsLayout({ children }: { children: React.ReactNode 
           <div className="min-w-0 space-y-4">{children}</div>
 
           <div className="space-y-4">
-            <SectionCard title="POD Details" action={<Link href={baseHref} className="text-[11.5px] font-semibold text-[#3650d4] hover:underline">See all</Link>}>
+            <SectionCard title="POD Details" action={<Link href={baseHref} className="text-[11.5px] font-semibold text-[#0052c2] hover:underline">See all</Link>}>
               <PodInfoTags hostedBy={pod.hostedBy} administeredBy={pod.administeredBy} type={pod.category} />
             </SectionCard>
 
-            <SectionCard title="Members" action={<Link href={`${baseHref}/members`} className="text-[11.5px] font-semibold text-[#3650d4] hover:underline">See all</Link>}>
+            <SectionCard title="Members" action={<Link href={`${baseHref}/members`} className="text-[11.5px] font-semibold text-[#0052c2] hover:underline">See all</Link>}>
               <div className="space-y-2.5">
                 {pod.members.slice(0, 2).map((m) => (
                   <div key={m.id} className="flex items-center gap-2.5">
@@ -185,7 +185,7 @@ export default function PodTabsLayout({ children }: { children: React.ReactNode 
               onClick={toggleDigest}
               className="w-full text-left flex items-start gap-3 bg-white rounded-xl border border-slate-200 p-5 hover:border-slate-300 transition-colors"
             >
-              <span className={`shrink-0 w-9 h-5 rounded-full mt-0.5 relative transition-colors ${pod.digestEnabled ? "bg-[#4361ee]" : "bg-slate-200"}`}>
+              <span className={`shrink-0 w-9 h-5 rounded-full mt-0.5 relative transition-colors ${pod.digestEnabled ? "bg-[#0066f3]" : "bg-slate-200"}`}>
                 <span className={`absolute top-0.5 w-4 h-4 rounded-full bg-white shadow transition-all ${pod.digestEnabled ? "left-4" : "left-0.5"}`} />
               </span>
               <span>
@@ -219,7 +219,7 @@ function EngagementBar({ label, done, total }: { label: string; done: number; to
         <span className="font-semibold text-slate-700">{done} of {total}</span>
       </div>
       <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden">
-        <div className="h-full rounded-full bg-[#4361ee]" style={{ width: `${pct}%` }} />
+        <div className="h-full rounded-full bg-[#0066f3]" style={{ width: `${pct}%` }} />
       </div>
     </div>
   );

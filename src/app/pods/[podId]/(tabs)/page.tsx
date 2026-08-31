@@ -45,11 +45,11 @@ export default function PodActivityPage() {
               </div>
               <div className="flex items-start gap-4">
                 <div className="shrink-0 w-12 h-12 rounded-lg bg-slate-50 border border-slate-200 flex flex-col items-center justify-center leading-none">
-                  <span className="text-[9px] font-bold text-[#3650d4]">{month}</span>
+                  <span className="text-[9px] font-bold text-[#0052c2]">{month}</span>
                   <span className="text-[15px] font-bold text-slate-800">{day}</span>
                 </div>
                 <div className="min-w-0 flex-1">
-                  <Link href={`/pods/${pod.id}/events/${event.id}`} className="text-[14.5px] font-bold text-slate-900 hover:text-[#3650d4] transition-colors">
+                  <Link href={`/pods/${pod.id}/events/${event.id}`} className="text-[14.5px] font-bold text-slate-900 hover:text-[#0052c2] transition-colors">
                     {event.title}
                   </Link>
                   <div className="flex items-center gap-3 mt-1 text-[11.5px] text-slate-400 flex-wrap">
@@ -65,7 +65,7 @@ export default function PodActivityPage() {
                 <div className="shrink-0">
                   {myStatus === "no_response" ? (
                     <div className="flex items-center gap-1.5">
-                      <button onClick={() => rsvpToEvent(event.id, "attending")} className="px-2.5 py-1.5 rounded-lg bg-[#4361ee] text-white text-[11.5px] font-semibold hover:bg-[#3650d4] transition-colors">Yes</button>
+                      <button onClick={() => rsvpToEvent(event.id, "attending")} className="px-2.5 py-1.5 rounded-lg bg-[#0066f3] text-white text-[11.5px] font-semibold hover:bg-[#0052c2] transition-colors">Yes</button>
                       <button onClick={() => rsvpToEvent(event.id, "declined")} className="px-2.5 py-1.5 rounded-lg border border-slate-200 text-slate-500 text-[11.5px] font-semibold hover:bg-slate-50 transition-colors">No</button>
                       <button onClick={() => rsvpToEvent(event.id, "maybe")} className="px-2.5 py-1.5 rounded-lg border border-slate-200 text-slate-500 text-[11.5px] font-semibold hover:bg-slate-50 transition-colors">Maybe</button>
                     </div>

@@ -79,7 +79,7 @@ export default function CreatePodModal({ onClose, onCreated }: { onClose: () => 
                       opt.disabled
                         ? "border-slate-200 opacity-50 cursor-not-allowed"
                         : active
-                        ? "border-[#4361ee] bg-[#4361ee]/5 shadow-sm"
+                        ? "border-[#0066f3] bg-[#0066f3]/5 shadow-sm"
                         : "border-slate-200 hover:border-slate-300"
                     }`}
                   >
@@ -88,7 +88,7 @@ export default function CreatePodModal({ onClose, onCreated }: { onClose: () => 
                         Coming soon
                       </span>
                     )}
-                    <div className={`w-9 h-9 rounded-lg flex items-center justify-center mb-3 ${active && !opt.disabled ? "bg-[#4361ee] text-white" : "bg-slate-100 text-slate-500"}`}>
+                    <div className={`w-9 h-9 rounded-lg flex items-center justify-center mb-3 ${active && !opt.disabled ? "bg-[#0066f3] text-white" : "bg-slate-100 text-slate-500"}`}>
                       <Icon size={16} />
                     </div>
                     <p className="text-[13.5px] font-bold text-slate-900 mb-1.5">{opt.title}</p>
@@ -102,7 +102,7 @@ export default function CreatePodModal({ onClose, onCreated }: { onClose: () => 
               <button onClick={onClose} className="text-[13px] font-medium text-slate-500 hover:text-slate-700 px-3 py-2">Cancel</button>
               <button
                 onClick={() => setStep(2)}
-                className="px-4 py-2 rounded-lg bg-[#4361ee] text-white text-[13px] font-semibold hover:bg-[#3650d4] transition-colors"
+                className="px-4 py-2 rounded-lg bg-[#0066f3] text-white text-[13px] font-semibold hover:bg-[#0052c2] transition-colors"
               >
                 Continue
               </button>
@@ -112,7 +112,7 @@ export default function CreatePodModal({ onClose, onCreated }: { onClose: () => 
           <>
             <div className="px-6 pt-5 space-y-4">
               <div className="flex items-center gap-2">
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#4361ee]/10 text-[#3650d4] text-[11px] font-semibold border border-[#4361ee]/25">
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#0066f3]/10 text-[#0052c2] text-[11px] font-semibold border border-[#0066f3]/25">
                   {KIND_OPTIONS.find((o) => o.kind === kind)?.title}
                 </span>
                 <button onClick={() => setStep(1)} className="text-[12px] font-medium text-slate-400 hover:text-slate-600">Change</button>
@@ -124,7 +124,7 @@ export default function CreatePodModal({ onClose, onCreated }: { onClose: () => 
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="e.g. Emerging Managers Vendor List"
-                  className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 text-[13.5px] focus:outline-none focus:ring-2 focus:ring-[#4361ee]/30 focus:border-[#4361ee]"
+                  className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 text-[13.5px] focus:outline-none focus:ring-2 focus:ring-[#0066f3]/30 focus:border-[#0066f3]"
                 />
               </div>
 
@@ -134,7 +134,7 @@ export default function CreatePodModal({ onClose, onCreated }: { onClose: () => 
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   placeholder="What is this POD for?"
-                  className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 text-[13.5px] focus:outline-none focus:ring-2 focus:ring-[#4361ee]/30 focus:border-[#4361ee]"
+                  className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 text-[13.5px] focus:outline-none focus:ring-2 focus:ring-[#0066f3]/30 focus:border-[#0066f3]"
                 />
               </div>
 
@@ -144,7 +144,7 @@ export default function CreatePodModal({ onClose, onCreated }: { onClose: () => 
                   <input
                     value={hostOrg}
                     onChange={(e) => setHostOrg(e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 text-[13.5px] focus:outline-none focus:ring-2 focus:ring-[#4361ee]/30 focus:border-[#4361ee]"
+                    className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 text-[13.5px] focus:outline-none focus:ring-2 focus:ring-[#0066f3]/30 focus:border-[#0066f3]"
                   />
                 </div>
                 <div>
@@ -152,7 +152,7 @@ export default function CreatePodModal({ onClose, onCreated }: { onClose: () => 
                   <select
                     value={joinPolicy}
                     onChange={(e) => setJoinPolicy(e.target.value as typeof joinPolicy)}
-                    className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 text-[13.5px] bg-white focus:outline-none focus:ring-2 focus:ring-[#4361ee]/30 focus:border-[#4361ee]"
+                    className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 text-[13.5px] bg-white focus:outline-none focus:ring-2 focus:ring-[#0066f3]/30 focus:border-[#0066f3]"
                   >
                     <option value="invite_only">Invite only</option>
                     <option value="request">Anyone can request</option>
@@ -167,7 +167,7 @@ export default function CreatePodModal({ onClose, onCreated }: { onClose: () => 
                   value={inviteText}
                   onChange={(e) => setInviteText(e.target.value)}
                   placeholder="Search people, or paste emails separated by commas"
-                  className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 text-[13.5px] focus:outline-none focus:ring-2 focus:ring-[#4361ee]/30 focus:border-[#4361ee]"
+                  className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 text-[13.5px] focus:outline-none focus:ring-2 focus:ring-[#0066f3]/30 focus:border-[#0066f3]"
                 />
               </div>
             </div>
@@ -179,7 +179,7 @@ export default function CreatePodModal({ onClose, onCreated }: { onClose: () => 
                 <button
                   onClick={handleCreate}
                   disabled={!name.trim()}
-                  className="px-4 py-2 rounded-lg bg-[#4361ee] text-white text-[13px] font-semibold hover:bg-[#3650d4] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                  className="px-4 py-2 rounded-lg bg-[#0066f3] text-white text-[13px] font-semibold hover:bg-[#0052c2] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                 >
                   Create POD
                 </button>

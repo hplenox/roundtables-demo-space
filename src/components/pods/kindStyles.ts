@@ -14,7 +14,7 @@ export const KIND_STYLE: Record<PodKind, {
     iconBg: "bg-blue-50",
     iconColor: "text-blue-600",
     badge: "bg-blue-50 text-blue-700 border-blue-200",
-    accent: "#4361ee",
+    accent: "#0066f3",
     gradient: "from-blue-500/15 via-blue-500/5 to-transparent",
   },
   vendor: {

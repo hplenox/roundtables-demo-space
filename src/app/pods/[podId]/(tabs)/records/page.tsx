@@ -51,7 +51,7 @@ export default function PodRecordsPage() {
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Search records"
-              className="w-full pl-8 pr-2.5 py-2 rounded-lg border border-slate-200 bg-white text-[12.5px] focus:outline-none focus:ring-2 focus:ring-[#4361ee]/30"
+              className="w-full pl-8 pr-2.5 py-2 rounded-lg border border-slate-200 bg-white text-[12.5px] focus:outline-none focus:ring-2 focus:ring-[#0066f3]/30"
             />
           </div>
           <button className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg border border-slate-200 bg-white text-slate-600 text-[12px] font-medium hover:border-slate-300 transition-colors">
@@ -62,7 +62,7 @@ export default function PodRecordsPage() {
           </button>
           <button
             onClick={() => setShowAdd(true)}
-            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-[#4361ee] text-white text-[12.5px] font-semibold hover:bg-[#3650d4] transition-colors"
+            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-[#0066f3] text-white text-[12.5px] font-semibold hover:bg-[#0052c2] transition-colors"
           >
             <Plus size={13} /> Add a {pod.kind === "deal" ? "deal" : "vendor"}
           </button>
@@ -94,7 +94,7 @@ export default function PodRecordsPage() {
                 key={r.id}
                 onClick={() => setSelectedId(r.id)}
                 className={`w-full grid grid-cols-[2.1fr_0.9fr_0.7fr_0.9fr_1.1fr_0.6fr] gap-2 px-4 py-3 items-center text-left border-b border-slate-50 last:border-0 hover:bg-slate-50/70 transition-colors ${
-                  selected?.id === r.id ? "bg-[#4361ee]/5" : ""
+                  selected?.id === r.id ? "bg-[#0066f3]/5" : ""
                 }`}
               >
                 <span className="flex items-center gap-2 min-w-0">
@@ -158,7 +158,7 @@ export default function PodRecordsPage() {
                   {r.confirmation === "sent" ? `Sent to ${confirmer}` : `${confirmer[0].toUpperCase()}${confirmer.slice(1)} reviewing`}
                 </span>
                 {r.confirmation === "sent" ? (
-                  <button onClick={() => resendRecord(r.id)} className="text-[12px] font-semibold text-[#3650d4] hover:underline">Resend</button>
+                  <button onClick={() => resendRecord(r.id)} className="text-[12px] font-semibold text-[#0052c2] hover:underline">Resend</button>
                 ) : (
                   <button onClick={() => withdrawRecord(r.id)} className="text-[12px] font-semibold text-rose-600 hover:underline">Withdraw</button>
                 )}
@@ -211,17 +211,17 @@ function RecordDetail({
           <Link href={`/pods/${podId}/discussion`} className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg border border-slate-200 text-slate-600 text-[12px] font-semibold hover:border-slate-300 transition-colors">
             Discuss in POD
           </Link>
-          <button className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-[#4361ee] text-white text-[12px] font-semibold hover:bg-[#3650d4] transition-colors">
+          <button className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-[#0066f3] text-white text-[12px] font-semibold hover:bg-[#0052c2] transition-colors">
             Request {requestLabel}
           </button>
         </div>
       </div>
 
       {record.aiSummary && (
-        <div className="flex items-start gap-2.5 p-3.5 rounded-lg bg-[#4361ee]/[0.06] border border-[#4361ee]/15 mb-4">
-          <Sparkles size={14} className="text-[#3650d4] shrink-0 mt-0.5" />
+        <div className="flex items-start gap-2.5 p-3.5 rounded-lg bg-[#0066f3]/[0.06] border border-[#0066f3]/15 mb-4">
+          <Sparkles size={14} className="text-[#0052c2] shrink-0 mt-0.5" />
           <p className="text-[12.5px] text-slate-700 leading-snug">
-            <span className="font-bold text-[#3650d4]">Members say — </span>
+            <span className="font-bold text-[#0052c2]">Members say — </span>
             {record.aiSummary}
             <span className="block text-[11px] text-slate-400 mt-1">Summarized from {record.notes.length || 1} member note{record.notes.length === 1 ? "" : "s"}. Not an endorsement or diligence.</span>
           </p>
@@ -231,7 +231,7 @@ function RecordDetail({
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
         <Field label="Category" value={record.category} />
         <Field label="Contact" value={record.contactName ?? "—"} />
-        <Field label="Website" value={record.website ? <a href={`https://${record.website}`} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-[#3650d4] hover:underline">{record.website}<ExternalLink size={10} /></a> : "—"} />
+        <Field label="Website" value={record.website ? <a href={`https://${record.website}`} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-[#0052c2] hover:underline">{record.website}<ExternalLink size={10} /></a> : "—"} />
         <Field label="Confirmation" value={record.confirmedDateLabel ? `Confirmed ${record.confirmedDateLabel}` : "—"} valueClass="text-emerald-600" />
       </div>
 
@@ -258,10 +258,10 @@ function RecordDetail({
             value={noteDraft}
             onChange={(e) => setNoteDraft(e.target.value)}
             placeholder="Add a note — visible to POD members only"
-            className="flex-1 px-3 py-2 rounded-lg border border-slate-200 text-[12.5px] focus:outline-none focus:ring-2 focus:ring-[#4361ee]/30"
+            className="flex-1 px-3 py-2 rounded-lg border border-slate-200 text-[12.5px] focus:outline-none focus:ring-2 focus:ring-[#0066f3]/30"
             onKeyDown={(e) => e.key === "Enter" && onAddNote()}
           />
-          <button onClick={onAddNote} className="text-[12px] font-semibold text-white bg-[#4361ee] hover:bg-[#3650d4] px-3 py-2 rounded-lg transition-colors">Add note</button>
+          <button onClick={onAddNote} className="text-[12px] font-semibold text-white bg-[#0066f3] hover:bg-[#0052c2] px-3 py-2 rounded-lg transition-colors">Add note</button>
           <button className="inline-flex items-center gap-1.5 text-[12px] font-medium text-slate-400 hover:text-slate-600 px-2"><Paperclip size={13} /> Attach</button>
         </div>
       </div>

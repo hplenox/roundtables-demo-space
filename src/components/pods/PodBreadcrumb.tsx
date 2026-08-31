@@ -18,7 +18,7 @@ export default function PodBreadcrumb({ items }: { items: PodBreadcrumbItem[] })
         <span key={`${item.label}-${i}`} className="flex items-center gap-2">
           <span className="text-slate-300">/</span>
           {item.href ? (
-            <Link href={item.href} className="text-[#3650d4] hover:underline">
+            <Link href={item.href} className="text-[#0052c2] hover:underline">
               {item.label}
             </Link>
           ) : (
