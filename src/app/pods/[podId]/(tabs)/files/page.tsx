@@ -37,7 +37,7 @@ export default function PodFilesPage() {
         </div>
         <button
           onClick={() => uploadPodFile("New Upload.pdf", "1.4 MB")}
-          className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-[#4361ee] text-white text-[12.5px] font-semibold hover:bg-[#3650d4] transition-colors"
+          className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-[#0066f3] text-white text-[12.5px] font-semibold hover:bg-[#0052c2] transition-colors"
         >
           <Upload size={14} /> Upload
         </button>

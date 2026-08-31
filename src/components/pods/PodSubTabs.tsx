@@ -20,7 +20,7 @@ export default function PodSubTabs({ tabs, activeKey }: { tabs: PodSubTab[]; act
           href={tab.href}
           className={`shrink-0 pb-2.5 -mb-px text-[13px] font-medium border-b-2 transition-colors ${
             activeKey === tab.key
-              ? "border-[#4361ee] text-[#3650d4]"
+              ? "border-[#0066f3] text-[#0052c2]"
               : "border-transparent text-slate-500 hover:text-slate-700"
           }`}
         >

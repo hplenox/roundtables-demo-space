@@ -10,6 +10,7 @@ import { RSVP_STYLE } from "@/components/pods/kindStyles";
 import PodAvatar from "@/components/pods/PodAvatar";
 import PodBreadcrumb from "@/components/pods/PodBreadcrumb";
 import PodSubTabs from "@/components/pods/PodSubTabs";
+import SectionCard from "@/components/pods/SectionCard";
 import EventBanner from "@/components/pods/EventBanner";
 import type { EventRsvpStatus } from "@/types/pod";
 
@@ -43,65 +44,71 @@ export default function EventTabsLayout({ children }: { children: React.ReactNod
 
   return (
     <div className="min-h-full bg-slate-50">
-      <div className="max-w-5xl mx-auto px-6 py-6 space-y-4">
-        <PodBreadcrumb
-          items={[
-            { label: "My PODs", href: "/pods" },
-            { label: pod.name, href: `/pods/${podId}` },
-            { label: "Events", href: `/pods/${podId}/events` },
-            { label: event.title },
-          ]}
-        />
-
-        <EventBanner />
-
-        <div className="flex items-start justify-between gap-4 flex-wrap">
-          <div>
-            <h1 className="text-[26px] font-bold text-slate-900">{event.title}</h1>
-            <p className="text-[12.5px] text-slate-400 mt-1">{attendingCount} of {event.invitees.length} attending</p>
+      {/* Sticky, full-bleed platform-style header */}
+      <div className="sticky top-0 z-10 bg-white border-b border-slate-200">
+        <div className="max-w-5xl mx-auto px-6 pt-5">
+          <div className="mb-4">
+            <PodBreadcrumb
+              items={[
+                { label: "My PODs", href: "/pods" },
+                { label: pod.name, href: `/pods/${podId}` },
+                { label: "Events", href: `/pods/${podId}/events` },
+                { label: event.title },
+              ]}
+            />
           </div>
-          <div className="relative shrink-0">
-            <button
-              onClick={() => setRsvpMenuOpen((o) => !o)}
-              className={`inline-flex items-center gap-1.5 px-4 py-2.5 rounded-lg text-[13px] font-semibold transition-colors ${
-                myStatus === "no_response" ? "bg-[#4361ee] text-white hover:bg-[#3650d4]" : `border ${RSVP_STYLE[myStatus]}`
-              }`}
-            >
-              {myStatus !== "no_response" && <Check size={13} />}
-              {RSVP_LABEL[myStatus]}
-              <ChevronDown size={13} />
-            </button>
-            {rsvpMenuOpen && (
-              <div className="absolute right-0 top-full mt-1.5 w-36 bg-white rounded-lg border border-slate-200 shadow-lg py-1.5 z-10">
-                {(["attending", "maybe", "declined"] as const).map((s) => (
-                  <button
-                    key={s}
-                    onClick={() => { rsvpToEvent(event.id, s); setRsvpMenuOpen(false); }}
-                    className="w-full text-left px-3 py-2 text-[12.5px] text-slate-600 hover:bg-slate-50"
-                  >
-                    {RSVP_LABEL[s]}
-                  </button>
-                ))}
-              </div>
-            )}
+
+          <div className="flex items-start justify-between gap-4 flex-wrap mb-5">
+            <div>
+              <h1 className="text-[22px] font-bold text-slate-900 tracking-tight leading-tight">{event.title}</h1>
+              <p className="text-[12.5px] text-slate-400 mt-1">{attendingCount} of {event.invitees.length} attending</p>
+            </div>
+            <div className="relative shrink-0">
+              <button
+                onClick={() => setRsvpMenuOpen((o) => !o)}
+                className={`inline-flex items-center gap-1.5 px-4 py-2.5 rounded-lg text-[13px] font-semibold transition-colors ${
+                  myStatus === "no_response" ? "bg-[#0066f3] text-white hover:bg-[#0052c2]" : `border ${RSVP_STYLE[myStatus]}`
+                }`}
+              >
+                {myStatus !== "no_response" && <Check size={13} />}
+                {RSVP_LABEL[myStatus]}
+                <ChevronDown size={13} />
+              </button>
+              {rsvpMenuOpen && (
+                <div className="absolute right-0 top-full mt-1.5 w-36 bg-white rounded-lg border border-slate-200 shadow-lg py-1.5 z-10">
+                  {(["attending", "maybe", "declined"] as const).map((s) => (
+                    <button
+                      key={s}
+                      onClick={() => { rsvpToEvent(event.id, s); setRsvpMenuOpen(false); }}
+                      className="w-full text-left px-3 py-2 text-[12.5px] text-slate-600 hover:bg-slate-50"
+                    >
+                      {RSVP_LABEL[s]}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
+
+          <PodSubTabs
+            activeKey={activeSub}
+            tabs={[
+              { key: "about", label: "About", href: baseHref },
+              { key: "invitees", label: "Invitees", href: `${baseHref}/invitees` },
+              { key: "documents", label: "Documents", href: `${baseHref}/documents` },
+            ]}
+          />
         </div>
+      </div>
 
-        <PodSubTabs
-          activeKey={activeSub}
-          tabs={[
-            { key: "about", label: "About", href: baseHref },
-            { key: "invitees", label: "Invitees", href: `${baseHref}/invitees` },
-            { key: "documents", label: "Documents", href: `${baseHref}/documents` },
-          ]}
-        />
+      <div className="max-w-5xl mx-auto px-6 py-6 space-y-4">
+        <EventBanner />
 
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-5">
           <div className="min-w-0 space-y-4">{children}</div>
 
           <div className="space-y-4">
-            <div className="bg-white rounded-lg border border-slate-200 p-4 shadow-sm">
-              <h3 className="text-[12.5px] font-bold text-slate-800 mb-3">Event Details</h3>
+            <SectionCard title="Event Details">
               <div className="flex items-center gap-2.5 mb-4">
                 <PodAvatar name={event.createdBy} />
                 <div className="min-w-0">
@@ -124,18 +131,13 @@ export default function EventTabsLayout({ children }: { children: React.ReactNod
                     <p className="text-slate-500">{event.location.detail}</p>
                   </div>
                 </div>
-                <span className="flex items-center gap-1.5 text-[#3650d4] font-semibold">
+                <span className="flex items-center gap-1.5 text-[#0052c2] font-semibold">
                   <Download size={12} /> Download iCal
                 </span>
               </div>
-            </div>
+            </SectionCard>
 
-            <div className="bg-white rounded-lg border border-slate-200 p-4 shadow-sm">
-              <div className="flex items-center gap-2 mb-3">
-                <h3 className="text-[12.5px] font-bold text-slate-800">Invitees</h3>
-                <span className="text-[10px] font-semibold text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded-full">TOP 3</span>
-                <Link href={`${baseHref}/invitees`} className="ml-auto text-[11.5px] font-semibold text-[#3650d4] hover:underline">See all</Link>
-              </div>
+            <SectionCard title="Invitees" badge="Top 3" action={<Link href={`${baseHref}/invitees`} className="text-[11.5px] font-semibold text-[#0052c2] hover:underline">See all</Link>}>
               <div className="space-y-2.5">
                 {event.invitees.slice(0, 3).map((inv) => (
                   <div key={inv.email} className="flex items-center gap-2.5">
@@ -144,13 +146,9 @@ export default function EventTabsLayout({ children }: { children: React.ReactNod
                   </div>
                 ))}
               </div>
-            </div>
+            </SectionCard>
 
-            <div className="bg-white rounded-lg border border-slate-200 p-4 shadow-sm">
-              <div className="flex items-center gap-1.5 mb-3">
-                <h3 className="text-[12.5px] font-bold text-slate-800">Invitation emails</h3>
-                <span className="text-[10px] font-semibold text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded-full">Admin only</span>
-              </div>
+            <SectionCard title="Invitation Emails" badge="Admin only">
               <p className="text-[11.5px] text-slate-500 mb-2">Opened <span className="font-semibold text-slate-700">{event.invitees.filter((i) => i.status !== "no_response").length} of {event.invitees.length}</span></p>
               <div className="space-y-1.5">
                 {event.invitees.map((inv) => (
@@ -160,7 +158,7 @@ export default function EventTabsLayout({ children }: { children: React.ReactNod
                   </div>
                 ))}
               </div>
-            </div>
+            </SectionCard>
           </div>
         </div>
       </div>

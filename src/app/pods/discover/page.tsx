@@ -1,11 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Search, Users, Check } from "lucide-react";
+import { Search, Users, Check } from "lucide-react";
 import { getDiscoverablePods, joinDiscoverablePod } from "@/lib/mock-pods";
 import { KIND_STYLE } from "@/components/pods/kindStyles";
+import PodBreadcrumb from "@/components/pods/PodBreadcrumb";
 
 export default function DiscoverPodsPage() {
   const router = useRouter();
@@ -32,22 +32,26 @@ export default function DiscoverPodsPage() {
 
   return (
     <div className="min-h-full bg-slate-50">
-      <div className="max-w-5xl mx-auto px-6 py-7">
-        <Link href="/pods" className="inline-flex items-center gap-1.5 text-[12.5px] font-medium text-slate-500 hover:text-slate-700 mb-4">
-          <ArrowLeft size={14} />
-          Back to My PODs
-        </Link>
+      {/* Sticky, full-bleed platform-style header */}
+      <div className="sticky top-0 z-10 bg-white border-b border-slate-200">
+        <div className="max-w-5xl mx-auto px-6 pt-5 pb-5">
+          <div className="mb-4">
+            <PodBreadcrumb items={[{ label: "My PODs", href: "/pods" }, { label: "Discover" }]} />
+          </div>
 
-        <h1 className="text-[26px] font-bold text-slate-900 tracking-tight">Discover PODs</h1>
-        <p className="text-[13px] text-slate-500 mt-1 mb-6">Networks and lists other RoundTables members have opened up beyond your organization.</p>
+          <h1 className="text-[26px] font-bold text-slate-900 tracking-tight">Discover PODs</h1>
+          <p className="text-[13px] text-slate-500 mt-1">Networks and lists other RoundTables members have opened up beyond your organization.</p>
+        </div>
+      </div>
 
+      <div className="max-w-5xl mx-auto px-6 py-6">
         <div className="relative max-w-md mb-6">
           <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
           <input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search discoverable PODs"
-            className="w-full pl-9 pr-3 py-2.5 rounded-lg border border-slate-200 bg-white text-[13px] focus:outline-none focus:ring-2 focus:ring-[#4361ee]/30 focus:border-[#4361ee]"
+            className="w-full pl-9 pr-3 py-2.5 rounded-lg border border-slate-200 bg-white text-[13px] focus:outline-none focus:ring-2 focus:ring-[#0066f3]/30 focus:border-[#0066f3]"
           />
         </div>
 
@@ -72,7 +76,7 @@ export default function DiscoverPodsPage() {
             const Icon = style.icon;
             const isRequested = requested.includes(d.id);
             return (
-              <div key={d.id} className="bg-white rounded-lg border border-slate-200 p-5 shadow-sm hover:shadow-md transition-shadow flex flex-col">
+              <div key={d.id} className="bg-white rounded-xl border border-slate-200 p-5 hover:border-slate-300 hover:shadow-sm transition-all flex flex-col">
                 <div className="flex items-start gap-3 mb-3">
                   <div className={`shrink-0 w-11 h-11 rounded-lg flex items-center justify-center ${style.iconBg}`}>
                     <Icon size={18} className={style.iconColor} />
@@ -94,7 +98,7 @@ export default function DiscoverPodsPage() {
                     className={`px-3.5 py-2 rounded-lg text-[12.5px] font-semibold transition-colors ${
                       isRequested
                         ? "bg-slate-100 text-slate-400 cursor-default"
-                        : "bg-[#4361ee] text-white hover:bg-[#3650d4]"
+                        : "bg-[#0066f3] text-white hover:bg-[#0052c2]"
                     }`}
                   >
                     {isRequested ? "Request sent" : d.joinPolicy === "open" ? "Join POD" : "Request to join"}
@@ -104,7 +108,7 @@ export default function DiscoverPodsPage() {
             );
           })}
           {filtered.length === 0 && (
-            <div className="sm:col-span-2 bg-white rounded-lg border border-dashed border-slate-200 p-10 text-center">
+            <div className="sm:col-span-2 bg-white rounded-xl border border-dashed border-slate-200 p-10 text-center">
               <p className="text-[13px] text-slate-400">No discoverable PODs match your search.</p>
             </div>
           )}
