@@ -104,8 +104,11 @@ export default function OrgDetailPage() {
             <div>
               <h2 className="font-serif text-[20px] font-bold text-gray-900">{org.name}</h2>
               <p className="text-[12.5px] text-gray-400 mt-0.5">
-                {org.domain} · {org.type}
+                {org.domains && org.domains.length > 0 ? org.domains.join(", ") : org.domain} · {org.type}
               </p>
+              {customOrg && (
+                <p className="text-[11px] text-gray-400 mt-0.5">Unique identifier: {customOrg.uniqueId}</p>
+              )}
             </div>
           </div>
           <span

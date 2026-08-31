@@ -2,10 +2,18 @@
 
 import { useMemo, useRef, useState } from "react";
 import Link from "next/link";
-import { Search, X, ChevronDown, SlidersHorizontal, Plus, CheckCircle2, Copy, Building2 } from "lucide-react";
+import {
+  Search, X, ChevronDown, SlidersHorizontal, Plus, CheckCircle2, Copy, Building2,
+  AlertTriangle, Loader2, Check, Info,
+} from "lucide-react";
 import { ORG_REGISTRY, OrgRegistryRow } from "@/lib/mock-organizations";
 import { PlatformOrg } from "@/lib/mock-org-associations";
-import { createOrganization, useCustomOrgRecords, CustomOrgRecord } from "@/lib/org-registry-store";
+import {
+  createOrganization,
+  useCustomOrgRecords,
+  CustomOrgRecord,
+  getKnownDomainOwners,
+} from "@/lib/org-registry-store";
 
 function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
@@ -90,24 +98,86 @@ function customOrgToRow(record: CustomOrgRecord): OrgRegistryRow {
 // ─── Create Organization modal ─────────────────────────────────────────────
 
 const ORG_TYPES: PlatformOrg["type"][] = ["GP", "LP", "Administrator"];
+const DOMAIN_CHECK_DELAY_MS = 450;
+
+type DomainStatus = "idle" | "checking" | "duplicate" | "ok";
+
+interface DomainField {
+  id: number;
+  value: string;
+  status: DomainStatus;
+  ownerName?: string;
+}
+
+function EinTooltip() {
+  return (
+    <div className="relative inline-flex group">
+      <Info size={12} className="text-gray-300 hover:text-gray-400 cursor-help" />
+      <div className="hidden group-hover:block absolute z-10 left-1/2 -translate-x-1/2 bottom-full mb-1.5 w-64 bg-gray-900 text-white text-[10.5px] leading-relaxed rounded-md px-2.5 py-2 shadow-lg">
+        Ties this org to a specific legal entity — e.g. an EIN — so survey submissions and contacts get matched to
+        the right organization even when staff use different email domains or personal addresses.
+        <div className="absolute top-full left-1/2 -translate-x-1/2 -mt-px border-4 border-transparent border-t-gray-900" />
+      </div>
+    </div>
+  );
+}
 
 function CreateOrganizationModal({
+  domainOwners,
   onClose,
   onCreated,
 }: {
+  domainOwners: Map<string, string>;
   onClose: () => void;
   onCreated: (record: CustomOrgRecord) => void;
 }) {
   const [name, setName] = useState("");
-  const [domain, setDomain] = useState("");
+  const [domainFields, setDomainFields] = useState<DomainField[]>([{ id: 0, value: "", status: "idle" }]);
+  const [uniqueId, setUniqueId] = useState("");
   const [type, setType] = useState<PlatformOrg["type"]>("GP");
   const [created, setCreated] = useState<CustomOrgRecord | null>(null);
   const [copied, setCopied] = useState(false);
-  const canCreate = name.trim().length >= 2;
+  const nextFieldId = useRef(1);
+  const timeouts = useRef<Record<number, ReturnType<typeof setTimeout>>>({});
+
+  const hasDomain = domainFields.some((f) => f.value.trim());
+  const hasDuplicate = domainFields.some((f) => f.status === "duplicate");
+  const isChecking = domainFields.some((f) => f.status === "checking");
+  const canCreate = name.trim().length >= 2 && uniqueId.trim().length >= 2 && hasDomain && !hasDuplicate && !isChecking;
+
+  function handleDomainChange(id: number, value: string) {
+    setDomainFields((prev) => prev.map((f) => (f.id === id ? { ...f, value, status: "checking" } : f)));
+    if (timeouts.current[id]) clearTimeout(timeouts.current[id]);
+    timeouts.current[id] = setTimeout(() => {
+      setDomainFields((prev) =>
+        prev.map((f) => {
+          if (f.id !== id) return f;
+          const v = f.value.trim().toLowerCase();
+          if (!v) return { ...f, status: "idle", ownerName: undefined };
+          const owner = domainOwners.get(v);
+          return { ...f, status: owner ? "duplicate" : "ok", ownerName: owner };
+        })
+      );
+    }, DOMAIN_CHECK_DELAY_MS);
+  }
+
+  function addDomainField() {
+    setDomainFields((prev) => [...prev, { id: nextFieldId.current++, value: "", status: "idle" }]);
+  }
+
+  function removeDomainField(id: number) {
+    if (timeouts.current[id]) clearTimeout(timeouts.current[id]);
+    setDomainFields((prev) => (prev.length > 1 ? prev.filter((f) => f.id !== id) : prev));
+  }
 
   function handleCreate() {
     if (!canCreate) return;
-    const record = createOrganization(name.trim(), domain.trim(), type);
+    const record = createOrganization(
+      name.trim(),
+      domainFields.map((f) => f.value.trim()).filter(Boolean),
+      type,
+      uniqueId.trim()
+    );
     setCreated(record);
     onCreated(record);
   }
@@ -122,12 +192,12 @@ function CreateOrganizationModal({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4" onClick={onClose}>
       <div
-        className="bg-white rounded-lg border border-gray-200 shadow-xl w-full max-w-md"
+        className="bg-white rounded-lg border border-gray-200 shadow-xl w-full max-w-md max-h-[90vh] flex flex-col"
         onClick={(e) => e.stopPropagation()}
       >
         {!created ? (
           <>
-            <div className="flex items-start gap-3 px-5 py-4 border-b border-gray-100">
+            <div className="flex items-start gap-3 px-5 py-4 border-b border-gray-100 shrink-0">
               <div className="shrink-0 w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center">
                 <Building2 size={14} className="text-blue-500" />
               </div>
@@ -139,7 +209,7 @@ function CreateOrganizationModal({
               </div>
             </div>
 
-            <div className="px-5 py-4 space-y-3">
+            <div className="px-5 py-4 space-y-3.5 overflow-y-auto">
               <div>
                 <label className="block text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
                   Organization name (required)
@@ -152,18 +222,81 @@ function CreateOrganizationModal({
                   className="w-full text-[12.5px] border border-gray-300 rounded-md px-2.5 py-2 bg-white text-gray-700 focus:outline-none focus:ring-1 focus:ring-blue-300 focus:border-blue-400"
                 />
               </div>
+
               <div>
                 <label className="block text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
-                  Email domain
+                  Email domains
                 </label>
+                <div className="space-y-1.5">
+                  {domainFields.map((f) => (
+                    <div key={f.id}>
+                      <div className="flex items-center gap-2">
+                        <div className="relative flex-1">
+                          <input
+                            type="text"
+                            value={f.value}
+                            onChange={(e) => handleDomainChange(f.id, e.target.value)}
+                            placeholder="e.g. meridiancp.com"
+                            className={`w-full text-[12.5px] border rounded-md pl-2.5 pr-7 py-2 focus:outline-none focus:ring-1 transition-colors ${
+                              f.status === "duplicate"
+                                ? "border-amber-400 bg-amber-50 text-amber-900 focus:ring-amber-300 focus:border-amber-400"
+                                : "border-gray-300 bg-white text-gray-700 focus:ring-blue-300 focus:border-blue-400"
+                            }`}
+                          />
+                          <span className="absolute right-2.5 top-1/2 -translate-y-1/2">
+                            {f.status === "checking" && (
+                              <Loader2 size={13} className="text-gray-300 animate-spin" />
+                            )}
+                            {f.status === "duplicate" && <AlertTriangle size={13} className="text-amber-500" />}
+                            {f.status === "ok" && <Check size={13} className="text-emerald-500" />}
+                          </span>
+                        </div>
+                        {domainFields.length > 1 && (
+                          <button
+                            type="button"
+                            onClick={() => removeDomainField(f.id)}
+                            className="text-gray-300 hover:text-red-500 transition-colors shrink-0"
+                            title="Remove domain"
+                          >
+                            <X size={14} />
+                          </button>
+                        )}
+                      </div>
+                      {f.status === "duplicate" && (
+                        <p className="flex items-center gap-1 text-[10.5px] text-amber-600 mt-1">
+                          <AlertTriangle size={10} className="shrink-0" />
+                          Already registered to <span className="font-semibold">{f.ownerName}</span> — remove or
+                          change this domain to continue.
+                        </p>
+                      )}
+                    </div>
+                  ))}
+                </div>
+                <button
+                  type="button"
+                  onClick={addDomainField}
+                  className="flex items-center gap-1 text-[11px] font-semibold text-blue-600 hover:text-blue-700 transition-colors mt-1.5"
+                >
+                  <Plus size={11} /> Add another domain
+                </button>
+              </div>
+
+              <div>
+                <div className="flex items-center gap-1.5 mb-1.5">
+                  <label className="text-[11px] font-semibold text-gray-500 uppercase tracking-wide">
+                    Unique identifier (required)
+                  </label>
+                  <EinTooltip />
+                </div>
                 <input
                   type="text"
-                  value={domain}
-                  onChange={(e) => setDomain(e.target.value)}
-                  placeholder="e.g. meridiancp.com"
+                  value={uniqueId}
+                  onChange={(e) => setUniqueId(e.target.value)}
+                  placeholder="EIN recommended — e.g. 84-1234567"
                   className="w-full text-[12.5px] border border-gray-300 rounded-md px-2.5 py-2 bg-white text-gray-700 focus:outline-none focus:ring-1 focus:ring-blue-300 focus:border-blue-400"
                 />
               </div>
+
               <div>
                 <label className="block text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
                   Organization type
@@ -182,7 +315,7 @@ function CreateOrganizationModal({
               </div>
             </div>
 
-            <div className="flex items-center justify-end gap-2 px-5 py-3.5 border-t border-gray-100">
+            <div className="flex items-center justify-end gap-2 px-5 py-3.5 border-t border-gray-100 shrink-0">
               <button
                 onClick={onClose}
                 className="px-3 py-1.5 rounded-md border border-gray-200 text-[12px] font-medium text-gray-600 hover:bg-gray-50 transition-colors"
@@ -200,7 +333,7 @@ function CreateOrganizationModal({
           </>
         ) : (
           <>
-            <div className="flex items-start gap-3 px-5 py-4 border-b border-gray-100">
+            <div className="flex items-start gap-3 px-5 py-4 border-b border-gray-100 shrink-0">
               <div className="shrink-0 w-8 h-8 rounded-full bg-emerald-50 flex items-center justify-center">
                 <CheckCircle2 size={14} className="text-emerald-600" />
               </div>
@@ -213,7 +346,7 @@ function CreateOrganizationModal({
               </div>
             </div>
 
-            <div className="px-5 py-4">
+            <div className="px-5 py-4 overflow-y-auto">
               <p className="text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
                 Org Code
               </p>
@@ -232,9 +365,22 @@ function CreateOrganizationModal({
                 Share this code with survey hosts to invite {created.org.name} into a cycle. It now appears in the
                 Organizations list and can be assigned to any user from the Users tab.
               </p>
+
+              <div className="mt-3 pt-3 border-t border-gray-100 space-y-1.5 text-[11.5px]">
+                <p className="text-gray-500">
+                  <span className="text-gray-400">Domains:</span>{" "}
+                  <span className="text-gray-700">
+                    {created.org.domains && created.org.domains.length > 0 ? created.org.domains.join(", ") : "—"}
+                  </span>
+                </p>
+                <p className="text-gray-500">
+                  <span className="text-gray-400">Unique identifier:</span>{" "}
+                  <span className="text-gray-700">{created.uniqueId}</span>
+                </p>
+              </div>
             </div>
 
-            <div className="flex items-center justify-end gap-2 px-5 py-3.5 border-t border-gray-100">
+            <div className="flex items-center justify-end gap-2 px-5 py-3.5 border-t border-gray-100 shrink-0">
               <button
                 onClick={onClose}
                 className="px-3 py-1.5 rounded-md bg-gray-900 text-white text-[12px] font-semibold hover:bg-gray-800 transition-colors"
@@ -293,6 +439,7 @@ export default function AdminOrganizationsPage() {
     () => [...ORG_REGISTRY, ...customOrgs.map(customOrgToRow)],
     [customOrgs]
   );
+  const domainOwners = useMemo(() => getKnownDomainOwners(customOrgs), [customOrgs]);
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
@@ -312,7 +459,11 @@ export default function AdminOrganizationsPage() {
   return (
     <div className="space-y-5">
       {createModalOpen && (
-        <CreateOrganizationModal onClose={() => setCreateModalOpen(false)} onCreated={() => {}} />
+        <CreateOrganizationModal
+          domainOwners={domainOwners}
+          onClose={() => setCreateModalOpen(false)}
+          onCreated={() => {}}
+        />
       )}
 
       <div className="flex items-start justify-between gap-4 flex-wrap">

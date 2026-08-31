@@ -21,6 +21,29 @@ export interface CustomOrgRecord {
   orgCode: string;
   displayId: number;
   createdAt: string;
+  /**
+   * A tax ID (EIN) or other unique identifier tying this org to a specific
+   * legal entity — used to match survey submissions and contacts correctly
+   * even when domains or contact emails vary across the org's staff.
+   */
+  uniqueId: string;
+}
+
+/** Every domain known to be registered to any org, mapped to that org's name — used to flag a duplicate before it's created. */
+export function getKnownDomainOwners(customOrgs: CustomOrgRecord[]): Map<string, string> {
+  const map = new Map<string, string>();
+  PLATFORM_ORGS.forEach((o) => {
+    (o.domains && o.domains.length > 0 ? o.domains : [o.domain]).forEach((d) => {
+      if (d) map.set(d.toLowerCase(), o.name);
+    });
+  });
+  customOrgs.forEach((r) => {
+    const domains = r.org.domains && r.org.domains.length > 0 ? r.org.domains : [r.org.domain];
+    domains.forEach((d) => {
+      if (d) map.set(d.toLowerCase(), r.org.name);
+    });
+  });
+  return map;
 }
 
 // Custom orgs get IDs after every seeded org, so they never collide with a
@@ -92,8 +115,9 @@ function persistRecords(records: CustomOrgRecord[]) {
 /** Creates a new org with a freshly-generated org code and persists it. Returns the new record. */
 export function createOrganization(
   name: string,
-  domain: string,
-  type: PlatformOrg["type"]
+  domains: string[],
+  type: PlatformOrg["type"],
+  uniqueId: string
 ): CustomOrgRecord {
   const existing = getSnapshot();
   const usedCodes = new Set([
@@ -101,11 +125,13 @@ export function createOrganization(
     ...existing.map((r) => r.orgCode),
   ]);
   const id = `porg-custom-${Date.now()}`;
+  const cleanDomains = domains.map((d) => d.trim()).filter(Boolean);
   const record: CustomOrgRecord = {
-    org: { id, name, domain, type },
+    org: { id, name, domain: cleanDomains[0] ?? "", domains: cleanDomains, type },
     orgCode: generateOrgCode(usedCodes),
     displayId: BASE_DISPLAY_ID + existing.length,
     createdAt: new Date().toISOString(),
+    uniqueId,
   };
   persistRecords([...existing, record]);
   return record;

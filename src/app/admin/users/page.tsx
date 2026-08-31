@@ -3,7 +3,7 @@
 import { useMemo, useRef, useState } from "react";
 import {
   Search, Plus, X, ChevronDown, ChevronUp, ShieldCheck,
-  History, CheckCircle2, AlertTriangle, SlidersHorizontal, MinusCircle,
+  History, CheckCircle2, AlertTriangle, SlidersHorizontal, MinusCircle, UsersRound,
 } from "lucide-react";
 import {
   PLATFORM_ORGS,
@@ -23,6 +23,11 @@ const CURRENT_ADMIN = "You (Super Admin)";
 
 // Stable display ID, independent of filtering/sorting order.
 const DISPLAY_ID = new Map(PLATFORM_USERS.map((u, i) => [u.id, 1000 + i + 1]));
+
+// Submitter names are always resolved from the static roster — whoever
+// filed a response is a fixed historical fact, unlike a user's current
+// organization list.
+const USER_NAME_BY_ID = new Map(PLATFORM_USERS.map((u) => [u.id, getUserFullName(u)]));
 
 type OrgLookup = Map<string, PlatformOrg>;
 type OrgDisplayIdLookup = Map<string, number>;
@@ -146,11 +151,29 @@ function ManagePanel({
   onAdd: (orgId: string) => void;
   onRemove: (orgId: string) => void;
 }) {
-  const [pickedOrgId, setPickedOrgId] = useState("");
+  const [orgQuery, setOrgQuery] = useState("");
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const searchBoxRef = useRef<HTMLDivElement>(null);
   const orgs = user.organizationIds.map((id) => orgById.get(id)).filter(Boolean) as PlatformOrg[];
   const availableOrgs = allOrgs.filter((o) => !user.organizationIds.includes(o.id));
   const userAudit = audit.filter((a) => a.userId === user.id);
   const isLastOrg = orgs.length <= 1;
+
+  const q = orgQuery.trim().toLowerCase();
+  const qId = q.replace(/^#/, "");
+  const matchingOrgs = availableOrgs
+    .filter((o) => {
+      if (!q) return true;
+      const idStr = String(orgDisplayId.get(o.id) ?? "");
+      return o.name.toLowerCase().includes(q) || idStr.includes(qId);
+    })
+    .slice(0, 8);
+
+  function handlePick(orgId: string) {
+    onAdd(orgId);
+    setOrgQuery("");
+    setShowSuggestions(false);
+  }
 
   return (
     <div className="border-b border-gray-100 bg-gray-50/70 px-4 py-4">
@@ -166,54 +189,88 @@ function ManagePanel({
             <p className="text-[11.5px] text-gray-400 italic mb-3">No organizations associated yet.</p>
           ) : (
             <div className="space-y-1.5 mb-3">
-              {orgs.map((org) => (
-                <div
-                  key={org.id}
-                  className="flex items-center gap-2 px-2.5 py-1.5 rounded-md bg-blue-50 border border-blue-100"
-                >
-                  <span className="text-[12px] font-medium text-blue-700 flex-1 truncate">
-                    {org.name} <span className="text-blue-400 font-normal">#{orgDisplayId.get(org.id)}</span>
-                  </span>
-                  <span className="text-[9.5px] font-semibold text-blue-500 bg-white px-1.5 py-0.5 rounded-full shrink-0">
-                    Survey response only
-                  </span>
-                  <button
-                    onClick={() => onRemove(org.id)}
-                    disabled={isLastOrg}
-                    className="text-blue-400 hover:text-red-500 disabled:opacity-30 disabled:pointer-events-none transition-colors shrink-0"
-                    title={isLastOrg ? "A user must belong to at least one organization" : "Remove organization"}
-                  >
-                    <X size={12} />
-                  </button>
-                </div>
-              ))}
+              {orgs.map((org) => {
+                const survey = getLatestActiveSurveyStatusForOrg(org.id);
+                const cfg = survey ? SURVEY_STATUS_CFG[survey.status] : null;
+                const submitterName = survey?.submittedByUserId
+                  ? USER_NAME_BY_ID.get(survey.submittedByUserId)
+                  : undefined;
+                const submittedByOther = !!submitterName && survey!.submittedByUserId !== user.id;
+                return (
+                  <div key={org.id} className="rounded-md bg-blue-50 border border-blue-100 px-2.5 py-1.5">
+                    <div className="flex items-center gap-2">
+                      <span className="text-[12px] font-medium text-blue-700 flex-1 truncate">
+                        {org.name} <span className="text-blue-400 font-normal">#{orgDisplayId.get(org.id)}</span>
+                      </span>
+                      <span className="text-[9.5px] font-semibold text-blue-500 bg-white px-1.5 py-0.5 rounded-full shrink-0">
+                        Survey response only
+                      </span>
+                      <button
+                        onClick={() => onRemove(org.id)}
+                        disabled={isLastOrg}
+                        className="text-blue-400 hover:text-red-500 disabled:opacity-30 disabled:pointer-events-none transition-colors shrink-0"
+                        title={isLastOrg ? "A user must belong to at least one organization" : "Remove organization"}
+                      >
+                        <X size={12} />
+                      </button>
+                    </div>
+                    <div
+                      className={`mt-1 flex items-center gap-1.5 text-[10.5px] ${submittedByOther ? "text-amber-700" : "text-gray-500"}`}
+                    >
+                      <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${cfg ? cfg.dot : "bg-gray-300"}`} />
+                      <span className="truncate">
+                        {cfg ? cfg.label : "No active survey"}
+                        {survey?.status === "in_progress" && typeof survey.progress === "number"
+                          ? ` (${survey.progress}%)`
+                          : ""}
+                        {submitterName ? ` · submitted by ${submitterName}` : ""}
+                      </span>
+                      {submittedByOther && <UsersRound size={10} className="text-amber-500 shrink-0" />}
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           )}
 
-          <div className="flex gap-2">
-            <select
-              value={pickedOrgId}
-              onChange={(e) => setPickedOrgId(e.target.value)}
-              className="flex-1 min-w-0 text-[12px] border border-gray-300 rounded-md px-2 py-1.5 bg-white text-gray-700 focus:outline-none focus:ring-1 focus:ring-blue-300 focus:border-blue-400"
-            >
-              <option value="">Add organization…</option>
-              {availableOrgs.map((org) => (
-                <option key={org.id} value={org.id}>
-                  {org.name}
-                </option>
-              ))}
-            </select>
-            <button
-              onClick={() => {
-                if (!pickedOrgId) return;
-                onAdd(pickedOrgId);
-                setPickedOrgId("");
-              }}
-              disabled={!pickedOrgId}
-              className="px-3 py-1.5 rounded-md bg-blue-600 text-white text-[11px] font-semibold disabled:opacity-40 hover:bg-blue-700 transition-colors shrink-0"
-            >
-              Save
-            </button>
+          <div
+            ref={searchBoxRef}
+            className="relative"
+            onBlur={(e) => {
+              if (!e.currentTarget.contains(e.relatedTarget as Node)) setShowSuggestions(false);
+            }}
+          >
+            <div className="relative">
+              <Search size={12} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+              <input
+                type="text"
+                value={orgQuery}
+                onChange={(e) => setOrgQuery(e.target.value)}
+                onFocus={() => setShowSuggestions(true)}
+                placeholder="Search by name or org ID (e.g. #4011)…"
+                className="w-full text-[12px] border border-gray-300 rounded-md pl-7 pr-2 py-1.5 bg-white text-gray-700 focus:outline-none focus:ring-1 focus:ring-blue-300 focus:border-blue-400"
+              />
+            </div>
+
+            {showSuggestions && (
+              <div className="absolute z-20 mt-1 w-full bg-white rounded-md border border-gray-200 shadow-lg max-h-48 overflow-y-auto">
+                {matchingOrgs.length === 0 ? (
+                  <p className="px-3 py-2 text-[11.5px] text-gray-400 italic">No matching organizations.</p>
+                ) : (
+                  matchingOrgs.map((org) => (
+                    <button
+                      key={org.id}
+                      type="button"
+                      onClick={() => handlePick(org.id)}
+                      className="w-full flex items-center justify-between gap-2 text-left px-3 py-1.5 text-[12px] text-gray-700 hover:bg-blue-50 transition-colors"
+                    >
+                      <span className="truncate">{org.name}</span>
+                      <span className="text-gray-400 text-[11px] shrink-0">#{orgDisplayId.get(org.id)}</span>
+                    </button>
+                  ))
+                )}
+              </div>
+            )}
           </div>
           <p className="text-[10.5px] text-gray-400 mt-2 leading-relaxed">
             Scoped narrowly: <span className="font-medium text-gray-500">{getUserFullName(user)}</span>{" "}
@@ -288,6 +345,13 @@ function UserRow({
               {orgs.map((org) => {
                 const survey = getLatestActiveSurveyStatusForOrg(org.id);
                 const cfg = survey ? SURVEY_STATUS_CFG[survey.status] : null;
+                const submitterName = survey?.submittedByUserId
+                  ? USER_NAME_BY_ID.get(survey.submittedByUserId)
+                  : undefined;
+                const submittedByOther = !!submitterName && survey!.submittedByUserId !== user.id;
+                const tooltip = survey
+                  ? `${cfg!.label} — ${survey.surveyName}${submitterName ? ` · submitted by ${submitterName}` : ""}`
+                  : "No active survey";
                 return (
                   <div key={org.id} className="flex items-center gap-1.5 min-w-0">
                     <span
@@ -299,10 +363,17 @@ function UserRow({
                     </span>
                     <span
                       className="inline-flex items-center gap-1 text-[10px] text-gray-500 shrink-0"
-                      title={survey ? `${cfg!.label} — ${survey.surveyName}` : "No active survey"}
+                      title={tooltip}
                     >
                       <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${cfg ? cfg.dot : "bg-gray-200"}`} />
                       {cfg ? cfg.label : "No active survey"}
+                      {submittedByOther && (
+                        <UsersRound
+                          size={10}
+                          className="text-amber-500 shrink-0"
+                          aria-label={`Submitted by ${submitterName}, not ${getUserFullName(user)}`}
+                        />
+                      )}
                     </span>
                   </div>
                 );

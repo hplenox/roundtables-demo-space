@@ -31,6 +31,14 @@ export interface MySurveyOrgContext {
   status: SurveyOrgStatus;
   progress?: number;
   submittedDate?: string | null;
+  /**
+   * References a PlatformUser id — whoever actually filed (or is actively
+   * filling out) this org's response. Any user affiliated with the org can
+   * be the one who acted, not necessarily the user viewing this context, so
+   * the admin Users tab surfaces this to catch a submission that landed
+   * under the right org but from the wrong contact.
+   */
+  submittedByUserId?: string;
 }
 
 export interface MySurveyAssignment {
@@ -53,9 +61,14 @@ export const MY_SURVEY_ASSIGNMENTS: MySurveyAssignment[] = [
     targetCloseDate: "2026-09-30",
     surveyStatus: "active",
     orgContexts: [
-      { orgId: "porg-aduro", status: "in_progress", progress: 40 },
+      { orgId: "porg-aduro", status: "in_progress", progress: 40, submittedByUserId: "puser-05" },
       { orgId: "porg-bluebear", status: "not_started" },
-      { orgId: "porg-cherryrock", status: "submitted", submittedDate: "2026-08-20" },
+      {
+        orgId: "porg-cherryrock",
+        status: "submitted",
+        submittedDate: "2026-08-20",
+        submittedByUserId: "puser-05",
+      },
       { orgId: "porg-meritage", status: "not_started" },
     ],
   },
@@ -75,7 +88,9 @@ export const MY_SURVEY_ASSIGNMENTS: MySurveyAssignment[] = [
     year: 2025,
     targetCloseDate: "2025-11-30",
     surveyStatus: "closed",
-    orgContexts: [{ orgId: "porg-aduro", status: "submitted", submittedDate: "2025-11-18" }],
+    orgContexts: [
+      { orgId: "porg-aduro", status: "submitted", submittedDate: "2025-11-18", submittedByUserId: "puser-05" },
+    ],
   },
   {
     // CalPERS scenario: three unrelated parent firms each responding for a
@@ -90,18 +105,25 @@ export const MY_SURVEY_ASSIGNMENTS: MySurveyAssignment[] = [
     targetCloseDate: "2026-10-31",
     surveyStatus: "active",
     orgContexts: [
-      { orgId: "porg-rbc-gam", status: "in_progress", progress: 55 },
+      { orgId: "porg-rbc-gam", status: "in_progress", progress: 55, submittedByUserId: "puser-02" },
       { orgId: "porg-bluebay", status: "not_started" },
-      { orgId: "porg-blackrock", status: "submitted", submittedDate: "2026-08-22" },
+      {
+        orgId: "porg-blackrock",
+        status: "submitted",
+        submittedDate: "2026-08-22",
+        submittedByUserId: "puser-03",
+      },
       { orgId: "porg-gip", status: "not_started" },
-      { orgId: "porg-ssga", status: "in_progress", progress: 70 },
+      { orgId: "porg-ssga", status: "in_progress", progress: 70, submittedByUserId: "puser-04" },
       { orgId: "porg-ss-bank", status: "not_started" },
     ],
   },
   {
     // MACP scenario: KKR's own response already goes in under KKR (that part
     // always worked) — Arctos is the org that used to have no way to get a
-    // response at all before this feature.
+    // response at all before this feature. KKR's submission here was filed
+    // by Jennifer Walsh, not David Chen — both belong to KKR, so this is the
+    // exact "submitted by someone else" case the Users tab needs to surface.
     id: "mysurvey-macp-2026",
     name: "2026 MACP Manager Diversity Survey",
     hostOrg: "MACP",
@@ -109,7 +131,12 @@ export const MY_SURVEY_ASSIGNMENTS: MySurveyAssignment[] = [
     targetCloseDate: "2026-11-15",
     surveyStatus: "active",
     orgContexts: [
-      { orgId: "porg-kkr", status: "submitted", submittedDate: "2026-08-18" },
+      {
+        orgId: "porg-kkr",
+        status: "submitted",
+        submittedDate: "2026-08-18",
+        submittedByUserId: "puser-09",
+      },
       { orgId: "porg-arctos", status: "not_started" },
     ],
   },
@@ -123,6 +150,7 @@ export interface LatestActiveSurveyStatus {
   status: SurveyOrgStatus;
   surveyName: string;
   progress?: number;
+  submittedByUserId?: string;
 }
 
 /**
@@ -140,7 +168,12 @@ export function getLatestActiveSurveyStatusForOrg(orgId: string): LatestActiveSu
     (a, b) => new Date(a.assignment.targetCloseDate).getTime() - new Date(b.assignment.targetCloseDate).getTime()
   );
   const { assignment, ctx } = candidates[0];
-  return { status: ctx.status, surveyName: assignment.name, progress: ctx.progress };
+  return {
+    status: ctx.status,
+    surveyName: assignment.name,
+    progress: ctx.progress,
+    submittedByUserId: ctx.submittedByUserId,
+  };
 }
 
 /**

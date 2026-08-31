@@ -30,8 +30,10 @@
 export interface PlatformOrg {
   id: string;
   name: string;
-  /** Email domain used for the domain-matching behavior this feature overrides. */
+  /** Primary email domain used for the domain-matching behavior this feature overrides. */
   domain: string;
+  /** Every domain registered to this org, when it has more than one. Falls back to `domain` when absent. */
+  domains?: string[];
   type: "GP" | "LP" | "Administrator";
 }
 
