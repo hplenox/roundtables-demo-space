@@ -10,6 +10,7 @@ import { RSVP_STYLE } from "@/components/pods/kindStyles";
 import PodAvatar from "@/components/pods/PodAvatar";
 import PodBreadcrumb from "@/components/pods/PodBreadcrumb";
 import PodSubTabs from "@/components/pods/PodSubTabs";
+import SectionCard from "@/components/pods/SectionCard";
 import EventBanner from "@/components/pods/EventBanner";
 import type { EventRsvpStatus } from "@/types/pod";
 
@@ -107,8 +108,7 @@ export default function EventTabsLayout({ children }: { children: React.ReactNod
           <div className="min-w-0 space-y-4">{children}</div>
 
           <div className="space-y-4">
-            <div className="bg-white rounded-lg border border-slate-200 p-4 shadow-sm">
-              <h3 className="text-[12.5px] font-bold text-slate-800 mb-3">Event Details</h3>
+            <SectionCard title="Event Details">
               <div className="flex items-center gap-2.5 mb-4">
                 <PodAvatar name={event.createdBy} />
                 <div className="min-w-0">
@@ -135,14 +135,9 @@ export default function EventTabsLayout({ children }: { children: React.ReactNod
                   <Download size={12} /> Download iCal
                 </span>
               </div>
-            </div>
+            </SectionCard>
 
-            <div className="bg-white rounded-lg border border-slate-200 p-4 shadow-sm">
-              <div className="flex items-center gap-2 mb-3">
-                <h3 className="text-[12.5px] font-bold text-slate-800">Invitees</h3>
-                <span className="text-[10px] font-semibold text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded-full">TOP 3</span>
-                <Link href={`${baseHref}/invitees`} className="ml-auto text-[11.5px] font-semibold text-[#3650d4] hover:underline">See all</Link>
-              </div>
+            <SectionCard title="Invitees" badge="Top 3" action={<Link href={`${baseHref}/invitees`} className="text-[11.5px] font-semibold text-[#3650d4] hover:underline">See all</Link>}>
               <div className="space-y-2.5">
                 {event.invitees.slice(0, 3).map((inv) => (
                   <div key={inv.email} className="flex items-center gap-2.5">
@@ -151,13 +146,9 @@ export default function EventTabsLayout({ children }: { children: React.ReactNod
                   </div>
                 ))}
               </div>
-            </div>
+            </SectionCard>
 
-            <div className="bg-white rounded-lg border border-slate-200 p-4 shadow-sm">
-              <div className="flex items-center gap-1.5 mb-3">
-                <h3 className="text-[12.5px] font-bold text-slate-800">Invitation emails</h3>
-                <span className="text-[10px] font-semibold text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded-full">Admin only</span>
-              </div>
+            <SectionCard title="Invitation Emails" badge="Admin only">
               <p className="text-[11.5px] text-slate-500 mb-2">Opened <span className="font-semibold text-slate-700">{event.invitees.filter((i) => i.status !== "no_response").length} of {event.invitees.length}</span></p>
               <div className="space-y-1.5">
                 {event.invitees.map((inv) => (
@@ -167,7 +158,7 @@ export default function EventTabsLayout({ children }: { children: React.ReactNod
                   </div>
                 ))}
               </div>
-            </div>
+            </SectionCard>
           </div>
         </div>
       </div>

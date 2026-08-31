@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
-  Search, Plus, Compass, Pin, ChevronRight, Calendar, Sparkles, X,
+  Search, Plus, Compass, Pin, ChevronRight, Sparkles, X,
   CalendarClock, FileText, UserPlus, ArrowRight,
 } from "lucide-react";
 import {
@@ -18,6 +18,7 @@ import PodSparkline from "@/components/pods/PodSparkline";
 import CreatePodModal from "@/components/pods/CreatePodModal";
 import PodBreadcrumb from "@/components/pods/PodBreadcrumb";
 import PodInfoTags from "@/components/pods/PodInfoTags";
+import SectionCard from "@/components/pods/SectionCard";
 
 type SortKey = "active" | "recent" | "next_event" | "az";
 
@@ -146,7 +147,7 @@ export default function PodsListPage() {
                     const style = NEEDS_YOU_STYLE[card.kind];
                     const Icon = style.icon;
                     return (
-                      <div key={card.id} className="relative bg-white rounded-lg border border-slate-200 p-4 shadow-sm hover:shadow-md transition-shadow">
+                      <div key={card.id} className="relative bg-white rounded-xl border border-slate-200 p-4 hover:border-slate-300 hover:shadow-sm transition-all">
                         <button
                           onClick={() => setDismissedNeeds((prev) => [...prev, card.id])}
                           className="absolute top-3 right-3 text-slate-300 hover:text-slate-500"
@@ -217,7 +218,7 @@ export default function PodsListPage() {
                 <PodRow key={pod.id} pod={pod} onRsvp={handleRsvp} onPin={handlePin} />
               ))}
               {filtered.length === 0 && (
-                <div className="bg-white rounded-lg border border-dashed border-slate-200 p-10 text-center">
+                <div className="bg-white rounded-xl border border-dashed border-slate-200 p-10 text-center">
                   <p className="text-[13px] text-slate-400">No PODs match your search.</p>
                 </div>
               )}
@@ -226,14 +227,7 @@ export default function PodsListPage() {
 
           {/* Sidebar */}
           <div className="space-y-4">
-            <div className="bg-white rounded-lg border border-slate-200 p-5 shadow-sm">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="flex items-center gap-1.5 text-[13px] font-bold text-slate-800">
-                  <Calendar size={14} className="text-[#3650d4]" />
-                  Next 14 days
-                </h3>
-                <Link href="/calendar" className="text-[11.5px] font-semibold text-[#3650d4] hover:underline">Calendar</Link>
-              </div>
+            <SectionCard title="Next 14 Days" action={<Link href="/calendar" className="text-[11.5px] font-semibold text-[#3650d4] hover:underline">Calendar</Link>}>
               <div className="space-y-3">
                 {next14.length === 0 && <p className="text-[12px] text-slate-400">Nothing scheduled in the next 14 days.</p>}
                 {next14.map(({ event, pod }) => {
@@ -264,11 +258,11 @@ export default function PodsListPage() {
                   <div className="h-full rounded-full bg-[#4361ee]" style={{ width: "75%" }} />
                 </div>
               </div>
-            </div>
+            </SectionCard>
 
             <Link
               href="/pods/discover"
-              className="flex items-center justify-between bg-white rounded-lg border border-slate-200 p-4 shadow-sm hover:shadow-md hover:border-[#4361ee]/40 transition-all group"
+              className="flex items-center justify-between bg-white rounded-xl border border-slate-200 p-4 hover:border-[#4361ee]/40 hover:shadow-sm transition-all group"
             >
               <div className="flex items-center gap-2.5">
                 <Sparkles size={15} className="text-[#4361ee]" />
@@ -318,7 +312,7 @@ function PodRow({ pod, onRsvp, onPin }: { pod: Pod; onRsvp: (podId: string, even
   const avatarNames = recentNames.length ? recentNames : pod.members.slice(0, 3).map((m) => m.name);
 
   return (
-    <div className="group bg-white rounded-lg border border-slate-200 p-5 shadow-sm hover:shadow-md hover:border-slate-300 transition-all">
+    <div className="group bg-white rounded-xl border border-slate-200 p-5 hover:border-slate-300 hover:shadow-sm transition-all">
       <div className="flex items-start gap-4">
         <div className={`shrink-0 w-12 h-12 rounded-lg flex items-center justify-center ${style.iconBg}`}>
           <Icon size={20} className={style.iconColor} />

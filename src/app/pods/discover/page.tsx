@@ -76,7 +76,7 @@ export default function DiscoverPodsPage() {
             const Icon = style.icon;
             const isRequested = requested.includes(d.id);
             return (
-              <div key={d.id} className="bg-white rounded-lg border border-slate-200 p-5 shadow-sm hover:shadow-md transition-shadow flex flex-col">
+              <div key={d.id} className="bg-white rounded-xl border border-slate-200 p-5 hover:border-slate-300 hover:shadow-sm transition-all flex flex-col">
                 <div className="flex items-start gap-3 mb-3">
                   <div className={`shrink-0 w-11 h-11 rounded-lg flex items-center justify-center ${style.iconBg}`}>
                     <Icon size={18} className={style.iconColor} />
@@ -108,7 +108,7 @@ export default function DiscoverPodsPage() {
             );
           })}
           {filtered.length === 0 && (
-            <div className="sm:col-span-2 bg-white rounded-lg border border-dashed border-slate-200 p-10 text-center">
+            <div className="sm:col-span-2 bg-white rounded-xl border border-dashed border-slate-200 p-10 text-center">
               <p className="text-[13px] text-slate-400">No discoverable PODs match your search.</p>
             </div>
           )}
