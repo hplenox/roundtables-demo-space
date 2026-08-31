@@ -11,6 +11,7 @@ import {
   getDefaultPrefillSourceId,
   OrgSurveyHistoryEntry,
 } from "@/lib/mock-org-survey-history";
+import { useCustomOrgRecords } from "@/lib/org-registry-store";
 
 function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
@@ -33,8 +34,23 @@ function StatusBadge({ status }: { status: OrgSurveyHistoryEntry["status"] }) {
 
 export default function OrgDetailPage() {
   const { orgId } = useParams<{ orgId: string }>();
-  const org = getOrgById(orgId);
-  const registryRow = ORG_REGISTRY.find((r) => r.orgId === orgId);
+  const customOrgs = useCustomOrgRecords();
+  const customOrg = customOrgs.find((r) => r.org.id === orgId);
+  const org = getOrgById(orgId) ?? customOrg?.org;
+  const registryRow =
+    ORG_REGISTRY.find((r) => r.orgId === orgId) ??
+    (customOrg
+      ? {
+          displayId: customOrg.displayId,
+          orgId: customOrg.org.id,
+          name: customOrg.org.name,
+          orgCode: customOrg.orgCode,
+          lpiScore: null,
+          lastUpdated: customOrg.createdAt,
+          totalUsers: 0,
+          status: "Active" as const,
+        }
+      : undefined);
   const history = getSurveyHistoryForOrg(orgId);
   const [selectedSourceId, setSelectedSourceId] = useState<string | null>(() => getDefaultPrefillSourceId(orgId));
   const [savedSourceId, setSavedSourceId] = useState<string | null>(() => getDefaultPrefillSourceId(orgId));
@@ -88,8 +104,11 @@ export default function OrgDetailPage() {
             <div>
               <h2 className="font-serif text-[20px] font-bold text-gray-900">{org.name}</h2>
               <p className="text-[12.5px] text-gray-400 mt-0.5">
-                {org.domain} · {org.type}
+                {org.domains && org.domains.length > 0 ? org.domains.join(", ") : org.domain} · {org.type}
               </p>
+              {customOrg && (
+                <p className="text-[11px] text-gray-400 mt-0.5">Unique identifier: {customOrg.uniqueId}</p>
+              )}
             </div>
           </div>
           <span

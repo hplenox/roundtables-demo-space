@@ -1,8 +1,8 @@
 // ─── Shared, persisted state for Multi-Org Support associations ───────────
 //
 // admin/users/page.tsx (the Super Admin flow) and my-surveys/page.tsx (the
-// resulting survey-taker capability) both need to agree on which secondary
-// orgs a user currently holds. Without this, granting an association in the
+// resulting survey-taker capability) both need to agree on which orgs a
+// user currently belongs to. Without this, granting an association in the
 // admin tool and checking the survey-taker view would be two independent
 // hardcoded datasets that happen to start in sync — the actual causal
 // chain the requirements doc describes ("Super Admin grants → user can now
@@ -15,7 +15,7 @@
 import { useSyncExternalStore } from "react";
 import { PLATFORM_USERS, PlatformUser } from "./mock-org-associations";
 
-const STORAGE_KEY = "rt_secondary_org_overrides_v1";
+const STORAGE_KEY = "rt_org_membership_overrides_v1";
 
 type Overrides = Record<string, string[]>;
 
@@ -32,7 +32,7 @@ function parseOverrides(raw: string | null): Overrides {
 }
 
 function computeUsers(overrides: Overrides): PlatformUser[] {
-  return PLATFORM_USERS.map((u) => (overrides[u.id] ? { ...u, secondaryOrgIds: overrides[u.id] } : u));
+  return PLATFORM_USERS.map((u) => (overrides[u.id] ? { ...u, organizationIds: overrides[u.id] } : u));
 }
 
 /** Cached so repeated calls return the same reference when nothing changed (required by useSyncExternalStore). */
@@ -61,7 +61,7 @@ function subscribe(callback: () => void): () => void {
   };
 }
 
-/** All platform users with any locally-persisted secondary-org grants/removals applied. */
+/** All platform users with any locally-persisted organization grants/removals applied. */
 export function useEffectiveUsers(): PlatformUser[] {
   return useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 }
@@ -70,11 +70,11 @@ export function useEffectiveUser(userId: string): PlatformUser | undefined {
   return useEffectiveUsers().find((u) => u.id === userId);
 }
 
-export function persistSecondaryOrgIds(userId: string, secondaryOrgIds: string[]) {
+export function persistOrganizationIds(userId: string, organizationIds: string[]) {
   if (typeof window === "undefined") return;
   try {
     const overrides = parseOverrides(window.localStorage.getItem(STORAGE_KEY));
-    overrides[userId] = secondaryOrgIds;
+    overrides[userId] = organizationIds;
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(overrides));
   } catch {
     // Storage unavailable (private browsing, quota) — the session still
