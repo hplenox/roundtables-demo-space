@@ -5,9 +5,21 @@
 // subsidiary or a fund the contact administers), domain matching silently
 // overrides the invited-as organization and the response gets filed under
 // the wrong firm. This is the narrow first-step fix: let a Super Admin
-// manually associate a registered user with a second, already-registered
+// manually associate a registered user with another already-registered
 // organization, scoped narrowly — the user can take a survey on behalf of
 // that organization and nothing else.
+//
+// Deliberately no "primary" vs. "secondary" distinction: a user simply
+// belongs to a list of organizations. Locking in a fixed "home" org and
+// treating everything else as a lesser, bolted-on grant doesn't match how
+// this is actually used — a fund administrator like Aduro Advisors isn't
+// "primarily" any one of the funds it administers, and a parent company's
+// contact isn't more entitled to KKR than to Arctos once both are legitimate.
+// Every organization in the list carries the same scope (survey response
+// only); this matches how most multi-tenant products model membership —
+// GitHub organization membership, Slack workspaces, Google Workspace
+// delegated access — as a flat, freely editable set rather than a ranked
+// hierarchy. See the Users tab for the management UI.
 //
 // Scenarios below mirror the three live client escalations named in the
 // Aug 19, 2026 requirements doc: CalPERS (parent firms responding for
@@ -29,9 +41,13 @@ export interface PlatformUser {
   lastName: string;
   email: string;
   title: string;
-  primaryOrgId: string;
-  /** Orgs a Super Admin has manually associated this user with. Scope: survey response only. */
-  secondaryOrgIds: string[];
+  /**
+   * Every organization this user is affiliated with — no primary/secondary
+   * ranking. The first entry is simply the org they originally registered
+   * under; it carries no special weight and can be edited or removed like
+   * any other. Scope for every org in the list: survey response only.
+   */
+  organizationIds: string[];
   registeredDate: string;
 }
 
@@ -81,8 +97,7 @@ export const PLATFORM_USERS: PlatformUser[] = [
     lastName: "Chen",
     email: "david.chen@kkr.com",
     title: "Investor Relations Associate",
-    primaryOrgId: "porg-kkr",
-    secondaryOrgIds: ["porg-arctos"],
+    organizationIds: ["porg-kkr", "porg-arctos"],
     registeredDate: "2025-11-03",
   },
   {
@@ -91,8 +106,7 @@ export const PLATFORM_USERS: PlatformUser[] = [
     lastName: "Nair",
     email: "priya.nair@rbcgam.com",
     title: "Client Reporting Manager",
-    primaryOrgId: "porg-rbc-gam",
-    secondaryOrgIds: ["porg-bluebay"],
+    organizationIds: ["porg-rbc-gam", "porg-bluebay"],
     registeredDate: "2024-06-18",
   },
   {
@@ -101,8 +115,7 @@ export const PLATFORM_USERS: PlatformUser[] = [
     lastName: "Webb",
     email: "marcus.webb@blackrock.com",
     title: "ESG Data Coordinator",
-    primaryOrgId: "porg-blackrock",
-    secondaryOrgIds: ["porg-gip"],
+    organizationIds: ["porg-blackrock", "porg-gip"],
     registeredDate: "2023-09-22",
   },
   {
@@ -111,8 +124,7 @@ export const PLATFORM_USERS: PlatformUser[] = [
     lastName: "Roth",
     email: "elaine.roth@ssga.com",
     title: "Diversity Reporting Lead",
-    primaryOrgId: "porg-ssga",
-    secondaryOrgIds: ["porg-ss-bank"],
+    organizationIds: ["porg-ssga", "porg-ss-bank"],
     registeredDate: "2024-02-11",
   },
   {
@@ -121,8 +133,7 @@ export const PLATFORM_USERS: PlatformUser[] = [
     lastName: "Kim",
     email: "sandra.kim@aduroadvisors.com",
     title: "Fund Administrator",
-    primaryOrgId: "porg-aduro",
-    secondaryOrgIds: ["porg-bluebear", "porg-cherryrock", "porg-meritage"],
+    organizationIds: ["porg-aduro", "porg-bluebear", "porg-cherryrock", "porg-meritage"],
     registeredDate: "2023-04-30",
   },
   {
@@ -131,8 +142,7 @@ export const PLATFORM_USERS: PlatformUser[] = [
     lastName: "Grant",
     email: "thomas.grant@baincapital.com",
     title: "Portfolio Analyst",
-    primaryOrgId: "porg-bain",
-    secondaryOrgIds: [],
+    organizationIds: ["porg-bain"],
     registeredDate: "2022-08-14",
   },
   {
@@ -141,8 +151,7 @@ export const PLATFORM_USERS: PlatformUser[] = [
     lastName: "Kim",
     email: "robert.kim@apollo.com",
     title: "Investor Relations Director",
-    primaryOrgId: "porg-apollo",
-    secondaryOrgIds: [],
+    organizationIds: ["porg-apollo"],
     registeredDate: "2023-01-09",
   },
   {
@@ -151,8 +160,7 @@ export const PLATFORM_USERS: PlatformUser[] = [
     lastName: "Torres",
     email: "amanda.torres@carlyle.com",
     title: "Compliance Associate",
-    primaryOrgId: "porg-carlyle",
-    secondaryOrgIds: [],
+    organizationIds: ["porg-carlyle"],
     registeredDate: "2023-05-27",
   },
   {
@@ -161,8 +169,7 @@ export const PLATFORM_USERS: PlatformUser[] = [
     lastName: "Walsh",
     email: "jennifer.walsh@kkr.com",
     title: "Head of ESG Reporting",
-    primaryOrgId: "porg-kkr",
-    secondaryOrgIds: [],
+    organizationIds: ["porg-kkr"],
     registeredDate: "2021-11-15",
   },
   {
@@ -171,8 +178,7 @@ export const PLATFORM_USERS: PlatformUser[] = [
     lastName: "Brown",
     email: "nicole.brown@vistaequitypartners.com",
     title: "Data Governance Manager",
-    primaryOrgId: "porg-vista",
-    secondaryOrgIds: [],
+    organizationIds: ["porg-vista"],
     registeredDate: "2024-10-02",
   },
 ];

@@ -12,7 +12,7 @@ import {
   ResponseAuditEntry,
   ResponseAuditAction,
   isCrossOrgSubmission,
-  getSubmitterHomeOrgName,
+  getOtherAffiliatedOrgNames,
   getSubmitterName,
 } from "@/lib/mock-response-review";
 import { PLATFORM_ORGS, getOrgById } from "@/lib/mock-org-associations";
@@ -250,7 +250,7 @@ function ResponseDetail({
 }) {
   const [flagReason, setFlagReason] = useState("");
   const org = getOrgById(record.orgId);
-  const homeOrgName = getSubmitterHomeOrgName(record);
+  const otherOrgNames = getOtherAffiliatedOrgNames(record);
   const crossOrg = isCrossOrgSubmission(record);
   const recordAudit = audit.filter((a) => a.responseId === record.id);
 
@@ -270,8 +270,8 @@ function ResponseDetail({
                 <p className="flex items-start gap-1.5 text-amber-700 bg-amber-50 border border-amber-200 rounded-md px-2.5 py-1.5">
                   <Info size={12} className="shrink-0 mt-0.5" />
                   <span>
-                    This contact&rsquo;s own organization is <span className="font-semibold">{homeOrgName}</span> —
-                    filed via a secondary-org association, not their home org.
+                    This contact is a multi-org user — also affiliated with{" "}
+                    <span className="font-semibold">{otherOrgNames.join(", ")}</span>.
                   </span>
                 </p>
               )}
@@ -431,7 +431,7 @@ function ResponseRow({
         <div className="w-32 shrink-0 text-gray-700 truncate" title={org?.name}>{org?.name ?? "—"}</div>
         <div className="w-36 shrink-0 truncate">
           <span className="text-gray-700">{getSubmitterName(record)}</span>
-          {crossOrg && <span className="block text-[10px] text-amber-600">via secondary org</span>}
+          {crossOrg && <span className="block text-[10px] text-amber-600">multi-org user</span>}
         </div>
         <div className="w-20 shrink-0 text-gray-400">{formatDate(record.submittedDate)}</div>
         <div className="w-24 shrink-0"><LifecycleBadge record={record} /></div>
@@ -726,8 +726,8 @@ export default function AdminResponsesPage() {
       <div>
         <h2 className="font-serif text-[22px] font-bold text-gray-900">Response Review</h2>
         <p className="text-[13px] text-gray-500 mt-1 max-w-2xl leading-relaxed">
-          Review historical responses filed under each organization — especially ones submitted via a
-          secondary-org association. Old data pre-fills that org&rsquo;s upcoming surveys, so an invalid response
+          Review historical responses filed under each organization — especially ones submitted by a
+          multi-org user. Old data pre-fills that org&rsquo;s upcoming surveys, so an invalid response
           needs to be caught and corrected before it carries forward, not just at the source.
         </p>
       </div>

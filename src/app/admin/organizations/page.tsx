@@ -2,8 +2,10 @@
 
 import { useMemo, useRef, useState } from "react";
 import Link from "next/link";
-import { Search, X, ChevronDown, SlidersHorizontal } from "lucide-react";
+import { Search, X, ChevronDown, SlidersHorizontal, Plus, CheckCircle2, Copy, Building2 } from "lucide-react";
 import { ORG_REGISTRY, OrgRegistryRow } from "@/lib/mock-organizations";
+import { PlatformOrg } from "@/lib/mock-org-associations";
+import { createOrganization, useCustomOrgRecords, CustomOrgRecord } from "@/lib/org-registry-store";
 
 function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
@@ -72,6 +74,181 @@ function FilterDropdown({
   );
 }
 
+function customOrgToRow(record: CustomOrgRecord): OrgRegistryRow {
+  return {
+    displayId: record.displayId,
+    orgId: record.org.id,
+    name: record.org.name,
+    orgCode: record.orgCode,
+    lpiScore: null,
+    lastUpdated: record.createdAt,
+    totalUsers: 0,
+    status: "Active",
+  };
+}
+
+// ─── Create Organization modal ─────────────────────────────────────────────
+
+const ORG_TYPES: PlatformOrg["type"][] = ["GP", "LP", "Administrator"];
+
+function CreateOrganizationModal({
+  onClose,
+  onCreated,
+}: {
+  onClose: () => void;
+  onCreated: (record: CustomOrgRecord) => void;
+}) {
+  const [name, setName] = useState("");
+  const [domain, setDomain] = useState("");
+  const [type, setType] = useState<PlatformOrg["type"]>("GP");
+  const [created, setCreated] = useState<CustomOrgRecord | null>(null);
+  const [copied, setCopied] = useState(false);
+  const canCreate = name.trim().length >= 2;
+
+  function handleCreate() {
+    if (!canCreate) return;
+    const record = createOrganization(name.trim(), domain.trim(), type);
+    setCreated(record);
+    onCreated(record);
+  }
+
+  function handleCopy() {
+    if (!created) return;
+    navigator.clipboard?.writeText(created.orgCode).catch(() => {});
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4" onClick={onClose}>
+      <div
+        className="bg-white rounded-lg border border-gray-200 shadow-xl w-full max-w-md"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {!created ? (
+          <>
+            <div className="flex items-start gap-3 px-5 py-4 border-b border-gray-100">
+              <div className="shrink-0 w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center">
+                <Building2 size={14} className="text-blue-500" />
+              </div>
+              <div>
+                <h2 className="font-serif text-[16px] font-bold text-gray-900">Create Organization</h2>
+                <p className="text-[11.5px] text-gray-500 mt-0.5">
+                  Registers a new organization and generates its org code.
+                </p>
+              </div>
+            </div>
+
+            <div className="px-5 py-4 space-y-3">
+              <div>
+                <label className="block text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
+                  Organization name (required)
+                </label>
+                <input
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="e.g. Meridian Capital Partners"
+                  className="w-full text-[12.5px] border border-gray-300 rounded-md px-2.5 py-2 bg-white text-gray-700 focus:outline-none focus:ring-1 focus:ring-blue-300 focus:border-blue-400"
+                />
+              </div>
+              <div>
+                <label className="block text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
+                  Email domain
+                </label>
+                <input
+                  type="text"
+                  value={domain}
+                  onChange={(e) => setDomain(e.target.value)}
+                  placeholder="e.g. meridiancp.com"
+                  className="w-full text-[12.5px] border border-gray-300 rounded-md px-2.5 py-2 bg-white text-gray-700 focus:outline-none focus:ring-1 focus:ring-blue-300 focus:border-blue-400"
+                />
+              </div>
+              <div>
+                <label className="block text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
+                  Organization type
+                </label>
+                <select
+                  value={type}
+                  onChange={(e) => setType(e.target.value as PlatformOrg["type"])}
+                  className="w-full text-[12.5px] border border-gray-300 rounded-md px-2.5 py-2 bg-white text-gray-700 focus:outline-none focus:ring-1 focus:ring-blue-300 focus:border-blue-400"
+                >
+                  {ORG_TYPES.map((t) => (
+                    <option key={t} value={t}>
+                      {t}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-end gap-2 px-5 py-3.5 border-t border-gray-100">
+              <button
+                onClick={onClose}
+                className="px-3 py-1.5 rounded-md border border-gray-200 text-[12px] font-medium text-gray-600 hover:bg-gray-50 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleCreate}
+                disabled={!canCreate}
+                className="px-3 py-1.5 rounded-md bg-blue-600 text-white text-[12px] font-semibold disabled:opacity-40 disabled:pointer-events-none hover:bg-blue-700 transition-colors"
+              >
+                Create organization
+              </button>
+            </div>
+          </>
+        ) : (
+          <>
+            <div className="flex items-start gap-3 px-5 py-4 border-b border-gray-100">
+              <div className="shrink-0 w-8 h-8 rounded-full bg-emerald-50 flex items-center justify-center">
+                <CheckCircle2 size={14} className="text-emerald-600" />
+              </div>
+              <div>
+                <h2 className="font-serif text-[16px] font-bold text-gray-900">Organization Created</h2>
+                <p className="text-[11.5px] text-gray-500 mt-0.5">
+                  <span className="font-semibold text-gray-700">{created.org.name}</span> is now registered as
+                  organization #{created.displayId}.
+                </p>
+              </div>
+            </div>
+
+            <div className="px-5 py-4">
+              <p className="text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
+                Org Code
+              </p>
+              <div className="flex items-center gap-2 px-3 py-2.5 rounded-md bg-blue-50 border border-blue-100">
+                <span className="text-[18px] font-bold text-blue-700 tracking-wider tabular-nums flex-1">
+                  {created.orgCode}
+                </span>
+                <button
+                  onClick={handleCopy}
+                  className="flex items-center gap-1 text-[11px] font-semibold text-blue-600 hover:text-blue-700 transition-colors shrink-0"
+                >
+                  <Copy size={11} /> {copied ? "Copied" : "Copy"}
+                </button>
+              </div>
+              <p className="text-[11px] text-gray-400 mt-2 leading-relaxed">
+                Share this code with survey hosts to invite {created.org.name} into a cycle. It now appears in the
+                Organizations list and can be assigned to any user from the Users tab.
+              </p>
+            </div>
+
+            <div className="flex items-center justify-end gap-2 px-5 py-3.5 border-t border-gray-100">
+              <button
+                onClick={onClose}
+                className="px-3 py-1.5 rounded-md bg-gray-900 text-white text-[12px] font-semibold hover:bg-gray-800 transition-colors"
+              >
+                Done
+              </button>
+            </div>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
 // ─── Right rail ──────────────────────────────────────────────────────────
 
 function TopActiveOrgsCard({ rows }: { rows: OrgRegistryRow[] }) {
@@ -109,15 +286,22 @@ type StatusFilter = "all" | "Active" | "Archived";
 export default function AdminOrganizationsPage() {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
+  const [createModalOpen, setCreateModalOpen] = useState(false);
+  const customOrgs = useCustomOrgRecords();
+
+  const allRows = useMemo(
+    () => [...ORG_REGISTRY, ...customOrgs.map(customOrgToRow)],
+    [customOrgs]
+  );
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
-    return ORG_REGISTRY.filter((row) => {
+    return allRows.filter((row) => {
       if (statusFilter !== "all" && row.status !== statusFilter) return false;
       if (!q) return true;
       return row.name.toLowerCase().includes(q) || row.orgCode?.toLowerCase().includes(q);
     });
-  }, [search, statusFilter]);
+  }, [allRows, search, statusFilter]);
 
   const hasActiveFilters = statusFilter !== "all" || search.trim() !== "";
   function clearFilters() {
@@ -127,12 +311,25 @@ export default function AdminOrganizationsPage() {
 
   return (
     <div className="space-y-5">
-      <div>
-        <h2 className="font-serif text-[22px] font-bold text-gray-900">All Organizations</h2>
-        <p className="text-[13px] text-gray-500 mt-1 max-w-2xl leading-relaxed">
-          Every organization registered on the platform, with the org code it&rsquo;s most commonly invited under
-          and its current LPI score.
-        </p>
+      {createModalOpen && (
+        <CreateOrganizationModal onClose={() => setCreateModalOpen(false)} onCreated={() => {}} />
+      )}
+
+      <div className="flex items-start justify-between gap-4 flex-wrap">
+        <div>
+          <h2 className="font-serif text-[22px] font-bold text-gray-900">All Organizations</h2>
+          <p className="text-[13px] text-gray-500 mt-1 max-w-2xl leading-relaxed">
+            Every organization registered on the platform, with the org code it&rsquo;s most commonly invited under
+            and its current LPI score.
+          </p>
+        </div>
+        <button
+          type="button"
+          onClick={() => setCreateModalOpen(true)}
+          className="shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-blue-600 text-white text-[12.5px] font-semibold hover:bg-blue-700 transition-colors"
+        >
+          <Plus size={13} /> Create Organization
+        </button>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_280px] gap-4 items-start">
@@ -140,7 +337,7 @@ export default function AdminOrganizationsPage() {
           <div className="px-4 py-3 border-b border-gray-100 flex items-center gap-2">
             <span className="font-serif text-[15px] font-semibold text-gray-900">Organizations</span>
             <span className="bg-gray-100 text-gray-600 text-[12px] font-semibold px-2 py-0.5 rounded">
-              {ORG_REGISTRY.length}
+              {allRows.length}
             </span>
           </div>
 
@@ -221,11 +418,11 @@ export default function AdminOrganizationsPage() {
           </div>
 
           <p className="text-center text-[11.5px] text-gray-400 py-3">
-            {filtered.length} of {ORG_REGISTRY.length} organizations shown
+            {filtered.length} of {allRows.length} organizations shown
           </p>
         </div>
 
-        <TopActiveOrgsCard rows={ORG_REGISTRY} />
+        <TopActiveOrgsCard rows={allRows} />
       </div>
     </div>
   );

@@ -10,16 +10,28 @@ import {
   PLATFORM_USERS,
   ORG_ASSOCIATION_AUDIT,
   PlatformUser,
+  PlatformOrg,
   OrgAssociationAuditEntry,
-  getOrgById,
   getUserFullName,
 } from "@/lib/mock-org-associations";
-import { useEffectiveUsers, persistSecondaryOrgIds } from "@/lib/org-association-store";
+import { useEffectiveUsers, persistOrganizationIds } from "@/lib/org-association-store";
+import { useCustomOrgRecords } from "@/lib/org-registry-store";
+import { ORG_REGISTRY } from "@/lib/mock-organizations";
+import { getLatestActiveSurveyStatusForOrg, SurveyOrgStatus } from "@/lib/mock-my-surveys";
 
 const CURRENT_ADMIN = "You (Super Admin)";
 
 // Stable display ID, independent of filtering/sorting order.
 const DISPLAY_ID = new Map(PLATFORM_USERS.map((u, i) => [u.id, 1000 + i + 1]));
+
+type OrgLookup = Map<string, PlatformOrg>;
+type OrgDisplayIdLookup = Map<string, number>;
+
+const SURVEY_STATUS_CFG: Record<SurveyOrgStatus, { label: string; dot: string }> = {
+  not_started: { label: "Not started", dot: "bg-slate-300" },
+  in_progress: { label: "In progress", dot: "bg-amber-400" },
+  submitted: { label: "Submitted", dot: "bg-emerald-500" },
+};
 
 function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
@@ -90,8 +102,8 @@ function FilterDropdown({
 
 // ─── Per-user audit trail row ───────────────────────────────────────────────
 
-function AuditRow({ entry }: { entry: OrgAssociationAuditEntry }) {
-  const org = getOrgById(entry.orgId);
+function AuditRow({ entry, orgById }: { entry: OrgAssociationAuditEntry; orgById: OrgLookup }) {
+  const org = orgById.get(entry.orgId);
   const added = entry.action === "added";
   return (
     <div className="flex items-start gap-2.5 py-2 first:pt-0 last:pb-0">
@@ -106,7 +118,7 @@ function AuditRow({ entry }: { entry: OrgAssociationAuditEntry }) {
         <p className="text-[11.5px] text-gray-600 leading-snug">
           <span className="font-semibold text-gray-900">{entry.adminName}</span>{" "}
           {added ? "added" : "removed"} <span className="font-semibold text-gray-900">{org?.name ?? entry.orgId}</span>{" "}
-          as a secondary organization
+          {added ? "to" : "from"} this user&rsquo;s organizations
         </p>
         {entry.note && <p className="text-[11px] text-gray-400 italic mt-0.5">{entry.note}</p>}
         <p className="text-[10.5px] text-gray-400 mt-0.5">{formatDate(entry.timestamp)}</p>
@@ -120,56 +132,56 @@ function AuditRow({ entry }: { entry: OrgAssociationAuditEntry }) {
 function ManagePanel({
   user,
   audit,
+  allOrgs,
+  orgById,
+  orgDisplayId,
   onAdd,
   onRemove,
 }: {
   user: PlatformUser;
   audit: OrgAssociationAuditEntry[];
+  allOrgs: PlatformOrg[];
+  orgById: OrgLookup;
+  orgDisplayId: OrgDisplayIdLookup;
   onAdd: (orgId: string) => void;
   onRemove: (orgId: string) => void;
 }) {
   const [pickedOrgId, setPickedOrgId] = useState("");
-  const primaryOrg = getOrgById(user.primaryOrgId);
-  const secondaryOrgs = user.secondaryOrgIds.map((id) => getOrgById(id)).filter(Boolean) as NonNullable<
-    ReturnType<typeof getOrgById>
-  >[];
-  const availableOrgs = PLATFORM_ORGS.filter(
-    (o) => o.id !== user.primaryOrgId && !user.secondaryOrgIds.includes(o.id)
-  );
+  const orgs = user.organizationIds.map((id) => orgById.get(id)).filter(Boolean) as PlatformOrg[];
+  const availableOrgs = allOrgs.filter((o) => !user.organizationIds.includes(o.id));
   const userAudit = audit.filter((a) => a.userId === user.id);
+  const isLastOrg = orgs.length <= 1;
 
   return (
     <div className="border-b border-gray-100 bg-gray-50/70 px-4 py-4">
-      <div className="flex items-center gap-2 text-[12.5px] text-gray-600 mb-3">
-        <ShieldCheck size={13} className="text-gray-400" />
-        Primary organization: <span className="font-semibold text-gray-900">{primaryOrg?.name ?? "—"}</span>
-        <span className="text-gray-400">({primaryOrg?.domain})</span>
-      </div>
-
       <div className="grid grid-cols-2 gap-4">
-        {/* Secondary orgs + add control */}
+        {/* Organizations + add control */}
         <div className="bg-white rounded-md border border-gray-200 p-3.5">
-          <p className="text-[11px] font-semibold text-gray-400 uppercase tracking-wide mb-2">
-            Secondary Organizations
+          <p className="text-[11px] font-semibold text-gray-400 uppercase tracking-wide mb-2 flex items-center gap-1.5">
+            <ShieldCheck size={12} className="text-gray-400" />
+            Organizations this user belongs to
           </p>
 
-          {secondaryOrgs.length === 0 ? (
-            <p className="text-[11.5px] text-gray-400 italic mb-3">None associated yet.</p>
+          {orgs.length === 0 ? (
+            <p className="text-[11.5px] text-gray-400 italic mb-3">No organizations associated yet.</p>
           ) : (
             <div className="space-y-1.5 mb-3">
-              {secondaryOrgs.map((org) => (
+              {orgs.map((org) => (
                 <div
                   key={org.id}
                   className="flex items-center gap-2 px-2.5 py-1.5 rounded-md bg-blue-50 border border-blue-100"
                 >
-                  <span className="text-[12px] font-medium text-blue-700 flex-1 truncate">{org.name}</span>
+                  <span className="text-[12px] font-medium text-blue-700 flex-1 truncate">
+                    {org.name} <span className="text-blue-400 font-normal">#{orgDisplayId.get(org.id)}</span>
+                  </span>
                   <span className="text-[9.5px] font-semibold text-blue-500 bg-white px-1.5 py-0.5 rounded-full shrink-0">
                     Survey response only
                   </span>
                   <button
                     onClick={() => onRemove(org.id)}
-                    className="text-blue-400 hover:text-red-500 transition-colors shrink-0"
-                    title="Remove secondary organization"
+                    disabled={isLastOrg}
+                    className="text-blue-400 hover:text-red-500 disabled:opacity-30 disabled:pointer-events-none transition-colors shrink-0"
+                    title={isLastOrg ? "A user must belong to at least one organization" : "Remove organization"}
                   >
                     <X size={12} />
                   </button>
@@ -184,7 +196,7 @@ function ManagePanel({
               onChange={(e) => setPickedOrgId(e.target.value)}
               className="flex-1 min-w-0 text-[12px] border border-gray-300 rounded-md px-2 py-1.5 bg-white text-gray-700 focus:outline-none focus:ring-1 focus:ring-blue-300 focus:border-blue-400"
             >
-              <option value="">Add secondary organization…</option>
+              <option value="">Add organization…</option>
               {availableOrgs.map((org) => (
                 <option key={org.id} value={org.id}>
                   {org.name}
@@ -205,8 +217,9 @@ function ManagePanel({
           </div>
           <p className="text-[10.5px] text-gray-400 mt-2 leading-relaxed">
             Scoped narrowly: <span className="font-medium text-gray-500">{getUserFullName(user)}</span>{" "}
-            can take a survey on behalf of the selected organization and nothing else. This overrides domain
-            matching for survey responses only — the account&rsquo;s registered organization does not change.
+            can take a survey on behalf of any organization in this list and nothing else. This overrides domain
+            matching for survey responses only — no organization here is treated as more &ldquo;home&rdquo; than
+            another.
           </p>
         </div>
 
@@ -221,7 +234,7 @@ function ManagePanel({
           ) : (
             <div className="divide-y divide-gray-100">
               {userAudit.map((entry) => (
-                <AuditRow key={entry.id} entry={entry} />
+                <AuditRow key={entry.id} entry={entry} orgById={orgById} />
               ))}
             </div>
           )}
@@ -236,7 +249,9 @@ function ManagePanel({
 function UserRow({
   user,
   audit,
-  showSecondaryColumn,
+  allOrgs,
+  orgById,
+  orgDisplayId,
   expanded,
   onToggle,
   onAdd,
@@ -244,16 +259,15 @@ function UserRow({
 }: {
   user: PlatformUser;
   audit: OrgAssociationAuditEntry[];
-  showSecondaryColumn: boolean;
+  allOrgs: PlatformOrg[];
+  orgById: OrgLookup;
+  orgDisplayId: OrgDisplayIdLookup;
   expanded: boolean;
   onToggle: () => void;
   onAdd: (orgId: string) => void;
   onRemove: (orgId: string) => void;
 }) {
-  const primaryOrg = getOrgById(user.primaryOrgId);
-  const secondaryOrgs = user.secondaryOrgIds.map((id) => getOrgById(id)).filter(Boolean) as NonNullable<
-    ReturnType<typeof getOrgById>
-  >[];
+  const orgs = user.organizationIds.map((id) => orgById.get(id)).filter(Boolean) as PlatformOrg[];
 
   return (
     <div>
@@ -264,35 +278,55 @@ function UserRow({
         <div className="w-11 shrink-0 text-gray-400 tabular-nums">{DISPLAY_ID.get(user.id)}</div>
         <div className="flex-1 min-w-[110px]">
           <span className="text-blue-600 font-medium truncate block hover:underline">{getUserFullName(user)}</span>
+          <span className="text-[10.5px] text-gray-400 truncate block" title={user.email}>{user.email}</span>
         </div>
-        <div className="w-40 shrink-0 text-gray-600 truncate" title={user.email}>{user.email}</div>
-        <div className="w-40 shrink-0 text-blue-600 truncate" title={primaryOrg?.name}>{primaryOrg?.name ?? "—"}</div>
-        <div className="w-40 shrink-0">
-          {showSecondaryColumn ? (
-            secondaryOrgs.length === 0 ? (
-              <span className="text-[11px] text-gray-300 italic">None</span>
-            ) : (
-              <div className="flex flex-wrap gap-1">
-                {secondaryOrgs.map((org) => (
-                  <span
-                    key={org.id}
-                    className="inline-flex items-center text-[10px] font-semibold px-1.5 py-0.5 rounded bg-blue-50 text-blue-700 border border-blue-100"
-                  >
-                    {org.name}
-                  </span>
-                ))}
-              </div>
-            )
+        <div className="w-56 shrink-0">
+          {orgs.length === 0 ? (
+            <span className="text-[11px] text-gray-300 italic">None</span>
           ) : (
-            <span className="text-gray-400">{formatDate(user.registeredDate)}</span>
+            <div className="space-y-1">
+              {orgs.map((org) => {
+                const survey = getLatestActiveSurveyStatusForOrg(org.id);
+                const cfg = survey ? SURVEY_STATUS_CFG[survey.status] : null;
+                return (
+                  <div key={org.id} className="flex items-center gap-1.5 min-w-0">
+                    <span
+                      className="inline-flex items-center text-[10px] font-semibold px-1.5 py-0.5 rounded bg-blue-50 text-blue-700 border border-blue-100 truncate max-w-[130px]"
+                      title={org.name}
+                    >
+                      {org.name}{" "}
+                      <span className="text-blue-400 font-normal ml-0.5">#{orgDisplayId.get(org.id)}</span>
+                    </span>
+                    <span
+                      className="inline-flex items-center gap-1 text-[10px] text-gray-500 shrink-0"
+                      title={survey ? `${cfg!.label} — ${survey.surveyName}` : "No active survey"}
+                    >
+                      <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${cfg ? cfg.dot : "bg-gray-200"}`} />
+                      {cfg ? cfg.label : "No active survey"}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
           )}
         </div>
+        <div className="w-24 shrink-0 text-gray-400">{formatDate(user.registeredDate)}</div>
         <div className="w-5 shrink-0 flex justify-end text-gray-400">
           {expanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
         </div>
       </div>
 
-      {expanded && <ManagePanel user={user} audit={audit} onAdd={onAdd} onRemove={onRemove} />}
+      {expanded && (
+        <ManagePanel
+          user={user}
+          audit={audit}
+          allOrgs={allOrgs}
+          orgById={orgById}
+          orgDisplayId={orgDisplayId}
+          onAdd={onAdd}
+          onRemove={onRemove}
+        />
+      )}
     </div>
   );
 }
@@ -313,7 +347,7 @@ function SnapshotCard({
   const rows = [
     { label: "Total Users", value: totalUsers },
     { label: "Multi-Org Users", value: multiOrgUsers },
-    { label: "Active Secondary-Org Grants", value: totalGrants },
+    { label: "Active Organization Grants", value: totalGrants },
     { label: "Audit Events", value: auditCount },
   ];
   return (
@@ -339,10 +373,12 @@ function SnapshotCard({
 function RecentAssociationsCard({
   audit,
   users,
+  orgById,
   onViewAll,
 }: {
   audit: OrgAssociationAuditEntry[];
   users: PlatformUser[];
+  orgById: OrgLookup;
   onViewAll: () => void;
 }) {
   const recent = [...audit].sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()).slice(0, 5);
@@ -354,7 +390,7 @@ function RecentAssociationsCard({
       <div className="px-4 divide-y divide-gray-50">
         {recent.map((entry) => {
           const user = users.find((u) => u.id === entry.userId);
-          const org = getOrgById(entry.orgId);
+          const org = orgById.get(entry.orgId);
           const added = entry.action === "added";
           return (
             <div key={entry.id} className="py-2.5">
@@ -387,10 +423,12 @@ const AUDIT_PAGE_SIZE = 8;
 function AuditTrailModal({
   audit,
   users,
+  orgById,
   onClose,
 }: {
   audit: OrgAssociationAuditEntry[];
   users: PlatformUser[];
+  orgById: OrgLookup;
   onClose: () => void;
 }) {
   const sorted = useMemo(
@@ -422,7 +460,7 @@ function AuditTrailModal({
           <div>
             <h2 className="font-serif text-[17px] font-bold text-gray-900">Full Audit Trail</h2>
             <p className="text-[11.5px] text-gray-400 mt-0.5">
-              Every secondary-organization grant and removal, platform-wide.
+              Every organization grant and removal, platform-wide.
             </p>
           </div>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition-colors shrink-0">
@@ -433,8 +471,7 @@ function AuditTrailModal({
         <div ref={scrollRef} onScroll={handleScroll} className="overflow-y-auto divide-y divide-gray-50 flex-1">
           {visible.map((entry) => {
             const user = users.find((u) => u.id === entry.userId);
-            const org = getOrgById(entry.orgId);
-            const primaryOrg = user ? getOrgById(user.primaryOrgId) : undefined;
+            const org = orgById.get(entry.orgId);
             const added = entry.action === "added";
             return (
               <div key={entry.id} className="flex items-start gap-3 px-5 py-3">
@@ -448,10 +485,10 @@ function AuditTrailModal({
                 <div className="min-w-0 flex-1">
                   <p className="text-[12.5px] text-gray-700 leading-snug">
                     <span className="font-semibold text-gray-900">{entry.adminName}</span>{" "}
-                    {added ? "added" : "removed"} <span className="font-semibold text-gray-900">{org?.name}</span> as
-                    a secondary organization for{" "}
+                    {added ? "added" : "removed"} <span className="font-semibold text-gray-900">{org?.name}</span>{" "}
+                    {added ? "to" : "from"}{" "}
                     <span className="font-semibold text-gray-900">{user ? getUserFullName(user) : "—"}</span>
-                    {primaryOrg && <span className="text-gray-400"> (primary: {primaryOrg.name})</span>}
+                    &rsquo;s organizations
                   </p>
                   {entry.note && <p className="text-[11px] text-gray-400 italic mt-0.5">{entry.note}</p>}
                 </div>
@@ -481,6 +518,14 @@ export default function AdminUsersPage() {
   // here is still in effect after navigating to /my-surveys, and re-renders
   // this page automatically the moment handleAdd/handleRemove persist a change.
   const users = useEffectiveUsers();
+  const customOrgs = useCustomOrgRecords();
+  const allOrgs = useMemo(() => [...PLATFORM_ORGS, ...customOrgs.map((r) => r.org)], [customOrgs]);
+  const orgById: OrgLookup = useMemo(() => new Map(allOrgs.map((o) => [o.id, o])), [allOrgs]);
+  const orgDisplayId: OrgDisplayIdLookup = useMemo(() => {
+    const map = new Map(ORG_REGISTRY.map((r) => [r.orgId, r.displayId]));
+    customOrgs.forEach((r) => map.set(r.org.id, r.displayId));
+    return map;
+  }, [customOrgs]);
   const [audit, setAudit] = useState<OrgAssociationAuditEntry[]>(ORG_ASSOCIATION_AUDIT);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
@@ -510,47 +555,49 @@ export default function AdminUsersPage() {
 
   function handleAdd(userId: string, orgId: string) {
     const user = users.find((u) => u.id === userId);
-    const org = getOrgById(orgId);
+    const org = orgById.get(orgId);
     if (!user || !org) return;
-    if (user.secondaryOrgIds.includes(orgId) || user.primaryOrgId === orgId) {
+    if (user.organizationIds.includes(orgId)) {
       showToast("This user is already associated with that organization.");
       return;
     }
-    const nextSecondaryOrgIds = [...user.secondaryOrgIds, orgId];
-    persistSecondaryOrgIds(userId, nextSecondaryOrgIds);
+    const nextOrganizationIds = [...user.organizationIds, orgId];
+    persistOrganizationIds(userId, nextOrganizationIds);
     logAudit(userId, orgId, "added");
-    showToast(`${org.name} added as a secondary organization for ${getUserFullName(user)}.`);
+    showToast(`${org.name} added to ${getUserFullName(user)}'s organizations.`);
   }
 
   function handleRemove(userId: string, orgId: string) {
     const user = users.find((u) => u.id === userId);
-    const org = getOrgById(orgId);
+    const org = orgById.get(orgId);
     if (!user || !org) return;
-    const nextSecondaryOrgIds = user.secondaryOrgIds.filter((id) => id !== orgId);
-    persistSecondaryOrgIds(userId, nextSecondaryOrgIds);
+    if (user.organizationIds.length <= 1) {
+      showToast("A user must belong to at least one organization.");
+      return;
+    }
+    const nextOrganizationIds = user.organizationIds.filter((id) => id !== orgId);
+    persistOrganizationIds(userId, nextOrganizationIds);
     logAudit(userId, orgId, "removed");
-    showToast(`${org.name} removed as a secondary organization for ${getUserFullName(user)}.`);
+    showToast(`${org.name} removed from ${getUserFullName(user)}'s organizations.`);
   }
 
-  const multiOrgUsers = users.filter((u) => u.secondaryOrgIds.length > 0);
-  const totalGrants = users.reduce((sum, u) => sum + u.secondaryOrgIds.length, 0);
+  const multiOrgUsers = users.filter((u) => u.organizationIds.length > 1);
+  const totalGrants = users.reduce((sum, u) => sum + Math.max(0, u.organizationIds.length - 1), 0);
 
   const filteredUsers = useMemo(() => {
     const q = search.trim().toLowerCase();
     return users.filter((u) => {
-      if (statusFilter === "multi-org" && u.secondaryOrgIds.length === 0) return false;
-      if (orgFilter && u.primaryOrgId !== orgFilter && !u.secondaryOrgIds.includes(orgFilter)) return false;
+      if (statusFilter === "multi-org" && u.organizationIds.length <= 1) return false;
+      if (orgFilter && !u.organizationIds.includes(orgFilter)) return false;
       if (!q) return true;
-      const primaryOrg = getOrgById(u.primaryOrgId);
-      const secondaryNames = u.secondaryOrgIds.map((id) => getOrgById(id)?.name.toLowerCase() ?? "");
+      const orgNames = u.organizationIds.map((id) => orgById.get(id)?.name.toLowerCase() ?? "");
       return (
         getUserFullName(u).toLowerCase().includes(q) ||
         u.email.toLowerCase().includes(q) ||
-        primaryOrg?.name.toLowerCase().includes(q) ||
-        secondaryNames.some((n) => n.includes(q))
+        orgNames.some((n) => n.includes(q))
       );
     });
-  }, [users, search, statusFilter, orgFilter]);
+  }, [users, search, statusFilter, orgFilter, orgById]);
 
   const hasActiveFilters = statusFilter !== "all" || orgFilter !== "" || search.trim() !== "";
 
@@ -610,7 +657,7 @@ export default function AdminUsersPage() {
               onChange={setOrgFilter}
               options={[
                 { value: "", label: "All Organizations" },
-                ...PLATFORM_ORGS.map((o) => ({ value: o.id, label: o.name })),
+                ...allOrgs.map((o) => ({ value: o.id, label: o.name })),
               ]}
             />
             <button
@@ -635,17 +682,14 @@ export default function AdminUsersPage() {
             </div>
           </div>
 
-          {/* Table — Secondary Orgs replaces Registered (rather than adding a column) so
-              the row never grows wider than the card, and desktop never needs to scroll. */}
           <div className="overflow-x-auto">
-            <div className="min-w-[560px]">
+            <div className="min-w-[620px]">
               {/* Table header */}
               <div className="flex items-center gap-2 px-4 py-2.5 border-b border-gray-200 bg-gray-50/60 text-[13px] font-semibold text-gray-900">
                 <div className="w-11 shrink-0">ID</div>
                 <div className="flex-1 min-w-[110px]">Name</div>
-                <div className="w-40 shrink-0">Email</div>
-                <div className="w-40 shrink-0">Organization</div>
-                <div className="w-40 shrink-0">{statusFilter === "multi-org" ? "Secondary Orgs" : "Registered"}</div>
+                <div className="w-56 shrink-0">Organizations · Survey Status</div>
+                <div className="w-24 shrink-0">Registered</div>
                 <div className="w-5 shrink-0" />
               </div>
 
@@ -661,7 +705,9 @@ export default function AdminUsersPage() {
                     key={user.id}
                     user={user}
                     audit={audit}
-                    showSecondaryColumn={statusFilter === "multi-org"}
+                    allOrgs={allOrgs}
+                    orgById={orgById}
+                    orgDisplayId={orgDisplayId}
                     expanded={expandedUserId === user.id}
                     onToggle={() => setExpandedUserId(expandedUserId === user.id ? null : user.id)}
                     onAdd={(orgId) => handleAdd(user.id, orgId)}
@@ -685,7 +731,7 @@ export default function AdminUsersPage() {
             totalGrants={totalGrants}
             auditCount={audit.length}
           />
-          <RecentAssociationsCard audit={audit} users={users} onViewAll={() => setAuditModalOpen(true)} />
+          <RecentAssociationsCard audit={audit} users={users} orgById={orgById} onViewAll={() => setAuditModalOpen(true)} />
         </div>
       </div>
 
@@ -701,7 +747,7 @@ export default function AdminUsersPage() {
       </div>
 
       {auditModalOpen && (
-        <AuditTrailModal audit={audit} users={users} onClose={() => setAuditModalOpen(false)} />
+        <AuditTrailModal audit={audit} users={users} orgById={orgById} onClose={() => setAuditModalOpen(false)} />
       )}
     </div>
   );

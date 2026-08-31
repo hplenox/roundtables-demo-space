@@ -32,7 +32,7 @@ export interface OrgResponseRecord {
   hostOrg: string;
   year: number;
   submittedDate: string;
-  /** The org this response is filed under — may differ from the submitter's own primary org. */
+  /** The org this response is filed under — one of possibly several the submitter belongs to. */
   orgId: string;
   submittedByUserId: string;
   lifecycle: ResponseLifecycle;
@@ -61,7 +61,7 @@ export const ORG_RESPONSES: OrgResponseRecord[] = [
     year: 2026,
     submittedDate: "2026-08-24",
     orgId: "porg-arctos",
-    submittedByUserId: "puser-01", // David Chen — primary org KKR & Co.
+    submittedByUserId: "puser-01", // David Chen — multi-org: KKR & Co. and Arctos Partners
     lifecycle: "active",
     flagged: true,
     flagReason:
@@ -78,7 +78,7 @@ export const ORG_RESPONSES: OrgResponseRecord[] = [
     year: 2026,
     submittedDate: "2026-08-19",
     orgId: "porg-cherryrock",
-    submittedByUserId: "puser-05", // Sandra Kim — primary org Aduro Advisors
+    submittedByUserId: "puser-05", // Sandra Kim — fund administrator affiliated with Aduro, Blue Bear, Cherryrock, and Meritage
     lifecycle: "active",
     flagged: false,
     prefillsInto: [
@@ -92,7 +92,7 @@ export const ORG_RESPONSES: OrgResponseRecord[] = [
     year: 2026,
     submittedDate: "2026-08-14",
     orgId: "porg-bluebay",
-    submittedByUserId: "puser-02", // Priya Nair — primary org RBC Global Asset Management
+    submittedByUserId: "puser-02", // Priya Nair — multi-org: RBC Global Asset Management and BlueBay
     lifecycle: "active",
     flagged: false,
     prefillsInto: [
@@ -106,7 +106,7 @@ export const ORG_RESPONSES: OrgResponseRecord[] = [
     year: 2025,
     submittedDate: "2025-11-10",
     orgId: "porg-gip",
-    submittedByUserId: "puser-03", // Marcus Webb — primary org BlackRock
+    submittedByUserId: "puser-03", // Marcus Webb — multi-org: BlackRock and Global Infrastructure Partners
     lifecycle: "deleted",
     flagged: false,
     prefillsInto: [],
@@ -134,14 +134,20 @@ export const RESPONSE_AUDIT: ResponseAuditEntry[] = [
   },
 ];
 
+/** True when the submitter belongs to more than one organization — i.e. this response could plausibly have been filed under the wrong one. */
 export function isCrossOrgSubmission(record: OrgResponseRecord): boolean {
   const submitter = PLATFORM_USERS.find((u) => u.id === record.submittedByUserId);
-  return !!submitter && submitter.primaryOrgId !== record.orgId;
+  return !!submitter && submitter.organizationIds.length > 1;
 }
 
-export function getSubmitterHomeOrgName(record: OrgResponseRecord): string | undefined {
+/** The submitter's other organization affiliations, excluding the one this response is filed under. */
+export function getOtherAffiliatedOrgNames(record: OrgResponseRecord): string[] {
   const submitter = PLATFORM_USERS.find((u) => u.id === record.submittedByUserId);
-  return submitter ? getOrgById(submitter.primaryOrgId)?.name : undefined;
+  if (!submitter) return [];
+  return submitter.organizationIds
+    .filter((id) => id !== record.orgId)
+    .map((id) => getOrgById(id)?.name)
+    .filter((name): name is string => !!name);
 }
 
 export function getSubmitterName(record: OrgResponseRecord): string {

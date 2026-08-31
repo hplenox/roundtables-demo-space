@@ -125,9 +125,8 @@ export default function MySurveysPage() {
   // a shared backend — falls back to the static seed if nothing's persisted.
   const currentUser = useEffectiveUser(CURRENT_TEST_USER_ID) ?? getCurrentTestUser();
 
-  const primaryOrg = getOrgById(currentUser.primaryOrgId);
-  const secondaryOrgs = currentUser.secondaryOrgIds.map((id) => getOrgById(id)).filter(Boolean) as PlatformOrg[];
-  const authorizedOrgIds = new Set([currentUser.primaryOrgId, ...currentUser.secondaryOrgIds]);
+  const myOrgs = currentUser.organizationIds.map((id) => getOrgById(id)).filter(Boolean) as PlatformOrg[];
+  const authorizedOrgIds = new Set(currentUser.organizationIds);
   const [toast, setToast] = useState<string | null>(null);
 
   // Flattened: every survey this user (or an org they're authorized for) is
@@ -170,14 +169,9 @@ export default function MySurveysPage() {
           </p>
           <p className="text-[12px] text-slate-400 mt-2.5 flex items-center gap-1.5 flex-wrap">
             <User size={12} className="text-slate-300 shrink-0" />
-            Signed in as <span className="font-medium text-slate-600">{getUserFullName(currentUser)}</span> — primary{" "}
-            <span className="font-medium text-slate-600">{primaryOrg?.name}</span>
-            {secondaryOrgs.length > 0 && (
-              <>
-                , also authorized for{" "}
-                <span className="font-medium text-slate-600">{secondaryOrgs.map((o) => o.name).join(", ")}</span>
-              </>
-            )}
+            Signed in as <span className="font-medium text-slate-600">{getUserFullName(currentUser)}</span> —
+            organizations:{" "}
+            <span className="font-medium text-slate-600">{myOrgs.map((o) => o.name).join(", ")}</span>
           </p>
         </div>
       </div>

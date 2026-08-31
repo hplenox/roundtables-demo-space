@@ -24,12 +24,11 @@ export default function HomePage() {
     badge: BADGE_TYPES.find((bt) => bt.id === ob.badgeId)!,
   })).filter((ob) => ob.badge);
 
-  // Multi-Org Support: surface any secondary-organization associations a
-  // Super Admin has granted this account. Renders nothing at all when there
-  // are none — most users only ever belong to their one primary org.
+  // Multi-Org Support: surface every organization a Super Admin has
+  // associated this account with. Renders nothing at all when there's only
+  // one — most users only ever belong to a single org.
   const currentSurveyUser = useEffectiveUser(CURRENT_TEST_USER_ID) ?? getCurrentTestUser();
-  const primaryOrg = getOrgById(currentSurveyUser.primaryOrgId);
-  const secondaryOrgs = currentSurveyUser.secondaryOrgIds
+  const myOrgs = currentSurveyUser.organizationIds
     .map((id) => getOrgById(id))
     .filter(Boolean) as PlatformOrg[];
 
@@ -231,8 +230,8 @@ export default function HomePage() {
             </div>
           </div>
 
-          {/* Multi-Org Support: only appears when secondary orgs exist */}
-          {secondaryOrgs.length > 0 && (
+          {/* Multi-Org Support: only appears when the user belongs to more than one org */}
+          {myOrgs.length > 1 && (
             <div className="bg-white rounded-xl border border-slate-200 p-4">
               <div className="flex items-center justify-between mb-1">
                 <h2 className="text-sm font-semibold text-slate-900">Your Organizations</h2>
@@ -245,17 +244,10 @@ export default function HomePage() {
               </div>
               <p className="text-[11px] text-slate-400 mb-3 leading-relaxed">
                 A Super Admin has authorized {currentSurveyUser.firstName} to respond to surveys on behalf of{" "}
-                {secondaryOrgs.length} additional organization{secondaryOrgs.length !== 1 ? "s" : ""}.
+                {myOrgs.length} organizations.
               </p>
               <div className="space-y-1.5">
-                <div className="flex items-center gap-2 text-[12px]">
-                  <Building2 size={11} className="text-[#00b8a9] shrink-0" />
-                  <span className="font-medium text-slate-700 truncate">{primaryOrg?.name}</span>
-                  <span className="shrink-0 text-[9.5px] font-semibold text-[#00897b] bg-[#00b8a9]/10 px-1.5 py-0.5 rounded-full">
-                    Primary
-                  </span>
-                </div>
-                {secondaryOrgs.map((org) => (
+                {myOrgs.map((org) => (
                   <div key={org.id} className="flex items-center gap-2 text-[12px]">
                     <Building2 size={11} className="text-slate-300 shrink-0" />
                     <span className="text-slate-600 truncate">{org.name}</span>

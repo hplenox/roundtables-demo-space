@@ -1,10 +1,10 @@
 // ─── Survey-taker side of Multi-Org Support (Phase I) ──────────────────────
 //
-// Once a Super Admin associates a user with secondary organizations
+// Once a Super Admin associates a user with additional organizations
 // (src/lib/mock-org-associations.ts), the survey-taking contact needs a way
 // to pick which organization they're answering FOR on a given survey. This
 // models that: each survey a user is invited to lists the orgs (from their
-// own primary + secondary set) that need a response on that survey, each
+// own organization list) that need a response on that survey, each
 // tracked independently so a parent organization's contact can't
 // accidentally cross-file one subsidiary's data under another's.
 //
@@ -26,7 +26,7 @@ export const CURRENT_TEST_USER_ID = "puser-05";
 export type SurveyOrgStatus = "not_started" | "in_progress" | "submitted";
 
 export interface MySurveyOrgContext {
-  /** References a PlatformOrg id (from the user's own primary or secondary set). */
+  /** References a PlatformOrg id (from the user's own organization list). */
   orgId: string;
   status: SurveyOrgStatus;
   progress?: number;
@@ -117,6 +117,30 @@ export const MY_SURVEY_ASSIGNMENTS: MySurveyAssignment[] = [
 
 export function getCurrentTestUser() {
   return PLATFORM_USERS.find((u) => u.id === CURRENT_TEST_USER_ID)!;
+}
+
+export interface LatestActiveSurveyStatus {
+  status: SurveyOrgStatus;
+  surveyName: string;
+  progress?: number;
+}
+
+/**
+ * This org's most pressing active survey — the soonest-due one it's still on
+ * the hook for — so the Users tab can show "at a glance" whether an org's
+ * current obligation is submitted, in progress, or not started. Returns null
+ * when the org has no active survey at all (e.g. Apollo, Carlyle, Bain, Vista
+ * in this demo — no host has an open cycle for them right now).
+ */
+export function getLatestActiveSurveyStatusForOrg(orgId: string): LatestActiveSurveyStatus | null {
+  const candidates = MY_SURVEY_ASSIGNMENTS.filter((a) => a.surveyStatus === "active")
+    .flatMap((a) => a.orgContexts.filter((ctx) => ctx.orgId === orgId).map((ctx) => ({ assignment: a, ctx })));
+  if (candidates.length === 0) return null;
+  candidates.sort(
+    (a, b) => new Date(a.assignment.targetCloseDate).getTime() - new Date(b.assignment.targetCloseDate).getTime()
+  );
+  const { assignment, ctx } = candidates[0];
+  return { status: ctx.status, surveyName: assignment.name, progress: ctx.progress };
 }
 
 /**

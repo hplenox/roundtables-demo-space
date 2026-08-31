@@ -13,7 +13,7 @@ export default function AdminPage() {
   const uniqueOrgsWithBadges = [...new Set(ORG_BADGES.map((ob) => ob.orgId))].length;
   const totalOrgs = MOCK_ORGS.length;
   const activeSurveys = MOCK_SURVEYS.filter((s) => s.status === "active").length;
-  const multiOrgUsers = PLATFORM_USERS.filter((u) => u.secondaryOrgIds.length > 0).length;
+  const multiOrgUsers = PLATFORM_USERS.filter((u) => u.organizationIds.length > 1).length;
 
   // Badge type breakdown
   const categoryCount = BADGE_TYPES.reduce<Record<string, number>>((acc, bt) => {

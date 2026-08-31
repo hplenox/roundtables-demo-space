@@ -57,7 +57,7 @@ export const ORG_REGISTRY: OrgRegistryRow[] = PLATFORM_ORGS.map((org, i) => {
     orgCode: meta?.orgCode ?? null,
     lpiScore: meta?.lpiScore ?? null,
     lastUpdated: meta?.lastUpdated ?? org.domain, // never hit in practice — every org has meta above
-    totalUsers: PLATFORM_USERS.filter((u) => u.primaryOrgId === org.id).length,
+    totalUsers: PLATFORM_USERS.filter((u) => u.organizationIds.includes(org.id)).length,
     status: meta?.status ?? "Active",
   };
 });
