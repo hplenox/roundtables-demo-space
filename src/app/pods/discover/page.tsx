@@ -1,11 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Search, Users, Check } from "lucide-react";
+import { Search, Users, Check } from "lucide-react";
 import { getDiscoverablePods, joinDiscoverablePod } from "@/lib/mock-pods";
 import { KIND_STYLE } from "@/components/pods/kindStyles";
+import PodBreadcrumb from "@/components/pods/PodBreadcrumb";
 
 export default function DiscoverPodsPage() {
   const router = useRouter();
@@ -32,15 +32,19 @@ export default function DiscoverPodsPage() {
 
   return (
     <div className="min-h-full bg-slate-50">
-      <div className="max-w-5xl mx-auto px-6 py-7">
-        <Link href="/pods" className="inline-flex items-center gap-1.5 text-[12.5px] font-medium text-slate-500 hover:text-slate-700 mb-4">
-          <ArrowLeft size={14} />
-          Back to My PODs
-        </Link>
+      {/* Sticky, full-bleed platform-style header */}
+      <div className="sticky top-0 z-10 bg-white border-b border-slate-200">
+        <div className="max-w-5xl mx-auto px-6 pt-5 pb-5">
+          <div className="mb-4">
+            <PodBreadcrumb items={[{ label: "My PODs", href: "/pods" }, { label: "Discover" }]} />
+          </div>
 
-        <h1 className="text-[26px] font-bold text-slate-900 tracking-tight">Discover PODs</h1>
-        <p className="text-[13px] text-slate-500 mt-1 mb-6">Networks and lists other RoundTables members have opened up beyond your organization.</p>
+          <h1 className="text-[26px] font-bold text-slate-900 tracking-tight">Discover PODs</h1>
+          <p className="text-[13px] text-slate-500 mt-1">Networks and lists other RoundTables members have opened up beyond your organization.</p>
+        </div>
+      </div>
 
+      <div className="max-w-5xl mx-auto px-6 py-6">
         <div className="relative max-w-md mb-6">
           <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
           <input

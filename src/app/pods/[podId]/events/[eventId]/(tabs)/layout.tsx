@@ -43,58 +43,65 @@ export default function EventTabsLayout({ children }: { children: React.ReactNod
 
   return (
     <div className="min-h-full bg-slate-50">
-      <div className="max-w-5xl mx-auto px-6 py-6 space-y-4">
-        <PodBreadcrumb
-          items={[
-            { label: "My PODs", href: "/pods" },
-            { label: pod.name, href: `/pods/${podId}` },
-            { label: "Events", href: `/pods/${podId}/events` },
-            { label: event.title },
-          ]}
-        />
-
-        <EventBanner />
-
-        <div className="flex items-start justify-between gap-4 flex-wrap">
-          <div>
-            <h1 className="text-[26px] font-bold text-slate-900">{event.title}</h1>
-            <p className="text-[12.5px] text-slate-400 mt-1">{attendingCount} of {event.invitees.length} attending</p>
+      {/* Sticky, full-bleed platform-style header */}
+      <div className="sticky top-0 z-10 bg-white border-b border-slate-200">
+        <div className="max-w-5xl mx-auto px-6 pt-5">
+          <div className="mb-4">
+            <PodBreadcrumb
+              items={[
+                { label: "My PODs", href: "/pods" },
+                { label: pod.name, href: `/pods/${podId}` },
+                { label: "Events", href: `/pods/${podId}/events` },
+                { label: event.title },
+              ]}
+            />
           </div>
-          <div className="relative shrink-0">
-            <button
-              onClick={() => setRsvpMenuOpen((o) => !o)}
-              className={`inline-flex items-center gap-1.5 px-4 py-2.5 rounded-lg text-[13px] font-semibold transition-colors ${
-                myStatus === "no_response" ? "bg-[#4361ee] text-white hover:bg-[#3650d4]" : `border ${RSVP_STYLE[myStatus]}`
-              }`}
-            >
-              {myStatus !== "no_response" && <Check size={13} />}
-              {RSVP_LABEL[myStatus]}
-              <ChevronDown size={13} />
-            </button>
-            {rsvpMenuOpen && (
-              <div className="absolute right-0 top-full mt-1.5 w-36 bg-white rounded-lg border border-slate-200 shadow-lg py-1.5 z-10">
-                {(["attending", "maybe", "declined"] as const).map((s) => (
-                  <button
-                    key={s}
-                    onClick={() => { rsvpToEvent(event.id, s); setRsvpMenuOpen(false); }}
-                    className="w-full text-left px-3 py-2 text-[12.5px] text-slate-600 hover:bg-slate-50"
-                  >
-                    {RSVP_LABEL[s]}
-                  </button>
-                ))}
-              </div>
-            )}
+
+          <div className="flex items-start justify-between gap-4 flex-wrap mb-5">
+            <div>
+              <h1 className="text-[22px] font-bold text-slate-900 tracking-tight leading-tight">{event.title}</h1>
+              <p className="text-[12.5px] text-slate-400 mt-1">{attendingCount} of {event.invitees.length} attending</p>
+            </div>
+            <div className="relative shrink-0">
+              <button
+                onClick={() => setRsvpMenuOpen((o) => !o)}
+                className={`inline-flex items-center gap-1.5 px-4 py-2.5 rounded-lg text-[13px] font-semibold transition-colors ${
+                  myStatus === "no_response" ? "bg-[#4361ee] text-white hover:bg-[#3650d4]" : `border ${RSVP_STYLE[myStatus]}`
+                }`}
+              >
+                {myStatus !== "no_response" && <Check size={13} />}
+                {RSVP_LABEL[myStatus]}
+                <ChevronDown size={13} />
+              </button>
+              {rsvpMenuOpen && (
+                <div className="absolute right-0 top-full mt-1.5 w-36 bg-white rounded-lg border border-slate-200 shadow-lg py-1.5 z-10">
+                  {(["attending", "maybe", "declined"] as const).map((s) => (
+                    <button
+                      key={s}
+                      onClick={() => { rsvpToEvent(event.id, s); setRsvpMenuOpen(false); }}
+                      className="w-full text-left px-3 py-2 text-[12.5px] text-slate-600 hover:bg-slate-50"
+                    >
+                      {RSVP_LABEL[s]}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
+
+          <PodSubTabs
+            activeKey={activeSub}
+            tabs={[
+              { key: "about", label: "About", href: baseHref },
+              { key: "invitees", label: "Invitees", href: `${baseHref}/invitees` },
+              { key: "documents", label: "Documents", href: `${baseHref}/documents` },
+            ]}
+          />
         </div>
+      </div>
 
-        <PodSubTabs
-          activeKey={activeSub}
-          tabs={[
-            { key: "about", label: "About", href: baseHref },
-            { key: "invitees", label: "Invitees", href: `${baseHref}/invitees` },
-            { key: "documents", label: "Documents", href: `${baseHref}/documents` },
-          ]}
-        />
+      <div className="max-w-5xl mx-auto px-6 py-6 space-y-4">
+        <EventBanner />
 
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-5">
           <div className="min-w-0 space-y-4">{children}</div>

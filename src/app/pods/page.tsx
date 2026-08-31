@@ -89,37 +89,41 @@ export default function PodsListPage() {
 
   return (
     <div className="min-h-full bg-slate-50">
-      <div className="max-w-6xl mx-auto px-6 py-7">
-        <div className="mb-4">
-          <PodBreadcrumb items={[{ label: "My PODs" }]} />
-        </div>
-
-        {/* Header */}
-        <div className="flex items-start justify-between flex-wrap gap-4 mb-6">
-          <div>
-            <h1 className="text-[26px] font-bold text-slate-900 tracking-tight">My PODs</h1>
-            <p className="text-[13px] text-slate-500 mt-1">
-              {pods.length} PODs{needsAttentionCount > 0 ? ` · ${needsAttentionCount} need your attention this week` : ""}
-            </p>
+      {/* Sticky, full-bleed platform-style header */}
+      <div className="sticky top-0 z-10 bg-white border-b border-slate-200">
+        <div className="max-w-6xl mx-auto px-6 pt-5 pb-5">
+          <div className="mb-4">
+            <PodBreadcrumb items={[{ label: "My PODs" }]} />
           </div>
-          <div className="flex items-center gap-2.5">
-            <Link
-              href="/pods/discover"
-              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg border border-slate-200 bg-white text-slate-700 text-[13px] font-semibold hover:border-slate-300 hover:shadow-sm transition-all"
-            >
-              <Compass size={15} />
-              Discover PODs
-            </Link>
-            <button
-              onClick={() => setShowCreate(true)}
-              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-[#4361ee] text-white text-[13px] font-semibold hover:bg-[#3650d4] shadow-sm hover:shadow-md transition-all"
-            >
-              <Plus size={15} />
-              Create POD
-            </button>
+
+          <div className="flex items-start justify-between flex-wrap gap-4">
+            <div>
+              <h1 className="text-[26px] font-bold text-slate-900 tracking-tight">My PODs</h1>
+              <p className="text-[13px] text-slate-500 mt-1">
+                {pods.length} PODs{needsAttentionCount > 0 ? ` · ${needsAttentionCount} need your attention this week` : ""}
+              </p>
+            </div>
+            <div className="flex items-center gap-2.5">
+              <Link
+                href="/pods/discover"
+                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg border border-slate-200 bg-white text-slate-700 text-[13px] font-semibold hover:border-slate-300 hover:shadow-sm transition-all"
+              >
+                <Compass size={15} />
+                Discover PODs
+              </Link>
+              <button
+                onClick={() => setShowCreate(true)}
+                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-[#4361ee] text-white text-[13px] font-semibold hover:bg-[#3650d4] shadow-sm hover:shadow-md transition-all"
+              >
+                <Plus size={15} />
+                Create POD
+              </button>
+            </div>
           </div>
         </div>
+      </div>
 
+      <div className="max-w-6xl mx-auto px-6 py-6">
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-6">
           <div className="min-w-0">
             {/* Needs You */}

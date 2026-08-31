@@ -54,98 +54,96 @@ export default function PodTabsLayout({ children }: { children: React.ReactNode 
 
   return (
     <div className="min-h-full bg-slate-50">
-      <div className="max-w-6xl mx-auto px-6 py-6 space-y-4">
-        <PodBreadcrumb items={[{ label: "My PODs", href: "/pods" }, { label: pod.name }]} />
+      {/* Sticky, full-bleed platform-style header */}
+      <div className="sticky top-0 z-10 bg-white border-b border-slate-200">
+        <div className="max-w-6xl mx-auto px-6 pt-5">
+          <div className="mb-4">
+            <PodBreadcrumb items={[{ label: "My PODs", href: "/pods" }, { label: pod.name }]} />
+          </div>
 
-        {/* Header card */}
-        <div className="relative overflow-hidden bg-white rounded-lg border border-slate-200 shadow-sm">
-          <div className={`absolute inset-x-0 top-0 h-24 bg-gradient-to-br ${style.gradient} pointer-events-none`} />
-          <div className="relative p-5">
-            <div className="flex items-start justify-between gap-4 flex-wrap">
-              <div className="flex items-start gap-3.5 min-w-0">
-                <div className={`shrink-0 w-12 h-12 rounded-lg flex items-center justify-center shadow-sm ${style.iconBg}`}>
-                  <Icon size={20} className={style.iconColor} />
-                </div>
-                <div className="min-w-0">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <h1 className="text-[19px] font-bold text-slate-900 leading-tight">{pod.name}</h1>
-                    <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-white/80 text-slate-600 text-[10.5px] font-semibold border border-slate-200">
-                      {pod.category}
-                    </span>
-                    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10.5px] font-semibold border ${style.badge}`}>
-                      {POD_KIND_LABEL[pod.kind]}
-                    </span>
-                  </div>
-                  <p className="text-[12.5px] text-slate-500 mt-1">{pod.description}</p>
-                  <p className="text-[11.5px] text-slate-400 mt-1.5 flex items-center gap-1 flex-wrap">
-                    <span>Hosted by <span className="font-medium text-slate-500">{pod.hostedBy}</span></span>
-                    {pod.administeredBy && (
-                      <>
-                        <span>·</span>
-                        <span>Administered by <span className="font-medium text-slate-500">{pod.administeredBy}{pod.administeredByOrg ? ` · ${pod.administeredByOrg}` : ""}</span></span>
-                      </>
-                    )}
-                    {pod.createdBy && (
-                      <>
-                        <span>·</span>
-                        <span>Created by <span className="font-medium text-slate-500">{pod.createdBy}</span></span>
-                      </>
-                    )}
-                  </p>
-                </div>
+          <div className="flex items-start justify-between gap-4 flex-wrap mb-5">
+            <div className="flex items-start gap-3.5 min-w-0">
+              <div className={`shrink-0 w-11 h-11 rounded-lg flex items-center justify-center ${style.iconBg}`}>
+                <Icon size={19} className={style.iconColor} />
               </div>
-
-              <div className="shrink-0 flex items-center gap-2">
-                <button
-                  onClick={togglePin}
-                  className={`w-9 h-9 rounded-lg border flex items-center justify-center transition-colors ${
-                    pod.pinned ? "bg-amber-50 border-amber-200 text-amber-600" : "border-slate-200 text-slate-400 hover:text-amber-500 hover:border-amber-200"
-                  }`}
-                  title={pod.pinned ? "Unpin POD" : "Pin POD"}
-                >
-                  <Pin size={14} fill={pod.pinned ? "currentColor" : "none"} />
-                </button>
-                <button
-                  onClick={() => setShowInvite(true)}
-                  className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-[#4361ee] text-white text-[13px] font-semibold hover:bg-[#3650d4] shadow-sm hover:shadow-md transition-all"
-                >
-                  <UserPlus size={15} />
-                  Invite Members
-                </button>
-              </div>
-            </div>
-
-            {/* Stat cards */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-5">
-              {statCards.map((s) => (
-                <div key={s.label} className="bg-slate-50/80 rounded-lg border border-slate-100 p-3.5">
-                  <p className="text-[10px] text-slate-400 font-semibold uppercase tracking-wide mb-1">{s.label}</p>
-                  <p className="text-[19px] font-bold text-slate-800 leading-none">{s.value}</p>
-                  {s.hint && <p className="text-[11px] text-slate-400 mt-1">{s.hint}</p>}
+              <div className="min-w-0">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <h1 className="text-[22px] font-bold text-slate-900 tracking-tight leading-tight">{pod.name}</h1>
+                  <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-slate-50 text-slate-600 text-[10.5px] font-semibold border border-slate-200">
+                    {pod.category}
+                  </span>
+                  <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10.5px] font-semibold border ${style.badge}`}>
+                    {POD_KIND_LABEL[pod.kind]}
+                  </span>
                 </div>
-              ))}
-            </div>
-
-            {/* Weekly insight */}
-            {pod.weeklyInsight && (
-              <div className="flex items-start gap-2 mt-4 p-3 rounded-lg bg-[#4361ee]/[0.06] border border-[#4361ee]/15">
-                <Sparkles size={14} className="text-[#3650d4] shrink-0 mt-0.5" />
-                <p className="text-[12.5px] text-slate-700 leading-snug">
-                  <span className="font-bold text-[#3650d4]">This week in {pod.name}: </span>
-                  {pod.weeklyInsight}
+                <p className="text-[12.5px] text-slate-500 mt-1">{pod.description}</p>
+                <p className="text-[11.5px] text-slate-400 mt-1.5 flex items-center gap-1 flex-wrap">
+                  <span>Hosted by <span className="font-medium text-slate-500">{pod.hostedBy}</span></span>
+                  {pod.administeredBy && (
+                    <>
+                      <span>·</span>
+                      <span>Administered by <span className="font-medium text-slate-500">{pod.administeredBy}{pod.administeredByOrg ? ` · ${pod.administeredByOrg}` : ""}</span></span>
+                    </>
+                  )}
+                  {pod.createdBy && (
+                    <>
+                      <span>·</span>
+                      <span>Created by <span className="font-medium text-slate-500">{pod.createdBy}</span></span>
+                    </>
+                  )}
                 </p>
               </div>
-            )}
+            </div>
 
-            {/* Sub-tabs */}
-            <div className="mt-4 -mb-5">
-              <PodSubTabs
-                activeKey={activeSub}
-                tabs={SUB_TABS.map((tab) => ({ key: tab.key, label: tab.label, href: `${baseHref}${tab.href}` }))}
-              />
+            <div className="shrink-0 flex items-center gap-2">
+              <button
+                onClick={togglePin}
+                className={`w-9 h-9 rounded-lg border flex items-center justify-center transition-colors ${
+                  pod.pinned ? "bg-amber-50 border-amber-200 text-amber-600" : "border-slate-200 text-slate-400 hover:text-amber-500 hover:border-amber-200"
+                }`}
+                title={pod.pinned ? "Unpin POD" : "Pin POD"}
+              >
+                <Pin size={14} fill={pod.pinned ? "currentColor" : "none"} />
+              </button>
+              <button
+                onClick={() => setShowInvite(true)}
+                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-[#4361ee] text-white text-[13px] font-semibold hover:bg-[#3650d4] shadow-sm hover:shadow-md transition-all"
+              >
+                <UserPlus size={15} />
+                Invite Members
+              </button>
             </div>
           </div>
+
+          <PodSubTabs
+            activeKey={activeSub}
+            tabs={SUB_TABS.map((tab) => ({ key: tab.key, label: tab.label, href: `${baseHref}${tab.href}` }))}
+          />
         </div>
+      </div>
+
+      <div className="max-w-6xl mx-auto px-6 py-6 space-y-4">
+        {/* Stat cards */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          {statCards.map((s) => (
+            <div key={s.label} className="bg-white rounded-lg border border-slate-200 p-3.5 shadow-sm">
+              <p className="text-[10px] text-slate-400 font-semibold uppercase tracking-wide mb-1">{s.label}</p>
+              <p className="text-[19px] font-bold text-slate-800 leading-none">{s.value}</p>
+              {s.hint && <p className="text-[11px] text-slate-400 mt-1">{s.hint}</p>}
+            </div>
+          ))}
+        </div>
+
+        {/* Weekly insight */}
+        {pod.weeklyInsight && (
+          <div className="flex items-start gap-2 p-3 rounded-lg bg-[#4361ee]/[0.06] border border-[#4361ee]/15">
+            <Sparkles size={14} className="text-[#3650d4] shrink-0 mt-0.5" />
+            <p className="text-[12.5px] text-slate-700 leading-snug">
+              <span className="font-bold text-[#3650d4]">This week in {pod.name}: </span>
+              {pod.weeklyInsight}
+            </p>
+          </div>
+        )}
 
         {/* Body: content + sidebar */}
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-5">
