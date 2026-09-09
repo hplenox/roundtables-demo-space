@@ -6,7 +6,7 @@ import { useState, useEffect, useRef } from "react";
 import { getOrgById, getSurveyById, getOrgsBySurveyId, getCustomAssetClassesBySurveyId } from "@/lib/mock-data";
 import { buildBenchmarkPool, type BenchmarkGroupKey } from "@/lib/asset-class-groups";
 import LpiGaugeBar from "@/components/report/LpiGaugeBar";
-import BenchmarkDistributionChart from "@/components/report/BenchmarkDistributionChart";
+import BenchmarksCard from "@/components/report/BenchmarksCard";
 import LpiSubComponentsSection from "@/components/report/LpiSubComponentsSection";
 import WorkplacePoliciesCard from "@/components/report/WorkplacePoliciesCard";
 import GenderDemographicsSection from "@/components/report/GenderDemographicsSection";
@@ -19,7 +19,7 @@ import AssetClassBenchmarkWidget from "@/components/report/AssetClassBenchmarkWi
 import {
   ChevronRight, ChevronLeft, ChevronDown, Printer, Download,
   User, Mail, Calendar, Clock, MapPin, TrendingUp, BadgeCheck,
-  LayoutDashboard, Search, Lightbulb, Building2, Sparkles, Info, Layers,
+  LayoutDashboard, Search, Lightbulb, Building2, Sparkles, Info,
 } from "lucide-react";
 import type { InvitedOrg } from "@/types/survey";
 
@@ -636,167 +636,9 @@ export default function ManagerReportPage() {
 
         {/* SECTION 2 */}
         <ReportSection>
-          <SectionLabel>Section 2 · Primary Benchmarking Categories</SectionLabel>
+          <SectionLabel>Section 2 · Benchmarks</SectionLabel>
           <div className="p-6">
-            <div className="mb-5">
-              <div className="flex items-center gap-2.5 mb-1">
-                <h2 className="text-[15px] font-bold text-slate-800">LPI Benchmark Comparison</h2>
-
-                {/* Info tooltip */}
-                <div className="relative group inline-flex items-center">
-                  <Info
-                    size={15}
-                    className="text-slate-400 hover:text-blue-500 cursor-pointer transition-colors"
-                  />
-                  <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 w-72 bg-[#0f1923] rounded-xl p-4 shadow-2xl opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-200 z-50">
-                    <p className="text-[12.5px] text-slate-200 leading-relaxed">
-                      <strong className="text-amber-400">LPI (Lenox Park Impact) Score</strong>
-                      {" "}— a composite 0–10 metric measuring how well an organization has optimized
-                      its human capital across three layers: equity ownership, leadership, and total
-                      workforce. Built from 10 sub-components, each worth up to 1.00 point.
-                    </p>
-                    <div className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-3 h-3 bg-[#0f1923] rotate-45 rounded-sm" />
-                  </div>
-                </div>
-
-                {/* RT badge */}
-                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-orange-500 text-white tracking-wide">
-                  ◆ RT-006
-                </span>
-              </div>
-              <p className="text-[12.5px] text-slate-500 leading-relaxed max-w-2xl">
-                The charts below show where <strong>{org.name}</strong>'s LPI score of{" "}
-                <strong>{org.lpiScore.toFixed(1)}</strong> falls relative to three benchmark pools.
-                The orange marker indicates the organization's exact position within each distribution.
-              </p>
-            </div>
-
-            {/* Legend */}
-            <div className="flex flex-wrap items-center gap-5 mb-6 px-4 py-3 rounded-xl bg-slate-50 border border-slate-200">
-              <p className="text-[10.5px] font-bold text-slate-500 uppercase tracking-wider">Legend</p>
-              {[
-                { color: "#e2e8f0",  label: "Full range (min–max)" },
-                { color: "#bfdbfe",  label: "10th–90th percentile" },
-                { color: "#3b82f6",  label: "IQR (25th–75th)" },
-                { color: "#1d4ed8",  label: "Median",        isLine: true },
-                { color: "#f97316",  label: "This organization",  isSquare: true },
-              ].map(({ color, label, isLine, isSquare }) => (
-                <div key={label} className="flex items-center gap-1.5">
-                  {isLine   ? <div className="w-4 h-0.5 rounded" style={{ backgroundColor: color }} /> :
-                   isSquare ? <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: color }} /> :
-                              <div className="w-4 h-3 rounded-sm" style={{ backgroundColor: color }} />}
-                  <span className="text-[11px] text-slate-600">{label}</span>
-                </div>
-              ))}
-            </div>
-
-            {/* Three benchmark cards */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-              {benchmarkPools.map(({ key, data }) => {
-                const pctColor =
-                  data.managerPercentile >= 70 ? "#059669" :
-                  data.managerPercentile >= 40 ? "#b45309" : "#dc2626";
-
-                return (
-                  <div key={key} className={`relative rounded-xl border overflow-hidden ${data.comingSoon ? "border-amber-200" : "border-slate-200"}`}>
-                    <div className="flex items-start justify-between px-4 pt-4 pb-3 border-b border-slate-100">
-                      <div>
-                        <p className="text-[9.5px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">Relative to</p>
-
-                        {data.comingSoon ? (
-                          <p className="text-[13px] font-bold text-slate-800 leading-tight">Asset Class</p>
-                        ) : key === "universe" ? (
-                          <>
-                            <div className="flex items-center gap-1.5">
-                              <p className="text-[13px] font-bold text-slate-800 leading-tight">
-                                RoundTables{" "}
-                                <span className="bg-orange-500 text-white px-1 py-px rounded-sm">Universe</span>
-                              </p>
-                              <div className="relative group inline-flex items-center shrink-0">
-                                <div className="w-[17px] h-[17px] rounded-full bg-blue-500 hover:bg-blue-600 flex items-center justify-center cursor-pointer transition-colors">
-                                  <Info size={10} className="text-white" />
-                                </div>
-                                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 w-[280px] bg-[#0f1923] rounded-xl p-4 shadow-2xl opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-200 z-50">
-                                  <p className="text-[12.5px] text-slate-200 leading-relaxed">
-                                    <strong className="text-amber-400">RT (RoundTables)</strong>{" "}
-                                    <span className="bg-amber-400 text-[#0f1923] font-bold px-1 rounded-sm">Universe</span>
-                                    {" "}— the benchmark pool of organizations in the Lenox Park
-                                    RoundTables database with comparable data for this specific metric.
-                                  </p>
-                                  <div className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-3 h-3 bg-[#0f1923] rotate-45 rounded-sm" />
-                                </div>
-                              </div>
-                            </div>
-                            <div className="flex items-center gap-2 mt-0.5">
-                              <p className="text-[10.5px] text-slate-400">n = {data.n.toLocaleString()} organizations</p>
-                              <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[9px] font-bold bg-orange-500 text-white">
-                                ◆ RT-004
-                              </span>
-                            </div>
-                          </>
-                        ) : (
-                          <>
-                            <p className="text-[13px] font-bold text-slate-800 leading-tight">{data.label}</p>
-                            <p className="text-[10.5px] text-slate-400 mt-0.5">n = {data.n.toLocaleString()} organizations</p>
-                          </>
-                        )}
-                      </div>
-                      {!data.comingSoon && (
-                        <div className="text-right">
-                          <p className="text-[26px] font-black tabular-nums leading-none" style={{ color: pctColor }}>
-                            {data.managerPercentile}<span className="text-[14px] font-bold">th</span>
-                          </p>
-                          <p className="text-[9.5px] font-semibold text-slate-400 uppercase tracking-wider">percentile</p>
-                        </div>
-                      )}
-                    </div>
-
-                    <div className={`px-3 pt-5 pb-3 ${data.comingSoon ? "bg-amber-50/40" : ""}`}>
-                      {data.comingSoon ? (
-                        <div className="flex flex-col items-center justify-center py-8 gap-2">
-                          <div className="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center">
-                            <Layers size={14} className="text-amber-600" />
-                          </div>
-                          <p className="text-[12px] font-semibold text-amber-700">Asset Class Not Mapped</p>
-                          <p className="text-[11px] text-slate-500 text-center leading-snug max-w-[160px]">
-                            This organization hasn&apos;t been mapped to a benchmark category yet.
-                          </p>
-                        </div>
-                      ) : (
-                        <BenchmarkDistributionChart pool={data} />
-                      )}
-                    </div>
-
-                    {!data.comingSoon && (
-                      <div className="grid grid-cols-3 divide-x divide-slate-100 border-t border-slate-100 bg-slate-50/40">
-                        {[
-                          { label: "Q1",     value: data.q1.toFixed(2) },
-                          { label: "Median", value: data.median.toFixed(2) },
-                          { label: "Q3",     value: data.q3.toFixed(2) },
-                        ].map(({ label, value }) => (
-                          <div key={label} className="px-3 py-2.5 text-center">
-                            <p className="text-[11.5px] font-bold text-slate-700 tabular-nums">{value}</p>
-                            <p className="text-[9.5px] text-slate-400 font-medium">{label}</p>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-
-            {/* Interpretation note */}
-            <div className="mt-5 px-4 py-3 rounded-xl bg-blue-50 border border-blue-200">
-              <p className="text-[11.5px] text-blue-800 leading-relaxed">
-                <strong>How to read this:</strong> An LPI score at the{" "}
-                <strong>{org.benchmarks.universe.managerPercentile}th percentile</strong> within the
-                Roundtables Universe means {org.name} scores higher than{" "}
-                {org.benchmarks.universe.managerPercentile}% of all organizations in the database across all DEI
-                dimensions. The IQR band (dark blue) represents the middle 50% of organizations — a score within or
-                above this range indicates above-average DEI practice.
-              </p>
-            </div>
+            <BenchmarksCard org={org} benchmarkPools={benchmarkPools} />
           </div>
         </ReportSection>
 
