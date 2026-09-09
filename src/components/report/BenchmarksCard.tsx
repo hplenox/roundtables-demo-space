@@ -8,7 +8,7 @@ import type { InvitedOrg, BenchmarkPool, LpiSubMetric } from "@/types/survey";
 
 // ─── Helpers ───────────────────────────────────────────────────────────────────
 
-function ordinal(n: number): string {
+export function ordinal(n: number): string {
   const r = n % 100;
   if (r >= 11 && r <= 13) return `${n}th`;
   switch (n % 10) {
@@ -19,9 +19,46 @@ function ordinal(n: number): string {
   }
 }
 
-function pctColor(p: number | null): string {
+export function pctColor(p: number | null): string {
   if (p === null) return "#94a3b8";
   return p >= 70 ? "#059669" : p >= 40 ? "#b45309" : "#dc2626";
+}
+
+// A small deterministic placeholder count for the Encourage/Congratulate badge —
+// this is a UI affordance only (no backend), seeded so it stays stable per tile/render.
+export function seedCount(seed: number, percentile: number | null): number {
+  if (percentile === null) return 0;
+  return ((Math.round(percentile) * (seed * 7 + 3)) % 17) + 2;
+}
+
+/** Recognize top-quartile strengths, encourage weaker areas — shared across score tiles and the manager header. */
+export function AllocatorActionButton({
+  percentile, seed, size = "sm",
+}: {
+  percentile: number | null; seed: number; size?: "sm" | "md";
+}) {
+  const [count, setCount] = useState(() => seedCount(seed, percentile));
+  const isTop = (percentile ?? 0) >= 75;
+  const iconSize = size === "md" ? 15 : 12;
+
+  return (
+    <button
+      disabled={percentile === null}
+      onClick={() => setCount((c) => c + 1)}
+      className={`flex items-center justify-center gap-1.5 font-semibold rounded-lg transition-colors ${
+        size === "md" ? "text-[13px] px-3 py-1.5" : "text-[11px] py-1"
+      } ${
+        percentile === null
+          ? "text-slate-300 cursor-default"
+          : isTop
+            ? "text-emerald-600 hover:bg-emerald-50"
+            : "text-violet-600 hover:bg-violet-50"
+      }`}
+    >
+      {percentile !== null && (isTop ? <PartyPopper size={iconSize} /> : <HeartHandshake size={iconSize} />)}
+      {percentile === null ? "No data" : `${isTop ? "Congratulate" : "Encourage"} (${count})`}
+    </button>
+  );
 }
 
 const EMPTY_METRIC: LpiSubMetric = { label: "", rawScore: 0, maxScore: 0, percentile: null };
@@ -36,13 +73,6 @@ function combine(...metrics: LpiSubMetric[]) {
     ? null
     : Math.round(scored.reduce((s, m) => s + m.percentile! * m.maxScore, 0) / (wMax || 1));
   return { rawScore, maxScore, percentile };
-}
-
-// A small deterministic placeholder count for the Encourage/Congratulate badge —
-// this is a UI affordance only (no backend), seeded so it stays stable per tile/render.
-function seedCount(seed: number, percentile: number | null): number {
-  if (percentile === null) return 0;
-  return ((Math.round(percentile) * (seed * 7 + 3)) % 17) + 2;
 }
 
 // ─── Percentile gauge ──────────────────────────────────────────────────────────
@@ -112,8 +142,6 @@ function ScoreTile({
 }: {
   label: string; rawScore: number; percentile: number | null; seed: number;
 }) {
-  const [count, setCount] = useState(() => seedCount(seed, percentile));
-  const isTop = (percentile ?? 0) >= 75;
   const color = pctColor(percentile);
 
   return (
@@ -130,20 +158,9 @@ function ScoreTile({
           <div className="h-full rounded-full transition-all duration-500" style={{ width: `${percentile}%`, backgroundColor: color }} />
         )}
       </div>
-      <button
-        disabled={percentile === null}
-        onClick={() => setCount((c) => c + 1)}
-        className={`mt-auto flex items-center justify-center gap-1.5 text-[11px] font-semibold py-1 rounded-lg transition-colors ${
-          percentile === null
-            ? "text-slate-300 cursor-default"
-            : isTop
-              ? "text-emerald-600 hover:bg-emerald-50"
-              : "text-violet-600 hover:bg-violet-50"
-        }`}
-      >
-        {percentile !== null && (isTop ? <PartyPopper size={12} /> : <HeartHandshake size={12} />)}
-        {percentile === null ? "No data" : `${isTop ? "Congratulate" : "Encourage"} (${count})`}
-      </button>
+      <div className="mt-auto">
+        <AllocatorActionButton percentile={percentile} seed={seed} />
+      </div>
     </div>
   );
 }
