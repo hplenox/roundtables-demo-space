@@ -15,6 +15,13 @@ export interface PortfolioFund {
   geography: string;
 }
 
+export interface PortfolioList {
+  id: string;
+  name: string;
+  managerIds: string[];
+  createdDate: string;
+}
+
 export interface PortfolioManager {
   id: string;
   orgId?: string;        // links to InvitedOrg.id if sourced from directory
