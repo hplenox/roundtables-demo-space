@@ -98,9 +98,9 @@ export const MOCK_SURVEYS: Survey[] = [
   },
 
   // ── Multi-Org Support scenario surveys (CalPERS, McKnight, MACP, Maryland) ──
-  // Same names, hosts, and statuses used in src/lib/mock-my-surveys.ts and
-  // src/lib/mock-response-review.ts, so the Survey Admin list, My Surveys,
-  // and Response Review all describe the same underlying survey cycles.
+  // Same names, hosts, and statuses used in src/lib/mock-my-surveys.ts,
+  // so the Survey Admin list and My Surveys describe the same underlying
+  // survey cycles.
   {
     id: "survey-2026-dei-mcknight",
     name: "2026 Manager Diversity & Data Survey",
