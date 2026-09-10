@@ -9,14 +9,9 @@ import LpiGaugeBar from "@/components/report/LpiGaugeBar";
 import BenchmarksCard from "@/components/report/BenchmarksCard";
 import ManagerFunnelBar from "@/components/report/ManagerFunnelBar";
 import ManagerProfileCard from "@/components/report/ManagerProfileCard";
-import LpiSubComponentsSection from "@/components/report/LpiSubComponentsSection";
 import WorkplacePoliciesCard from "@/components/report/WorkplacePoliciesCard";
 import GenderDemographicsSection from "@/components/report/GenderDemographicsSection";
 import RacialDemographicsSection from "@/components/report/RacialDemographicsSection";
-import EvennessSection from "@/components/report/EvennessSection";
-import GeographyBenchmarkWidget from "@/components/report/GeographyBenchmarkWidget";
-import AumBenchmarkWidget from "@/components/report/AumBenchmarkWidget";
-import AssetClassBenchmarkWidget from "@/components/report/AssetClassBenchmarkWidget";
 
 import {
   ChevronRight, ChevronDown, Printer, Download,
@@ -316,8 +311,7 @@ export default function ManagerReportPage() {
   // Orgs classified via the survey's Asset Classes tab get a live, computed
   // asset-class benchmark; unclassified (or not-yet-mapped) orgs fall back to
   // a "not mapped" pool. A class can map to multiple categories — the first
-  // is used as the primary benchmark for this compact card; the full set is
-  // explorable in the interactive widget below (Section 3).
+  // is used as the primary benchmark surfaced in the Benchmarks card's Asset Class filter.
   const mappedGroups = (org.customAssetClass
     ? getCustomAssetClassesBySurveyId(surveyId).find((c) => c.name === org.customAssetClass)?.benchmarkGroups
     : undefined) as BenchmarkGroupKey[] | undefined;
@@ -433,177 +427,8 @@ export default function ManagerReportPage() {
           </div>
         </ReportSection>
 
-        {/* SECTION 3 — Asset Class Benchmark */}
         <ReportSection>
-          <SectionLabel>Section 3 · Asset Class Benchmark</SectionLabel>
-          <div className="p-6">
-            <div className="mb-5">
-              <div className="flex items-center gap-2.5 mb-1">
-                <h2 className="text-[15px] font-bold text-slate-800">Asset Class LPI Comparison</h2>
-                <div className="relative group inline-flex items-center">
-                  <Info
-                    size={15}
-                    className="text-slate-400 hover:text-blue-500 cursor-pointer transition-colors"
-                  />
-                  <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 w-72 bg-[#0f1923] rounded-xl p-4 shadow-2xl opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-200 z-50">
-                    <p className="text-[12.5px] text-slate-200 leading-relaxed">
-                      <strong className="text-amber-400">Asset Class Benchmark</strong>
-                      {" "}— filters the benchmark pool by asset class to show how this manager
-                      compares to direct peers. The teal dot marks this manager&apos;s own class.
-                      Toggle other classes to see cross-class comparisons.
-                    </p>
-                    <div className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-3 h-3 bg-[#0f1923] rotate-45 rounded-sm" />
-                  </div>
-                </div>
-              </div>
-              <p className="text-[12.5px] text-slate-500 leading-relaxed max-w-2xl">
-                How <strong>{org.name}</strong>&apos;s LPI score of{" "}
-                <strong>{org.lpiScore.toFixed(1)}</strong> compares to managers within the same
-                asset class — toggle between classes to explore cross-class positioning.
-                The teal dot marks this manager&apos;s own peer group.
-              </p>
-            </div>
-            <AssetClassBenchmarkWidget
-              orgLpiScore={org.lpiScore}
-              orgAssetClass={org.assetClass}
-              orgName={org.name}
-              mappedGroups={mappedGroups}
-            />
-          </div>
-        </ReportSection>
-
-        {/* SECTION 4 — Geography Benchmark */}
-        {org.geography && org.geographyBenchmarks && (
-          <ReportSection>
-            <SectionLabel>Section 4 · Geography Benchmark</SectionLabel>
-            <div className="p-6">
-              <div className="mb-5">
-                <div className="flex items-center gap-2.5 mb-1">
-                  <h2 className="text-[15px] font-bold text-slate-800">Geography-Based LPI Comparison</h2>
-                  <div className="relative group inline-flex items-center">
-                    <Info
-                      size={15}
-                      className="text-slate-400 hover:text-blue-500 cursor-pointer transition-colors"
-                    />
-                    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 w-72 bg-[#0f1923] rounded-xl p-4 shadow-2xl opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-200 z-50">
-                      <p className="text-[12.5px] text-slate-200 leading-relaxed">
-                        <strong className="text-amber-400">Geography Benchmark</strong>
-                        {" "}— filters the RoundTables benchmark pool by geographic context (region,
-                        U.S.-based status, country, or city) to surface how this manager compares to
-                        direct geographic peers. Toggle cuts to find the most relevant comparison.
-                      </p>
-                      <div className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-3 h-3 bg-[#0f1923] rotate-45 rounded-sm" />
-                    </div>
-                  </div>
-                </div>
-                <p className="text-[12.5px] text-slate-500 leading-relaxed max-w-2xl">
-                  How <strong>{org.name}</strong>&apos;s LPI score of{" "}
-                  <strong>{org.lpiScore.toFixed(1)}</strong> compares to managers within the same
-                  geographic context — toggle between region, U.S.-based status, country, and city
-                  to find the most relevant peer group.
-                </p>
-              </div>
-              <GeographyBenchmarkWidget
-                geography={org.geography}
-                benchmarks={org.geographyBenchmarks}
-                orgName={org.name}
-              />
-            </div>
-          </ReportSection>
-        )}
-
-        {/* SECTION 5 — AUM Benchmark */}
-        {org.aumBenchmarks && (
-          <ReportSection>
-            <SectionLabel>Section 5 · AUM Benchmark</SectionLabel>
-            <div className="p-6">
-              <div className="mb-5">
-                <div className="flex items-center gap-2.5 mb-1">
-                  <h2 className="text-[15px] font-bold text-slate-800">AUM-Based LPI Comparison</h2>
-                  <div className="relative group inline-flex items-center">
-                    <Info
-                      size={15}
-                      className="text-slate-400 hover:text-blue-500 cursor-pointer transition-colors"
-                    />
-                    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 w-72 bg-[#0f1923] rounded-xl p-4 shadow-2xl opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-200 z-50">
-                      <p className="text-[12.5px] text-slate-200 leading-relaxed">
-                        <strong className="text-amber-400">AUM Benchmark</strong>
-                        {" "}— filters the benchmark pool by assets under management bracket to surface
-                        how this manager compares to peers of similar scale. Toggle brackets to
-                        see how the picture shifts across AUM tiers.
-                      </p>
-                      <div className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-3 h-3 bg-[#0f1923] rotate-45 rounded-sm" />
-                    </div>
-                  </div>
-                </div>
-                <p className="text-[12.5px] text-slate-500 leading-relaxed max-w-2xl">
-                  How <strong>{org.name}</strong>&apos;s LPI score of{" "}
-                  <strong>{org.lpiScore.toFixed(1)}</strong> compares across AUM tiers — toggle
-                  brackets to see performance relative to smaller, peer-sized, and larger managers.
-                </p>
-              </div>
-              <AumBenchmarkWidget
-                aum={org.aum}
-                benchmarks={org.aumBenchmarks}
-              />
-            </div>
-          </ReportSection>
-        )}
-
-        {/* SECTION 5 — LPI Sub-Components */}
-        {org.lpiSubComponents && (
-          <ReportSection>
-            <SectionLabel>Section 5 · LPI Score Sub-Components Benchmarking</SectionLabel>
-            <div className="p-6">
-              <LpiSubComponentsSection
-                data={org.lpiSubComponents}
-                orgName={org.name}
-              />
-            </div>
-          </ReportSection>
-        )}
-
-        {/* Evenness Score — unnumbered, follows Section 4 */}
-        {org.lpiSubComponents && (
-          <ReportSection>
-            <SectionLabel>Evenness Score Sub-Components Benchmarking</SectionLabel>
-            <div className="p-6 space-y-5">
-
-              {/* Section heading + Evenness Sub-Components tooltip */}
-              <div>
-                <div className="flex items-center gap-2.5 mb-1">
-                  <h2 className="text-[15px] font-bold text-slate-800">Evenness Sub-Components</h2>
-                  <div className="relative group inline-flex items-center shrink-0">
-                    <div className="w-[18px] h-[18px] rounded-full bg-blue-500 hover:bg-blue-600 flex items-center justify-center cursor-pointer transition-colors">
-                      <Info size={10} className="text-white" />
-                    </div>
-                    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 w-[300px] bg-[#0f1923] rounded-xl p-4 shadow-2xl opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-200 z-50">
-                      <p className="text-[12.5px] text-slate-200 leading-relaxed">
-                        <strong className="text-amber-400">Evenness</strong>
-                        {" "}— a measure of distributional balance across the organization, used as a proxy for
-                        cognitive diversity. A higher Evenness score indicates a more even distribution of
-                        representation across measured categories — empirically associated with reduced
-                        groupthink and broader market perspective at the leadership level.
-                      </p>
-                      <div className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-3 h-3 bg-[#0f1923] rotate-45 rounded-sm" />
-                    </div>
-                  </div>
-                </div>
-                <p className="text-[12.5px] text-slate-500 leading-relaxed max-w-2xl">
-                  Distributional balance of {org.name}&apos;s composition across demographic categories
-                  at each organizational layer — a complement to the LPI&apos;s absolute representation
-                  scores.
-                </p>
-              </div>
-
-              <EvennessSection />
-
-            </div>
-          </ReportSection>
-        )}
-
-        <ReportSection>
-          <SectionLabel>Section 6 · Workplace Policies</SectionLabel>
+          <SectionLabel>Section 3 · Workplace Policies</SectionLabel>
           <div className="p-6">
             <WorkplacePoliciesCard />
           </div>
@@ -611,7 +436,7 @@ export default function ManagerReportPage() {
 
         {org.genderDemographics && (
           <ReportSection>
-            <SectionLabel>Section 7 · Gender Diversity Demographics</SectionLabel>
+            <SectionLabel>Section 4 · Gender Diversity Demographics</SectionLabel>
             <div className="p-6">
               <GenderDemographicsSection
                 ownership={org.genderDemographics.ownership}
@@ -624,7 +449,7 @@ export default function ManagerReportPage() {
 
         {org.racialDemographics && (
           <ReportSection>
-            <SectionLabel>Section 8 · Racial Diversity Demographics</SectionLabel>
+            <SectionLabel>Section 5 · Racial Diversity Demographics</SectionLabel>
             <div className="p-6">
               <RacialDemographicsSection data={org.racialDemographics} />
             </div>
