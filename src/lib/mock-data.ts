@@ -1459,6 +1459,17 @@ export function getOrgById(id: string): InvitedOrg | undefined {
   return MOCK_ORGS.find((o) => o.id === id);
 }
 
+/**
+ * Orgs eligible for a host org to add to its portfolio: those it has actually
+ * invited, via any survey it hosts — never an arbitrary/unvetted entry.
+ */
+export function getOrgsInvitedByHostOrg(hostOrg: string): InvitedOrg[] {
+  const hostedSurveyIds = new Set(
+    MOCK_SURVEYS.filter((s) => s.hostOrg === hostOrg).map((s) => s.id)
+  );
+  return MOCK_ORGS.filter((o) => hostedSurveyIds.has(o.surveyId));
+}
+
 // ── Custom asset classes (per-survey, host-defined) ─────────────────────────
 // Each maps a free-text label the host uses internally to zero or more of the
 // fixed Roundtables benchmark categories (see src/lib/asset-class-groups.ts).
