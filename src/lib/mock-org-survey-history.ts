@@ -1,13 +1,12 @@
 // ─── Org survey history & pre-fill source selection ────────────────────────
 //
 // An organization's past survey responses are what get pulled forward to
-// pre-populate its next survey — the exact mechanism the Response Review
-// tab exists to police ("this data will be available for prepopulation
-// into all the other upcoming KKR requests"). This is the other side of
-// that: from an org's own detail page, an admin can see its full survey
-// history and choose which past response should seed the next one, rather
-// than the platform silently picking the most recent submission regardless
-// of whether it was actually complete.
+// pre-populate its next survey ("this data will be available for
+// prepopulation into all the other upcoming KKR requests"). From an org's
+// own detail page, an admin can see its full survey history and choose
+// which past response should seed the next one, rather than the platform
+// silently picking the most recent submission regardless of whether it was
+// actually complete.
 
 export type SurveyHistoryStatus = "submitted" | "in_progress";
 

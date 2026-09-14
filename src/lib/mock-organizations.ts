@@ -4,8 +4,8 @@
 // RoundTables admin's Organizations tab (ID / Name / Org Code / LPI Score /
 // Last Updated / Total Users / Status). Built on top of the same
 // PLATFORM_ORGS used everywhere else in Multi-Org Support, so this tab and
-// the Users / Response Review / Contacts Management tabs are all describing
-// the same underlying organizations.
+// the Users / Contacts Management tabs are all describing the same
+// underlying organizations.
 
 import { PLATFORM_ORGS, PLATFORM_USERS } from "./mock-org-associations";
 
