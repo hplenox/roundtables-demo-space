@@ -166,7 +166,7 @@ function ScoreTile({
 }
 
 // Illustrative placeholder data — Evenness is a demo-only, non-per-org metric
-// throughout this dashboard (see EvennessSection), so these tiles mirror that.
+// throughout this dashboard.
 const EVENNESS_TILES: Array<{ label: string; score: number; percentile: number }> = [
   { label: "Evenness Prime",    score: 1.85, percentile: 78 },
   { label: "Prime · Gender",    score: 0.67, percentile: 52 },
