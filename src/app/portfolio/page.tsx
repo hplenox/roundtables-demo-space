@@ -11,10 +11,14 @@ import {
   MOCK_PORTFOLIO_MANAGERS,
   getTotalCommitted,
   getTotalFunds,
-  ASSET_CLASSES,
 } from "@/lib/mock-portfolio-data";
-import { MOCK_ORGS, MOCK_SURVEYS } from "@/lib/mock-data";
+import { MOCK_SURVEYS, getOrgsInvitedByHostOrg } from "@/lib/mock-data";
 import { PortfolioManager, PortfolioFund, FundStatus } from "@/types/portfolio";
+
+// Same demo persona as Sidebar.tsx / mock-clients.ts client-lenox — the LP
+// whose portfolio this page manages. Only orgs this org has actually invited
+// to one of its own surveys are eligible to add here.
+const MY_ORG_NAME = "Lenox Park Solutions, Inc.";
 
 // ─── helpers ─────────────────────────────────────────────────────────────────
 
@@ -382,17 +386,14 @@ function AddManagerModal({
   onAdd: (m: PortfolioManager) => void;
   onClose: () => void;
 }) {
-  const [tab, setTab] = useState<"directory" | "custom">("directory");
   const [search, setSearch] = useState("");
   const [added, setAdded] = useState<string | null>(null);
 
-  // Custom form state
-  const [form, setForm] = useState({
-    name: "", assetClass: "Private Equity", location: "", aum: "",
-    contactName: "", contactEmail: "", contactTitle: "", notes: "",
-  });
+  // Eligible orgs are restricted to ones Lenox Park has actually invited to
+  // one of its own surveys — never a free-typed, unvetted entry.
+  const invitedOrgs = useMemo(() => getOrgsInvitedByHostOrg(MY_ORG_NAME), []);
 
-  const directoryOrgs = MOCK_ORGS.filter(
+  const directoryOrgs = invitedOrgs.filter(
     (o) =>
       !existingIds.has("pm-" + o.id.replace("org-", "")) &&
       (search === "" ||
@@ -401,7 +402,7 @@ function AddManagerModal({
   );
 
   function handleAddFromDirectory(orgId: string) {
-    const org = MOCK_ORGS.find((o) => o.id === orgId);
+    const org = invitedOrgs.find((o) => o.id === orgId);
     if (!org) return;
     const m: PortfolioManager = {
       id: `pm-${Date.now()}`,
@@ -423,27 +424,6 @@ function AddManagerModal({
     setTimeout(() => { onAdd(m); onClose(); }, 900);
   }
 
-  function handleAddCustom() {
-    if (!form.name.trim()) return;
-    const m: PortfolioManager = {
-      id: `pm-${Date.now()}`,
-      name: form.name,
-      contactName: form.contactName,
-      contactEmail: form.contactEmail,
-      contactTitle: form.contactTitle,
-      assetClass: form.assetClass,
-      strategy: [],
-      location: form.location,
-      aum: form.aum || "—",
-      aumRaw: 0,
-      addedDate: "Mar 31, 2026",
-      notes: form.notes,
-      funds: [],
-    };
-    onAdd(m);
-    onClose();
-  }
-
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden">
@@ -452,126 +432,64 @@ function AddManagerModal({
             <div className="w-7 h-7 rounded-lg bg-violet-50 flex items-center justify-center">
               <Building2 size={14} className="text-violet-600" />
             </div>
-            <p className="text-[13.5px] font-semibold text-slate-800">Add Manager</p>
+            <div>
+              <p className="text-[13.5px] font-semibold text-slate-800">Add Manager</p>
+              <p className="text-[11px] text-slate-400 mt-0.5">Only organizations invited to your surveys can be added</p>
+            </div>
           </div>
           <button onClick={onClose} className="w-7 h-7 rounded-lg hover:bg-slate-100 flex items-center justify-center">
             <X size={14} className="text-slate-500" />
           </button>
         </div>
 
-        {/* Tabs */}
-        <div className="flex border-b border-slate-100">
-          {(["directory", "custom"] as const).map((t) => (
-            <button
-              key={t}
-              onClick={() => setTab(t)}
-              className={`flex-1 py-2.5 text-[12px] font-medium transition-colors border-b-2 -mb-px
-                ${tab === t ? "border-[#00b8a9] text-[#00897b]" : "border-transparent text-slate-500 hover:text-slate-700"}`}
-            >
-              {t === "directory" ? "Search Directory" : "Add Custom"}
-            </button>
-          ))}
-        </div>
-
-        {tab === "directory" ? (
-          <div className="p-4">
-            <div className="relative mb-3">
-              <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
-              <input
-                autoFocus
-                type="text"
-                placeholder="Search by name or asset class…"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="w-full h-9 pl-8 pr-3 rounded-lg border border-slate-200 text-[12.5px] text-slate-700 placeholder:text-slate-400 focus:outline-none focus:border-slate-300"
-              />
-            </div>
-            <div className="space-y-1.5 max-h-72 overflow-y-auto">
-              {directoryOrgs.length === 0 ? (
-                <p className="text-center text-[12px] text-slate-400 py-8">No matching organizations found.</p>
-              ) : directoryOrgs.map((org) => {
-                const ac = assetColor(org.assetClass);
-                const isAdded = added === org.id;
-                return (
-                  <div key={org.id} className="flex items-center gap-3 p-3 rounded-lg border border-slate-100 hover:border-slate-200 hover:bg-slate-50 transition-colors">
-                    <div className="w-8 h-8 rounded-lg bg-[#0f1923] flex items-center justify-center shrink-0">
-                      <span className="text-[9px] font-bold text-white">{org.name.substring(0, 2).toUpperCase()}</span>
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-[12.5px] font-semibold text-slate-800 truncate">{org.name}</p>
-                      <p className="text-[10.5px] text-slate-400">{org.contactName} · {org.location}</p>
-                    </div>
-                    <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded ${ac.bg} ${ac.text} shrink-0`}>
-                      {org.assetClass}
-                    </span>
-                    <button
-                      onClick={() => handleAddFromDirectory(org.id)}
-                      className={`shrink-0 px-3 py-1 rounded-lg text-[11px] font-medium transition-colors
-                        ${isAdded
-                          ? "bg-emerald-50 text-emerald-600 border border-emerald-200"
-                          : "bg-[#0f1923] text-white hover:bg-[#1a2733]"}`}
-                    >
-                      {isAdded ? "Added ✓" : "Add"}
-                    </button>
+        <div className="p-4">
+          <div className="relative mb-3">
+            <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+            <input
+              autoFocus
+              type="text"
+              placeholder="Search by name or asset class…"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="w-full h-9 pl-8 pr-3 rounded-lg border border-slate-200 text-[12.5px] text-slate-700 placeholder:text-slate-400 focus:outline-none focus:border-slate-300"
+            />
+          </div>
+          <div className="space-y-1.5 max-h-72 overflow-y-auto">
+            {directoryOrgs.length === 0 ? (
+              <p className="text-center text-[12px] text-slate-400 py-8">
+                {invitedOrgs.length === 0
+                  ? "No organizations have been invited to your surveys yet."
+                  : "No matching invited organizations found."}
+              </p>
+            ) : directoryOrgs.map((org) => {
+              const ac = assetColor(org.assetClass);
+              const isAdded = added === org.id;
+              return (
+                <div key={org.id} className="flex items-center gap-3 p-3 rounded-lg border border-slate-100 hover:border-slate-200 hover:bg-slate-50 transition-colors">
+                  <div className="w-8 h-8 rounded-lg bg-[#0f1923] flex items-center justify-center shrink-0">
+                    <span className="text-[9px] font-bold text-white">{org.name.substring(0, 2).toUpperCase()}</span>
                   </div>
-                );
-              })}
-            </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[12.5px] font-semibold text-slate-800 truncate">{org.name}</p>
+                    <p className="text-[10.5px] text-slate-400">{org.contactName} · {org.location}</p>
+                  </div>
+                  <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded ${ac.bg} ${ac.text} shrink-0`}>
+                    {org.assetClass}
+                  </span>
+                  <button
+                    onClick={() => handleAddFromDirectory(org.id)}
+                    className={`shrink-0 px-3 py-1 rounded-lg text-[11px] font-medium transition-colors
+                      ${isAdded
+                        ? "bg-emerald-50 text-emerald-600 border border-emerald-200"
+                        : "bg-[#0f1923] text-white hover:bg-[#1a2733]"}`}
+                  >
+                    {isAdded ? "Added ✓" : "Add"}
+                  </button>
+                </div>
+              );
+            })}
           </div>
-        ) : (
-          <div className="p-4 space-y-3">
-            {[
-              { label: "Manager Name *", key: "name", placeholder: "e.g. Acme Capital" },
-              { label: "Location", key: "location", placeholder: "e.g. New York, NY" },
-              { label: "AUM", key: "aum", placeholder: "e.g. $50B" },
-              { label: "Contact Name", key: "contactName", placeholder: "Full name" },
-              { label: "Contact Email", key: "contactEmail", placeholder: "email@firm.com" },
-              { label: "Contact Title", key: "contactTitle", placeholder: "e.g. Managing Director" },
-            ].map(({ label, key, placeholder }) => (
-              <div key={key}>
-                <label className="block text-[10.5px] font-semibold text-slate-500 uppercase tracking-wide mb-1">{label}</label>
-                <input
-                  type="text"
-                  placeholder={placeholder}
-                  value={(form as Record<string, string>)[key]}
-                  onChange={(e) => setForm((f) => ({ ...f, [key]: e.target.value }))}
-                  className="w-full h-8 px-3 rounded-lg border border-slate-200 text-[12.5px] text-slate-700 placeholder:text-slate-400 focus:outline-none focus:border-slate-300"
-                />
-              </div>
-            ))}
-            <div>
-              <label className="block text-[10.5px] font-semibold text-slate-500 uppercase tracking-wide mb-1">Asset Class</label>
-              <select
-                value={form.assetClass}
-                onChange={(e) => setForm((f) => ({ ...f, assetClass: e.target.value }))}
-                className="w-full h-8 px-3 rounded-lg border border-slate-200 text-[12.5px] text-slate-700 focus:outline-none focus:border-slate-300 bg-white"
-              >
-                {ASSET_CLASSES.map((ac) => <option key={ac}>{ac}</option>)}
-              </select>
-            </div>
-            <div>
-              <label className="block text-[10.5px] font-semibold text-slate-500 uppercase tracking-wide mb-1">Notes</label>
-              <textarea
-                rows={2}
-                placeholder="Optional notes…"
-                value={form.notes}
-                onChange={(e) => setForm((f) => ({ ...f, notes: e.target.value }))}
-                className="w-full px-3 py-2 rounded-lg border border-slate-200 text-[12.5px] text-slate-700 placeholder:text-slate-400 focus:outline-none focus:border-slate-300 resize-none"
-              />
-            </div>
-            <div className="flex justify-end gap-2 pt-1">
-              <button onClick={onClose} className="px-3.5 py-1.5 text-[12px] font-medium text-slate-600 hover:bg-slate-100 rounded-lg transition-colors">Cancel</button>
-              <button
-                onClick={handleAddCustom}
-                disabled={!form.name.trim()}
-                className="flex items-center gap-1.5 px-4 py-1.5 rounded-lg bg-[#0f1923] text-white text-[12px] font-medium hover:bg-[#1a2733] disabled:opacity-40 transition-colors"
-              >
-                <Plus size={12} />
-                Add Manager
-              </button>
-            </div>
-          </div>
-        )}
+        </div>
       </div>
     </div>
   );
