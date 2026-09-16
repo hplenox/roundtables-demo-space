@@ -9,13 +9,13 @@ import LpiGaugeBar from "@/components/report/LpiGaugeBar";
 import BenchmarksCard from "@/components/report/BenchmarksCard";
 import ManagerFunnelBar from "@/components/report/ManagerFunnelBar";
 import ManagerProfileCard from "@/components/report/ManagerProfileCard";
-import WorkplacePoliciesCard from "@/components/report/WorkplacePoliciesCard";
+import WorkplacePoliciesCard, { POLICIES } from "@/components/report/WorkplacePoliciesCard";
 import GenderDemographicsSection from "@/components/report/GenderDemographicsSection";
 import RacialDemographicsSection from "@/components/report/RacialDemographicsSection";
 
 import {
   ChevronRight, ChevronDown, Printer, Download,
-  User, Mail, Calendar, Clock, TrendingUp, BadgeCheck,
+  User, Mail, Calendar, Clock, TrendingUp, TrendingDown, BadgeCheck,
   LayoutDashboard, Building2, Sparkles, Info,
 } from "lucide-react";
 import type { InvitedOrg } from "@/types/survey";
@@ -67,6 +67,18 @@ function pct(value: number, total: number): string {
   return total === 0 ? "0.0" : ((value / total) * 100).toFixed(1);
 }
 
+const RACE_LABELS: Record<string, string> = {
+  white:          "White/European",
+  asian:          "Asian",
+  black:          "Black/African American",
+  latino:         "Hispanic/Latino/a/e/x",
+  mena:           "Middle Eastern/North African",
+  indigenous_na:  "Indigenous North American",
+  indigenous_out: "Indigenous (other)",
+  other:          "Other",
+  multiracial:    "Multiracial",
+};
+
 function buildInsightsText(org: InvitedOrg): string {
   if (!org.lpiScore || !org.benchmarks) return "";
 
@@ -113,23 +125,12 @@ function buildInsightsText(org: InvitedOrg): string {
     const menPct   = pct(wf.men, total);
     const womenPct = pct(wf.women, total);
 
-    const raceLabels: Record<string, string> = {
-      white:          "White/European",
-      asian:          "Asian",
-      black:          "Black/African American",
-      latino:         "Hispanic/Latino/a/e/x",
-      mena:           "Middle Eastern/North African",
-      indigenous_na:  "Indigenous North American",
-      indigenous_out: "Indigenous (other)",
-      other:          "Other",
-      multiracial:    "Multiracial",
-    };
     const rwf = org.racialDemographics.workforce;
     const raceTotal = Object.values(rwf).reduce((s, v) => s + v, 0);
     const raceParts = (Object.entries(rwf) as [string, number][])
       .filter(([, v]) => v > 0)
       .sort(([, a], [, b]) => b - a)
-      .map(([k, v]) => `${pct(v, raceTotal)}% ${raceLabels[k] ?? k}`)
+      .map(([k, v]) => `${pct(v, raceTotal)}% ${RACE_LABELS[k] ?? k}`)
       .join(", ");
 
     para2 = `The workforce of ${total} employees comprises ${menPct}% men and ${womenPct}% women, with racial composition of ${raceParts}.`;
@@ -156,6 +157,69 @@ function buildInsightsText(org: InvitedOrg): string {
   return [para1, para2].filter(Boolean).join(" ");
 }
 
+interface InsightBullet {
+  lead: string;
+  rest: string;
+  trend: "up" | "down";
+}
+
+function buildInsightBullets(org: InvitedOrg): InsightBullet[] {
+  const bullets: InsightBullet[] = [];
+
+  if (org.lpiScore && org.benchmarks) {
+    const univPct = org.benchmarks.universe.managerPercentile;
+    const trend: "up" | "down" = univPct >= 50 ? "up" : "down";
+    bullets.push({
+      lead: `${ordinal(univPct)} percentile`,
+      rest: ` in the Roundtables universe — among ${trend === "up" ? "stronger" : "weaker"} performers on leadership and inclusion maturity.`,
+      trend,
+    });
+  }
+
+  if (org.racialDemographics) {
+    const ro = org.racialDemographics.ownership;
+    const ownerTotal = Object.values(ro).reduce((s, v) => s + v, 0);
+    if (ownerTotal > 0) {
+      const whitePct = Math.round((ro.white / ownerTotal) * 100);
+      const nonWhitePct = 100 - whitePct;
+      const topGroups = (Object.entries(ro) as [string, number][])
+        .filter(([k, v]) => k !== "white" && v > 0)
+        .sort(([, a], [, b]) => b - a)
+        .slice(0, 2)
+        .map(([k, v]) => `${RACE_LABELS[k] ?? k} representation ${Math.round((v / ownerTotal) * 100)}%`)
+        .join(", ");
+
+      const trend: "up" | "down" = nonWhitePct >= 25 ? "up" : "down";
+      bullets.push(trend === "up"
+        ? { lead: "Ownership-level strength:", rest: ` ${topGroups || `non-White/European individuals hold ${nonWhitePct}% of ownership`}.`, trend }
+        : { lead: "Ownership concentration:", rest: ` White/European individuals hold ${whitePct}% of ownership, limiting broader representation at the top.`, trend });
+    }
+  }
+
+  if (org.genderDemographics) {
+    const wf = org.genderDemographics.workforce;
+    const ld = org.genderDemographics.leadership;
+    const wfTotal = wf.men + wf.women;
+    const ldTotal = ld.men + ld.women;
+    if (wfTotal > 0 && ldTotal > 0) {
+      const menWfPct = Math.round((wf.men / wfTotal) * 100);
+      const menLdPct = Math.round((ld.men / ldTotal) * 100);
+      const trend: "up" | "down" = menLdPct <= 60 ? "up" : "down";
+      bullets.push(trend === "down"
+        ? { lead: "Gender is the growth area:", rest: ` men are ${menWfPct}% of the workforce and ${menLdPct}% of leadership.`, trend }
+        : { lead: "Gender balance strength:", rest: ` leadership is ${100 - menLdPct}% women, close to parity with the ${100 - menWfPct}% share of the workforce.`, trend });
+    }
+  }
+
+  const adoptedCount = POLICIES.filter((p) => p.uploaded).length;
+  const trend: "up" | "down" = adoptedCount >= Math.ceil(POLICIES.length / 2) ? "up" : "down";
+  bullets.push(trend === "up"
+    ? { lead: "Policy foundation in place:", rest: ` ${adoptedCount} of ${POLICIES.length} foundational policies adopted, supporting sustained inclusion practices.`, trend }
+    : { lead: "Policy gaps remain:", rest: ` only ${adoptedCount} of ${POLICIES.length} foundational policies adopted. Broader policy coverage is associated with stronger leadership diversity outcomes.`, trend });
+
+  return bullets;
+}
+
 // ─── Insights Box ─────────────────────────────────────────────────────────────
 
 function InsightsBox({ org }: { org: InvitedOrg }) {
@@ -163,32 +227,64 @@ function InsightsBox({ org }: { org: InvitedOrg }) {
   const text = buildInsightsText(org);
   if (!text) return null;
 
-  const preview = text.length > 180 ? text.slice(0, 180).trimEnd() + "…" : text;
+  const bullets = buildInsightBullets(org);
 
   return (
     <div className="max-w-5xl mx-auto px-6 pt-5 print:hidden">
-      <div className="rounded-xl border border-[#00b8a9]/30 bg-[#00b8a9]/5 overflow-hidden">
-        <button
-          onClick={() => setExpanded((v) => !v)}
-          className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-[#00b8a9]/5 transition-colors group"
-        >
-          <div className="w-6 h-6 rounded-lg bg-[#00b8a9]/15 flex items-center justify-center shrink-0">
-            <Sparkles size={12} className="text-[#00897b]" strokeWidth={1.75} />
+      <div className="rounded-2xl border border-slate-200/80 bg-white shadow-sm overflow-hidden">
+        <div className="px-5 pt-4 pb-3">
+          <div className="flex items-center justify-between gap-4 mb-3">
+            <div className="flex items-center gap-1.5">
+              <Sparkles size={15} className="text-violet-500" strokeWidth={2} />
+              <h3 className="text-[14px] font-bold text-slate-800">AI Insights</h3>
+              <div className="relative group inline-flex items-center">
+                <Info size={13} className="text-slate-400 hover:text-blue-500 cursor-pointer transition-colors" />
+                <div className="absolute top-full left-0 mt-3 w-72 bg-[#0f1923] rounded-xl p-4 shadow-2xl opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-200 z-50">
+                  <p className="text-[12.5px] text-slate-200 leading-relaxed">
+                    AI-generated observations drawn from {org.name}&apos;s survey data and benchmark position.
+                  </p>
+                </div>
+              </div>
+            </div>
+            <button
+              onClick={() => setExpanded((v) => !v)}
+              className="flex items-center gap-1 text-[13px] font-semibold text-blue-600 hover:text-blue-700 transition-colors shrink-0"
+            >
+              {expanded ? "Collapse narrative" : "Read full narrative"}
+              <ChevronDown
+                size={15}
+                className={`transition-transform duration-200 ${expanded ? "rotate-180" : ""}`}
+              />
+            </button>
           </div>
-          <div className="flex-1 min-w-0">
-            <span className="text-[10px] font-bold text-[#00897b] uppercase tracking-widest">AI Insights Summary</span>
-            {!expanded && (
-              <p className="text-[12px] text-slate-500 leading-snug mt-0.5 truncate">{preview}</p>
-            )}
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-2.5">
+            {bullets.map((b, i) => {
+              const Icon = b.trend === "up" ? TrendingUp : TrendingDown;
+              return (
+                <div key={i} className="flex items-start gap-2">
+                  <Icon
+                    size={14}
+                    className={`shrink-0 mt-0.5 ${b.trend === "up" ? "text-emerald-600" : "text-orange-500"}`}
+                  />
+                  <p className="text-[13px] text-slate-700 leading-snug">
+                    <strong className="font-semibold text-slate-900">{b.lead}</strong>
+                    {b.rest}
+                  </p>
+                </div>
+              );
+            })}
           </div>
-          <ChevronDown
-            size={14}
-            className={`shrink-0 text-[#00897b]/60 transition-transform duration-200 group-hover:text-[#00897b] ${expanded ? "rotate-180" : ""}`}
-          />
-        </button>
+        </div>
+
         {expanded && (
-          <div className="px-4 pb-4 pt-1 border-t border-[#00b8a9]/20">
-            <p className="text-[12.5px] text-slate-600 leading-relaxed">{text}</p>
+          <div className="px-5 pb-4 pt-3 border-t border-slate-100">
+            <p className="text-[13px] text-slate-600 leading-relaxed">{text}</p>
+            <p className="text-[11px] text-slate-400 leading-relaxed mt-3">
+              AI-generated summary of underlying survey data. All data is self-reported and unaudited;
+              observations describe composition and are directionally informative. Intent should be
+              assessed through direct engagement with the organization.
+            </p>
           </div>
         )}
       </div>
