@@ -1,6 +1,6 @@
 "use client";
 
-const POLICIES = [
+export const POLICIES = [
   { label: "Diversity, Equity & Inclusion Policy", uploaded: true },
   { label: "Family and Medical Leave Act",          uploaded: true },
   { label: "Pay Equity Policy",                     uploaded: false },

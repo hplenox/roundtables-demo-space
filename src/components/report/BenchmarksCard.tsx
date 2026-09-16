@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import {
-  Info, Eye, SlidersHorizontal, Check, HeartHandshake, PartyPopper,
+  Info, SlidersHorizontal, Check,
 } from "lucide-react";
 import type { InvitedOrg, BenchmarkPool, LpiSubMetric } from "@/types/survey";
 
@@ -22,43 +22,6 @@ export function ordinal(n: number): string {
 export function pctColor(p: number | null): string {
   if (p === null) return "#94a3b8";
   return p >= 70 ? "#059669" : p >= 40 ? "#b45309" : "#dc2626";
-}
-
-// A small deterministic placeholder count for the Encourage/Congratulate badge —
-// this is a UI affordance only (no backend), seeded so it stays stable per tile/render.
-export function seedCount(seed: number, percentile: number | null): number {
-  if (percentile === null) return 0;
-  return ((Math.round(percentile) * (seed * 7 + 3)) % 17) + 2;
-}
-
-/** Recognize top-quartile strengths, encourage weaker areas — shared across score tiles and the manager header. */
-export function AllocatorActionButton({
-  percentile, seed, size = "sm",
-}: {
-  percentile: number | null; seed: number; size?: "sm" | "md";
-}) {
-  const [count, setCount] = useState(() => seedCount(seed, percentile));
-  const isTop = (percentile ?? 0) >= 75;
-  const iconSize = size === "md" ? 15 : 12;
-
-  return (
-    <button
-      disabled={percentile === null}
-      onClick={() => setCount((c) => c + 1)}
-      className={`flex items-center justify-center gap-1.5 font-semibold rounded-lg transition-colors ${
-        size === "md" ? "text-[13px] px-3 py-1.5" : "text-[11px] py-1"
-      } ${
-        percentile === null
-          ? "text-slate-300 cursor-default"
-          : isTop
-            ? "text-emerald-600 hover:bg-emerald-50"
-            : "text-violet-600 hover:bg-violet-50"
-      }`}
-    >
-      {percentile !== null && (isTop ? <PartyPopper size={iconSize} /> : <HeartHandshake size={iconSize} />)}
-      {percentile === null ? "No data" : `${isTop ? "Congratulate" : "Encourage"} (${count})`}
-    </button>
-  );
 }
 
 const EMPTY_METRIC: LpiSubMetric = { label: "", rawScore: 0, maxScore: 0, percentile: null };
@@ -138,9 +101,9 @@ function PercentileGauge({ pool }: { pool: BenchmarkPool }) {
 // ─── Score tile (LPI sub-component / Evenness) ─────────────────────────────────
 
 function ScoreTile({
-  label, rawScore, percentile, seed,
+  label, rawScore, percentile,
 }: {
-  label: string; rawScore: number; percentile: number | null; seed: number;
+  label: string; rawScore: number; percentile: number | null;
 }) {
   const color = pctColor(percentile);
 
@@ -153,13 +116,10 @@ function ScoreTile({
       <p className="text-[11.5px] font-bold mb-2 tabular-nums" style={{ color }}>
         {percentile === null ? "—" : ordinal(percentile)}
       </p>
-      <div className="h-1.5 bg-slate-200 rounded-full overflow-hidden mb-3">
+      <div className="h-1.5 bg-slate-200 rounded-full overflow-hidden">
         {percentile !== null && (
           <div className="h-full rounded-full transition-all duration-500" style={{ width: `${percentile}%`, backgroundColor: color }} />
         )}
-      </div>
-      <div className="mt-auto">
-        <AllocatorActionButton percentile={percentile} seed={seed} />
       </div>
     </div>
   );
@@ -326,15 +286,6 @@ export default function BenchmarksCard({
         </div>
       </div>
 
-      {/* Allocator view line */}
-      <div className="flex items-center gap-2 -mt-2.5">
-        <Eye size={13} className="text-violet-500 shrink-0" />
-        <p className="text-[12px] text-violet-600">
-          <strong>Allocator view</strong> — recognize top-quartile strengths or encourage weaker areas
-          straight from the score tiles below.
-        </p>
-      </div>
-
       {/* Big percentile stat + gauge */}
       <div>
         <div className="flex items-end justify-between flex-wrap gap-2">
@@ -384,12 +335,12 @@ export default function BenchmarksCard({
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
-          <ScoreTile label="LPI Prime"      rawScore={primeAll.rawScore}     percentile={primeAll.percentile}     seed={1} />
-          <ScoreTile label="Prime · Gender" rawScore={primeGender.rawScore}  percentile={primeGender.percentile}  seed={2} />
-          <ScoreTile label="Prime · Racial" rawScore={primeRacial.rawScore}  percentile={primeRacial.percentile}  seed={3} />
-          <ScoreTile label="LPI Ownership"  rawScore={ownershipAll.rawScore} percentile={ownershipAll.percentile} seed={4} />
-          <ScoreTile label="LPI · Gender"   rawScore={genderFull.rawScore}   percentile={genderFull.percentile}   seed={5} />
-          <ScoreTile label="LPI · Racial"   rawScore={racialFull.rawScore}   percentile={racialFull.percentile}   seed={6} />
+          <ScoreTile label="LPI Prime"      rawScore={primeAll.rawScore}     percentile={primeAll.percentile} />
+          <ScoreTile label="Prime · Gender" rawScore={primeGender.rawScore}  percentile={primeGender.percentile} />
+          <ScoreTile label="Prime · Racial" rawScore={primeRacial.rawScore}  percentile={primeRacial.percentile} />
+          <ScoreTile label="LPI Ownership"  rawScore={ownershipAll.rawScore} percentile={ownershipAll.percentile} />
+          <ScoreTile label="LPI · Gender"   rawScore={genderFull.rawScore}   percentile={genderFull.percentile} />
+          <ScoreTile label="LPI · Racial"   rawScore={racialFull.rawScore}   percentile={racialFull.percentile} />
         </div>
 
         <p className="text-[11px] text-slate-400 leading-relaxed mt-3">
@@ -411,8 +362,8 @@ export default function BenchmarksCard({
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
-          {EVENNESS_TILES.map((t, i) => (
-            <ScoreTile key={t.label} label={t.label} rawScore={t.score} percentile={t.percentile} seed={10 + i} />
+          {EVENNESS_TILES.map((t) => (
+            <ScoreTile key={t.label} label={t.label} rawScore={t.score} percentile={t.percentile} />
           ))}
         </div>
       </div>

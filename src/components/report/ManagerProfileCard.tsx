@@ -6,7 +6,7 @@ import {
   History, Bell, Bookmark, Share2, ChevronDown, Check, Copy, Mail, FileDown,
 } from "lucide-react";
 import type { InvitedOrg } from "@/types/survey";
-import { ordinal, pctColor, AllocatorActionButton } from "@/components/report/BenchmarksCard";
+import { ordinal, pctColor } from "@/components/report/BenchmarksCard";
 
 function scoreColor(score: number): string {
   return score >= 8 ? "#00897b" : score >= 6.5 ? "#b45309" : "#dc2626";
@@ -212,11 +212,6 @@ export default function ManagerProfileCard({ org }: { org: InvitedOrg }) {
                 </span>
               </div>
             </div>
-          </div>
-
-          {/* Congratulate / Encourage */}
-          <div className="shrink-0 self-center">
-            <AllocatorActionButton percentile={universePct} seed={99} size="md" />
           </div>
       </div>
 
