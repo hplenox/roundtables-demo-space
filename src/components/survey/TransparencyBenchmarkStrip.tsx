@@ -29,7 +29,7 @@ export default function TransparencyBenchmarkStrip({
     const W = containerRef.current.clientWidth || 500;
     const padL = 20;
     const padR = 20;
-    const trackY = 46;
+    const trackY = 36;
 
     const xScale = d3.scaleLinear().domain([0, 100]).range([padL, W - padR]);
     const sorted = [...allScores.map((p) => p.score)].sort((a, b) => a - b);
@@ -53,26 +53,26 @@ export default function TransparencyBenchmarkStrip({
       const x = xScale(v);
       svg.append("line")
         .attr("x1", x).attr("x2", x)
-        .attr("y1", trackY - 14).attr("y2", trackY + 14)
+        .attr("y1", trackY - 10).attr("y2", trackY + 10)
         .attr("stroke", "#94a3b8").attr("stroke-width", 1).attr("stroke-dasharray", "2,2");
       svg.append("text")
-        .attr("x", x).attr("y", trackY + 27)
+        .attr("x", x).attr("y", trackY + 22)
         .attr("text-anchor", "middle")
-        .attr("font-size", "9px").attr("fill", "#94a3b8")
+        .attr("font-size", "8.5px").attr("fill", "#94a3b8")
         .attr("font-family", "inherit")
         .text(label);
     });
 
     // Axis endpoints
     svg.append("text")
-      .attr("x", padL).attr("y", trackY - 20)
-      .attr("font-size", "9px").attr("fill", "#cbd5e1")
+      .attr("x", padL).attr("y", trackY - 16)
+      .attr("font-size", "8.5px").attr("fill", "#cbd5e1")
       .attr("font-family", "inherit")
       .text("0");
     svg.append("text")
-      .attr("x", W - padR).attr("y", trackY - 20)
+      .attr("x", W - padR).attr("y", trackY - 16)
       .attr("text-anchor", "end")
-      .attr("font-size", "9px").attr("fill", "#cbd5e1")
+      .attr("font-size", "8.5px").attr("fill", "#cbd5e1")
       .attr("font-family", "inherit")
       .text("100");
 
@@ -97,7 +97,7 @@ export default function TransparencyBenchmarkStrip({
       })
       .on("mouseleave", () => setTooltip((t) => ({ ...t, visible: false })))
       .transition().duration(600).ease(d3.easeCubicOut)
-      .attr("r", 6);
+      .attr("r", 5);
 
     // Current-survey marker
     const curX = xScale(currentScore);
@@ -113,13 +113,13 @@ export default function TransparencyBenchmarkStrip({
       .attr("stroke", "white")
       .attr("stroke-width", 2.5)
       .transition().delay(500).duration(350).ease(d3.easeCubicOut)
-      .attr("r", 10);
+      .attr("r", 8);
 
     // Persistent callout label above the current marker
     svg.append("text")
-      .attr("x", curX).attr("y", trackY - 24)
+      .attr("x", curX).attr("y", trackY - 20)
       .attr("text-anchor", "middle")
-      .attr("font-size", "10.5px").attr("font-weight", "700")
+      .attr("font-size", "10px").attr("font-weight", "700")
       .attr("fill", color)
       .attr("font-family", "inherit")
       .attr("opacity", 0)
@@ -131,11 +131,11 @@ export default function TransparencyBenchmarkStrip({
 
   return (
     <div ref={containerRef} className="relative w-full">
-      <svg ref={svgRef} width="100%" height={96} style={{ display: "block", overflow: "visible" }} />
+      <svg ref={svgRef} width="100%" height={76} style={{ display: "block", overflow: "visible" }} />
       {tooltip.visible && (
         <div
           className="absolute pointer-events-none z-10 px-2.5 py-1.5 rounded-lg bg-[#0f1923] text-white text-[11px] font-medium shadow-xl whitespace-nowrap"
-          style={{ left: tooltip.x, top: tooltip.y - 40, transform: "translateX(-50%)" }}
+          style={{ left: tooltip.x, top: tooltip.y - 34, transform: "translateX(-50%)" }}
         >
           {tooltip.text}
         </div>

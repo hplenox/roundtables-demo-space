@@ -76,7 +76,7 @@ export default function OverviewPage() {
   const noContacts = survey.totalInvited === 0;
 
   return (
-    <div className="space-y-5 relative">
+    <div className="relative">
 
       {/* ── No-contacts blur overlay ───────────────────────────────── */}
       {noContacts && (
@@ -104,7 +104,7 @@ export default function OverviewPage() {
       )}
 
       {/* ── Content (blurred when no contacts) ────────────────────── */}
-      <div className={noContacts ? "blur-sm pointer-events-none select-none opacity-60" : ""}>
+      <div className={`space-y-4 ${noContacts ? "blur-sm pointer-events-none select-none opacity-60" : ""}`}>
 
       {/* ── At-a-glance strip ─────────────────────────────────────── */}
       <div className="bg-white rounded-xl border border-slate-200 px-5 py-4 flex flex-wrap items-center gap-6">
