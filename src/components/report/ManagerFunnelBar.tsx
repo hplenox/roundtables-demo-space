@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import {
   Briefcase, Search, ChevronLeft, ChevronRight,
 } from "lucide-react";
-import { pctColor, ordinal } from "@/components/report/BenchmarksCard";
+import { pctColor, ordinal } from "@/components/report/benchmarkFormat";
 
 interface FunnelOrg {
   id: string;

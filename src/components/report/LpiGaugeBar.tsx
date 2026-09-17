@@ -2,13 +2,16 @@
 
 import { useEffect, useRef } from "react";
 import * as d3 from "d3";
+import { ordinal, pctColor } from "@/components/report/benchmarkFormat";
 
 interface LpiGaugeProps {
   score: number; // 0-10
   version?: string;
+  universePercentile: number;
+  portfolioPercentile: number;
 }
 
-export default function LpiGaugeBar({ score, version = "v3.1" }: LpiGaugeProps) {
+export default function LpiGaugeBar({ score, version = "v3.1", universePercentile, portfolioPercentile }: LpiGaugeProps) {
   const svgRef = useRef<SVGSVGElement>(null);
 
   useEffect(() => {
@@ -130,18 +133,20 @@ export default function LpiGaugeBar({ score, version = "v3.1" }: LpiGaugeProps) 
           </div>
         </div>
         <div className="text-right pr-1 pb-1">
-          <p className="text-[10px] text-slate-400 uppercase tracking-wider mb-0.5">Scale</p>
-          <div className="flex items-center gap-1.5">
-            {[
-              { label: "Emerging", color: "#ef4444" },
-              { label: "Developing", color: "#eab308" },
-              { label: "Strong", color: "#00b8a9" },
-            ].map(({ label, color }) => (
-              <div key={label} className="flex items-center gap-1">
-                <span className="w-2 h-2 rounded-full inline-block" style={{ backgroundColor: color }} />
-                <span className="text-[10px] text-slate-500">{label}</span>
-              </div>
-            ))}
+          <p className="text-[10px] text-slate-400 uppercase tracking-wider mb-1">Percentile rank</p>
+          <div className="flex items-center gap-1.5 flex-wrap justify-end">
+            <span
+              className="px-2 py-0.5 rounded-full text-[10.5px] font-bold bg-white border border-slate-200"
+              style={{ color: pctColor(universePercentile) }}
+            >
+              {ordinal(universePercentile)} · RT Universe
+            </span>
+            <span
+              className="px-2 py-0.5 rounded-full text-[10.5px] font-bold bg-white border border-slate-200"
+              style={{ color: pctColor(portfolioPercentile) }}
+            >
+              {ordinal(portfolioPercentile)} · Portfolio
+            </span>
           </div>
         </div>
       </div>
