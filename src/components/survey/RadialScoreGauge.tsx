@@ -52,10 +52,10 @@ export default function RadialScoreGauge({ score, color, size = 176 }: RadialSco
     <div className="relative shrink-0" style={{ width: size, height: size }}>
       <svg ref={svgRef} width={size} height={size} style={{ display: "block", overflow: "visible" }} />
       <div className="absolute inset-0 flex flex-col items-center justify-center">
-        <span className="text-[38px] font-black leading-none tabular-nums" style={{ color }}>
+        <span className="font-black leading-none tabular-nums" style={{ color, fontSize: size * 0.24 }}>
           {score}
         </span>
-        <span className="text-[11px] text-slate-400 font-semibold mt-0.5">/ 100</span>
+        <span className="text-slate-400 font-semibold mt-0.5" style={{ fontSize: Math.max(9, size * 0.07) }}>/ 100</span>
       </div>
     </div>
   );

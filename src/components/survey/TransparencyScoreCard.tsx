@@ -42,9 +42,9 @@ export default function TransparencyScoreCard({ survey }: { survey: Survey }) {
   const better = allScores.filter((p) => p.score < breakdown.score).length;
 
   return (
-    <div className="bg-white rounded-xl border border-slate-200 p-5">
-      <div className="flex items-center gap-1.5 mb-4">
-        <ShieldCheck size={14} className="text-[#00b8a9]" />
+    <div className="bg-white rounded-xl border border-slate-200 p-4">
+      <div className="flex items-center gap-1.5 mb-3">
+        <ShieldCheck size={13} className="text-[#00b8a9]" />
         <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-widest">Transparency Score</p>
         <div className="relative group inline-flex items-center">
           <Info size={12} className="text-slate-300 hover:text-blue-500 cursor-pointer transition-colors" />
@@ -58,29 +58,29 @@ export default function TransparencyScoreCard({ survey }: { survey: Survey }) {
         </div>
       </div>
 
-      <div className="flex flex-col lg:flex-row gap-6 lg:gap-10">
+      <div className="flex flex-col lg:flex-row lg:items-center gap-4 lg:gap-6">
         {/* Radial gauge + status */}
-        <div className="flex items-center gap-5 shrink-0">
-          <RadialScoreGauge score={breakdown.score} color={band.color} />
+        <div className="flex items-center gap-3.5 shrink-0">
+          <RadialScoreGauge score={breakdown.score} color={band.color} size={92} />
           <div>
-            <p className="text-[14px] font-bold" style={{ color: band.color }}>{band.label}</p>
-            <p className="text-[12.5px] text-slate-500 mt-1 leading-relaxed max-w-[220px]">
+            <p className="text-[13px] font-bold" style={{ color: band.color }}>{band.label}</p>
+            <p className="text-[11.5px] text-slate-500 mt-0.5 leading-snug max-w-[200px]">
               More transparent than <strong className="text-slate-700">{better} of {allScores.length}</strong>{" "}
-              surveys hosted on the platform — <strong className="text-slate-700">{ordinal(percentile)} percentile</strong>.
+              surveys — <strong className="text-slate-700">{ordinal(percentile)} percentile</strong>.
             </p>
           </div>
         </div>
 
         {/* Breakdown meters */}
-        <div className="flex-1 min-w-[220px] space-y-3 lg:border-l lg:border-slate-100 lg:pl-6">
+        <div className="flex-1 min-w-[200px] space-y-2 lg:border-l lg:border-slate-100 lg:pl-5">
           <BreakdownMeter label="Disclosure level" value={breakdown.disclosureScore} />
           <BreakdownMeter label="Response rate" value={breakdown.responseRateScore} />
           <BreakdownMeter label="Completion follow-through" value={breakdown.followThroughScore} />
         </div>
       </div>
 
-      <div className="border-t border-slate-100 mt-5 pt-4">
-        <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-widest mb-1">
+      <div className="border-t border-slate-100 mt-3 pt-3">
+        <p className="text-[10.5px] font-semibold text-slate-400 uppercase tracking-widest mb-0.5">
           vs. all surveys on the platform
         </p>
         <TransparencyBenchmarkStrip
