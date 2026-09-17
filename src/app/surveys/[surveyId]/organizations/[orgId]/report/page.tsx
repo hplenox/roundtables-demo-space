@@ -5,7 +5,6 @@ import Link from "next/link";
 import { useState } from "react";
 import { getOrgById, getSurveyById, getOrgsBySurveyId, getCustomAssetClassesBySurveyId } from "@/lib/mock-data";
 import { buildBenchmarkPool, type BenchmarkGroupKey } from "@/lib/asset-class-groups";
-import LpiGaugeBar from "@/components/report/LpiGaugeBar";
 import BenchmarksCard from "@/components/report/BenchmarksCard";
 import ManagerFunnelBar from "@/components/report/ManagerFunnelBar";
 import ManagerProfileCard from "@/components/report/ManagerProfileCard";
@@ -14,9 +13,9 @@ import GenderDemographicsSection from "@/components/report/GenderDemographicsSec
 import RacialDemographicsSection from "@/components/report/RacialDemographicsSection";
 
 import {
-  ChevronRight, ChevronDown, Printer, Download,
+  ArrowLeft, ChevronDown, Download,
   User, Mail, Calendar, Clock, TrendingUp, TrendingDown, BadgeCheck,
-  LayoutDashboard, Building2, Sparkles, Info,
+  Building2, Sparkles, Info,
 } from "lucide-react";
 import type { InvitedOrg } from "@/types/survey";
 
@@ -292,30 +291,27 @@ function InsightsBox({ org }: { org: InvitedOrg }) {
   );
 }
 
-// ─── How-to-read dropdown ─────────────────────────────────────────────────────
+// ─── How-to-read button (popover) ──────────────────────────────────────────────
 
-function HowToReadDropdown() {
+function HowToReadButton() {
   const [open, setOpen] = useState(false);
   return (
-    <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+    <div className="relative">
       <button
-        onClick={() => setOpen(!open)}
-        className="w-full flex items-center gap-2 px-5 py-3 text-left hover:bg-slate-50/70 transition-colors"
+        onClick={() => setOpen((v) => !v)}
+        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-[12px] font-medium transition-colors ${
+          open ? "border-slate-400 bg-slate-50 text-slate-800" : "border-slate-200 text-slate-600 hover:bg-slate-50"
+        }`}
       >
-        {open
-          ? <ChevronDown size={13} className="text-slate-500 shrink-0" />
-          : <ChevronRight size={13} className="text-slate-400 shrink-0" />
-        }
-        <span className="text-[12.5px] font-semibold text-slate-600">
-          Learn more about how to view this dashboard
-        </span>
+        <Info size={13} />
+        <span className="hidden md:inline">How to read this report</span>
       </button>
 
       {open && (
-        <div className="border-t border-slate-100 px-5 py-4">
-          <div className="border-l-4 border-blue-400 pl-4 space-y-3">
-            {/* Header */}
-            <div className="flex items-center gap-2.5">
+        <>
+          <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
+          <div className="absolute right-0 top-9 z-50 w-[420px] max-w-[88vw] max-h-[75vh] overflow-y-auto bg-white rounded-xl shadow-2xl border border-slate-200/80 p-5">
+            <div className="flex items-center gap-2.5 mb-3">
               <Info size={14} className="text-blue-500 shrink-0" />
               <span className="text-[13px] font-bold text-slate-800">How to read this dashboard</span>
               <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-orange-500 text-white tracking-wide">
@@ -323,7 +319,6 @@ function HowToReadDropdown() {
               </span>
             </div>
 
-            {/* Body */}
             <div className="space-y-3 text-[12.5px] text-slate-600 leading-relaxed">
               <p>
                 This is a <strong className="text-slate-800">human capital monitoring and benchmarking tool</strong>,
@@ -355,7 +350,7 @@ function HowToReadDropdown() {
               </p>
             </div>
           </div>
-        </div>
+        </>
       )}
     </div>
   );
@@ -427,42 +422,20 @@ export default function ManagerReportPage() {
       {/* Sticky report top bar */}
       <div className="sticky top-0 z-30 bg-white border-b border-slate-200 shadow-sm print:hidden">
         <div className="h-[3px] bg-gradient-to-r from-[#00b8a9] via-[#00b8a9]/70 to-transparent" />
-        <div className="max-w-5xl mx-auto px-6 h-11 flex items-center gap-3">
+        <div className="max-w-5xl mx-auto px-6 h-10 flex items-center gap-3">
 
-          {/* Breadcrumb — left */}
-          <nav className="flex items-center gap-1.5 text-[11px] min-w-0 overflow-hidden flex-1">
-            <Link
-              href="/surveys"
-              className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-[#0f1923] text-[#00b8a9] hover:bg-[#1a2d3d] transition-colors font-semibold text-[9.5px] tracking-wide shrink-0"
-            >
-              <LayoutDashboard size={9} strokeWidth={2} />
-              Survey Admin
-            </Link>
-            <ChevronRight size={11} className="text-slate-300 shrink-0" />
-            <Link
-              href={`/surveys/${surveyId}`}
-              className="text-slate-400 hover:text-slate-700 transition-colors font-medium truncate max-w-[110px] hidden sm:block"
-            >
-              {survey.year} {survey.name}
-            </Link>
-            <ChevronRight size={11} className="text-slate-300 shrink-0 hidden sm:block" />
-            <Link
-              href={`/surveys/${surveyId}/organizations`}
-              className="text-slate-400 hover:text-slate-700 transition-colors font-medium hidden lg:block"
-            >
-              Organizations
-            </Link>
-            <ChevronRight size={11} className="text-slate-300 shrink-0 hidden lg:block" />
-            <span className="text-slate-500 font-medium hidden lg:block shrink-0">Dashboard</span>
-          </nav>
+          {/* Breadcrumb — left, compact */}
+          <Link
+            href={`/surveys/${surveyId}/organizations`}
+            className="flex items-center gap-1.5 text-[12px] font-medium text-slate-500 hover:text-slate-800 transition-colors min-w-0 flex-1"
+          >
+            <ArrowLeft size={13} className="shrink-0" />
+            <span className="truncate">{survey.year} {survey.name}</span>
+          </Link>
 
           {/* Actions — right */}
           <div className="flex items-center gap-1.5 shrink-0">
-            <span className="text-[10px] text-slate-400 hidden xl:block">{org.lpiVersion}</span>
-            <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 text-[12px] text-slate-600 hover:bg-slate-50 transition-colors">
-              <Printer size={13} />
-              Print
-            </button>
+            <HowToReadButton />
             <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#0f1923] text-[12px] text-white font-medium hover:bg-slate-800 transition-colors">
               <Download size={13} />
               Export PDF
@@ -471,19 +444,19 @@ export default function ManagerReportPage() {
         </div>
       </div>
 
-      <InsightsBox org={org} />
-
-      <div className="max-w-5xl mx-auto px-6 py-8 space-y-5">
-
-        {submittedOrgs.length > 1 && (
+      {submittedOrgs.length > 1 && (
+        <div className="max-w-5xl mx-auto px-6 pt-5">
           <ManagerFunnelBar
             surveyId={surveyId ?? ""}
             currentOrgId={orgId ?? ""}
             orgs={submittedOrgs}
           />
-        )}
+        </div>
+      )}
 
-        <HowToReadDropdown />
+      <InsightsBox org={org} />
+
+      <div className="max-w-5xl mx-auto px-6 py-8 space-y-5">
 
         {/* SECTION 1 */}
         <ReportSection>
@@ -509,14 +482,6 @@ export default function ManagerReportPage() {
               <InfoPill icon={Calendar}  label="Survey Opens"      value={survey.startDate} />
               <InfoPill icon={Calendar}  label="Survey Closes"     value={survey.targetCloseDate} />
             </div>
-          </div>
-          <div className="border-t border-slate-100 px-2 pb-2">
-            <LpiGaugeBar
-              score={org.lpiScore}
-              version={org.lpiVersion}
-              universePercentile={org.benchmarks.universe.managerPercentile}
-              portfolioPercentile={org.benchmarks.portfolio.managerPercentile}
-            />
           </div>
         </ReportSection>
 

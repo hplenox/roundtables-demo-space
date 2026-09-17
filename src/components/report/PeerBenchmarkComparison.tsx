@@ -1,9 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import { Info, SlidersHorizontal, Check } from "lucide-react";
+import { Info, SlidersHorizontal, ChevronDown } from "lucide-react";
 import type { InvitedOrg, BenchmarkPool } from "@/types/survey";
 import { ordinal, pctColor } from "@/components/report/benchmarkFormat";
+import PeerFilterPanel from "@/components/report/PeerFilterPanel";
+import {
+  EMPTY_FILTER_SELECTIONS, hasActiveFilters, activeFilterCount, filterSelectionLabel,
+  buildMockFilteredPool, type LpiFilterSelections,
+} from "@/lib/lpi-filter-mock";
 
 // ─── Percentile gauge ──────────────────────────────────────────────────────────
 
@@ -67,12 +72,11 @@ function PercentileGauge({ pool }: { pool: BenchmarkPool }) {
 
 // ─── Main card ──────────────────────────────────────────────────────────────────
 
-type FilterKey = "assetClass" | "geography" | "aum";
-
 // Everything in this component reacts to the RT Universe / My Portfolio toggle
-// (plus the stacked Asset Class / Geography / AUM filter). Sections that always
-// benchmark vs RT Universe regardless of the toggle — LpiSubComponentScores,
-// EvennessScores — live in their own components instead.
+// (plus the stacked Geography / AUM Size / Asset Class / Workforce Size filter
+// panel). Sections that always benchmark vs RT Universe regardless of the
+// toggle — LpiSubComponentScores, EvennessScores — live in their own
+// components instead.
 export default function PeerBenchmarkComparison({
   org,
   benchmarkPools,
@@ -81,35 +85,27 @@ export default function PeerBenchmarkComparison({
   benchmarkPools: { key: string; data: BenchmarkPool }[];
 }) {
   const [poolKey, setPoolKey] = useState<"universe" | "portfolio">("universe");
-  const [filterKey, setFilterKey] = useState<FilterKey | null>(null);
+  const [customFilters, setCustomFilters] = useState<LpiFilterSelections>(EMPTY_FILTER_SELECTIONS);
   const [filtersOpen, setFiltersOpen] = useState(false);
 
   const universePool  = benchmarkPools.find((p) => p.key === "universe")!.data;
   const portfolioPool = benchmarkPools.find((p) => p.key === "portfolio")!.data;
-  const assetClassPool = benchmarkPools.find((p) => p.key === "assetClass")!.data;
 
-  const geoSlice = org.geographyBenchmarks
-    ? [org.geographyBenchmarks.city, org.geographyBenchmarks.country, org.geographyBenchmarks.usBased, ...Object.values(org.geographyBenchmarks.regions ?? {})]
-        .find((s) => s && !s.universe.insufficientData && !s.universe.comingSoon)
-    : undefined;
-  const geoPool = geoSlice?.universe;
+  const filtersActive = hasActiveFilters(customFilters);
+  const filterCount = activeFilterCount(customFilters);
 
-  const aumSlice = org.aumBenchmarks?.brackets?.[org.aumBenchmarks.managerBracket];
-  const aumPool = aumSlice && !aumSlice.universe.insufficientData ? aumSlice.universe : undefined;
+  const activePool: BenchmarkPool = filtersActive
+    ? buildMockFilteredPool(org.lpiScore!, customFilters)
+    : (poolKey === "universe" ? universePool : portfolioPool);
 
-  const filterOptions: Array<{ key: FilterKey; label: string; pool?: BenchmarkPool }> = [
-    { key: "assetClass", label: "Asset Class", pool: !assetClassPool.comingSoon ? assetClassPool : undefined },
-    { key: "geography",  label: "Geography",   pool: geoPool },
-    { key: "aum",        label: "AUM Bracket",  pool: aumPool },
-  ];
-
-  const activeFilter = filterKey ? filterOptions.find((f) => f.key === filterKey) : undefined;
-  const activePool: BenchmarkPool = activeFilter?.pool
-    ?? (poolKey === "universe" ? universePool : portfolioPool);
-
-  const poolLabel = activeFilter?.pool
-    ? `${activeFilter.label}: ${activeFilter.pool.label}`
+  const poolLabel = filtersActive
+    ? filterSelectionLabel(customFilters)
     : poolKey === "universe" ? "RoundTables Universe (all organizations)" : "My Portfolio";
+
+  function applyFilters(next: LpiFilterSelections) {
+    setCustomFilters(next);
+    setFiltersOpen(false);
+  }
 
   return (
     <div>
@@ -127,15 +123,15 @@ export default function PeerBenchmarkComparison({
                 <p className="text-[12.5px] text-slate-200 leading-relaxed">
                   Compares {org.name}&apos;s LPI score against a selected peer pool. Choose{" "}
                   <strong className="text-amber-400">RT Universe</strong> or{" "}
-                  <strong className="text-amber-400">My Portfolio</strong> as the base, then stack an
-                  Asset Class, Geography, or AUM filter to narrow the comparison further.
+                  <strong className="text-amber-400">My Portfolio</strong> as the base, then use Filters to
+                  narrow by Geography, AUM Size, Asset Class, or Workforce Size.
                 </p>
               </div>
             </div>
           </div>
           <p className="text-[12.5px] text-slate-500 leading-relaxed mt-1">
             Where the LPI score of <strong className="text-slate-700">{org.lpiScore!.toFixed(2)}</strong>{" "}
-            falls in the selected peer pool. Pick RT Universe or My Portfolio, then stack filters and apply.
+            falls in the selected peer pool. Pick RT Universe or My Portfolio, then apply filters.
           </p>
         </div>
 
@@ -145,9 +141,9 @@ export default function PeerBenchmarkComparison({
             {(["universe", "portfolio"] as const).map((k) => (
               <button
                 key={k}
-                onClick={() => { setPoolKey(k); setFilterKey(null); }}
+                onClick={() => { setPoolKey(k); setCustomFilters(EMPTY_FILTER_SELECTIONS); }}
                 className={`px-3 py-1.5 text-[12px] font-semibold transition-colors ${
-                  !filterKey && poolKey === k ? "bg-[#0f1923] text-white" : "bg-white text-slate-500 hover:bg-slate-50"
+                  !filtersActive && poolKey === k ? "bg-[#0f1923] text-white" : "bg-white text-slate-500 hover:bg-slate-50"
                 }`}
               >
                 {k === "universe" ? "RT Universe" : "My Portfolio"}
@@ -156,55 +152,29 @@ export default function PeerBenchmarkComparison({
           </div>
 
           {/* Filters */}
-          <div className="relative">
-            <button
-              onClick={() => setFiltersOpen((v) => !v)}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-[12px] font-semibold transition-colors ${
-                filterKey ? "border-[#00b8a9] text-[#00897b] bg-[#00b8a9]/5" : "border-slate-300 text-slate-600 hover:bg-slate-50"
-              }`}
-            >
-              <SlidersHorizontal size={13} />
-              Filters
-              {filterKey && <span className="w-1.5 h-1.5 rounded-full bg-[#00b8a9]" />}
-            </button>
-
-            {filtersOpen && (
-              <>
-                <div className="fixed inset-0 z-40" onClick={() => setFiltersOpen(false)} />
-                <div className="absolute right-0 top-9 z-50 w-64 bg-white rounded-xl shadow-2xl border border-slate-200/80 overflow-hidden">
-                  <div className="px-4 py-2.5 border-b border-slate-100">
-                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Stack a filter</p>
-                  </div>
-                  <div className="py-1">
-                    {filterOptions.map((f) => (
-                      <button
-                        key={f.key}
-                        disabled={!f.pool}
-                        onClick={() => { setFilterKey(f.key); setFiltersOpen(false); }}
-                        className={`w-full flex items-center justify-between px-4 py-2.5 text-left text-[12.5px] transition-colors ${
-                          !f.pool ? "text-slate-300 cursor-not-allowed" :
-                          filterKey === f.key ? "bg-[#00b8a9]/8 text-[#00897b] font-semibold" : "text-slate-700 hover:bg-slate-50"
-                        }`}
-                      >
-                        <span>{f.label}</span>
-                        {filterKey === f.key ? <Check size={13} /> : !f.pool && <span className="text-[9.5px]">Not mapped</span>}
-                      </button>
-                    ))}
-                  </div>
-                  {filterKey && (
-                    <button
-                      onClick={() => { setFilterKey(null); setFiltersOpen(false); }}
-                      className="w-full text-center px-4 py-2 text-[11.5px] font-semibold text-slate-400 hover:text-slate-600 border-t border-slate-100"
-                    >
-                      Clear filter
-                    </button>
-                  )}
-                </div>
-              </>
+          <button
+            onClick={() => setFiltersOpen((v) => !v)}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-[12px] font-semibold transition-colors ${
+              filtersActive ? "border-[#00b8a9] text-[#00897b] bg-[#00b8a9]/5" : "border-slate-300 text-slate-600 hover:bg-slate-50"
+            }`}
+          >
+            <SlidersHorizontal size={13} />
+            Filters
+            {filtersActive && (
+              <span className="w-4 h-4 rounded-full bg-[#00b8a9] text-white text-[9.5px] font-bold flex items-center justify-center">
+                {filterCount}
+              </span>
             )}
-          </div>
+            <ChevronDown size={11} className={`text-slate-400 transition-transform duration-150 ${filtersOpen ? "rotate-180" : ""}`} />
+          </button>
         </div>
       </div>
+
+      {filtersOpen && (
+        <div className="mt-4">
+          <PeerFilterPanel initial={customFilters} onApply={applyFilters} />
+        </div>
+      )}
 
       {/* Big percentile stat + gauge */}
       <div className="mt-5">
