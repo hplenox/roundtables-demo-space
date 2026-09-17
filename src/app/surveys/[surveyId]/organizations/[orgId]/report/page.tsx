@@ -511,7 +511,12 @@ export default function ManagerReportPage() {
             </div>
           </div>
           <div className="border-t border-slate-100 px-2 pb-2">
-            <LpiGaugeBar score={org.lpiScore} version={org.lpiVersion} />
+            <LpiGaugeBar
+              score={org.lpiScore}
+              version={org.lpiVersion}
+              universePercentile={org.benchmarks.universe.managerPercentile}
+              portfolioPercentile={org.benchmarks.portfolio.managerPercentile}
+            />
           </div>
         </ReportSection>
 
