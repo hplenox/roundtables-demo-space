@@ -2,10 +2,15 @@
 
 import { useEffect, useRef, useState } from "react";
 import {
-  Lock, TrendingUp, Landmark, MapPin, Users, BadgeCheck,
+  Lock, TrendingUp, Landmark, MapPin, Users, BadgeCheck, Info,
   History, Bell, Bookmark, Share2, ChevronDown, Check, Copy, Mail, FileDown,
 } from "lucide-react";
 import type { InvitedOrg } from "@/types/survey";
+import { ordinal, pctColor } from "@/components/report/benchmarkFormat";
+
+function scoreColor(score: number): string {
+  return score >= 8 ? "#00897b" : score >= 6.5 ? "#b45309" : "#dc2626";
+}
 
 function ownershipLabel(org: InvitedOrg): string {
   return org.type === "GP" ? "Privately held" : "Publicly reporting";
@@ -30,6 +35,29 @@ function verifiedDate(dateStr: string | null): string | null {
   const d = new Date(dateStr);
   if (isNaN(d.getTime())) return dateStr;
   return d.toLocaleDateString("en-US", { month: "short", year: "numeric" });
+}
+
+// ─── Mini 0–100 percentile gauge (compact — for the profile row's LPI box) ─────
+
+function MiniPercentileGauge({ percentile }: { percentile: number }) {
+  return (
+    <div>
+      <div className="flex items-center justify-between text-[9px] text-slate-400 mb-1">
+        <span>0</span>
+        <span className="font-semibold text-slate-500 uppercase tracking-wider">Percentile · RT Universe</span>
+        <span>100</span>
+      </div>
+      <div
+        className="relative h-2 rounded-full"
+        style={{ background: "linear-gradient(to right, #ef4444 0%, #f97316 35%, #eab308 55%, #84cc16 72%, #00b8a9 100%)" }}
+      >
+        <div
+          className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-3.5 h-3.5 rounded-full bg-white border-2 border-[#0f1923] shadow"
+          style={{ left: `${Math.min(100, Math.max(0, percentile))}%` }}
+        />
+      </div>
+    </div>
+  );
 }
 
 // ─── Secondary action popover shell ────────────────────────────────────────────
@@ -84,6 +112,8 @@ export default function ManagerProfileCard({ org }: { org: InvitedOrg }) {
 
   if (!org.lpiScore || !org.benchmarks) return null;
 
+  const universePct = org.benchmarks.universe.managerPercentile;
+  const portfolioPct = org.benchmarks.portfolio.managerPercentile;
   const empCount = employeeCount(org);
   const cohort = cohortBracket(empCount);
   const verified = verifiedDate(org.submissionDate);
@@ -95,7 +125,7 @@ export default function ManagerProfileCard({ org }: { org: InvitedOrg }) {
 
   return (
     <>
-      <div className="flex items-start gap-5">
+      <div className="flex items-start gap-5 flex-wrap lg:flex-nowrap">
           {/* Avatar */}
           <div className="w-16 h-16 rounded-2xl bg-[#0f1923] flex items-center justify-center shrink-0 shadow-md">
             <span className="text-[22px] font-black text-[#00b8a9] leading-none">
@@ -140,6 +170,48 @@ export default function ManagerProfileCard({ org }: { org: InvitedOrg }) {
                 Survey-verified profile · updated {verified}
               </p>
             )}
+          </div>
+
+          {/* LPI score box */}
+          <div className="shrink-0 w-full sm:w-auto border border-slate-200 rounded-xl px-4 py-3 bg-slate-50/60 flex items-center gap-4">
+            <div className="shrink-0">
+              <div className="flex items-center gap-1 mb-0.5">
+                <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">LPI Score</span>
+                <div className="relative group inline-flex items-center">
+                  <Info size={11} className="text-slate-400 hover:text-blue-500 cursor-pointer transition-colors" />
+                  <div className="absolute bottom-full right-0 mb-2 w-64 bg-[#0f1923] rounded-xl p-3.5 shadow-2xl opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-200 z-50">
+                    <p className="text-[11.5px] text-slate-200 leading-relaxed">
+                      Composite 0–10 human-capital score. Percentiles show where {org.name} ranks vs.
+                      the RT Universe and vs. your own portfolio of managers.
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div className="flex items-baseline gap-1">
+                <span className="text-[28px] font-black leading-none tabular-nums" style={{ color: scoreColor(org.lpiScore) }}>
+                  {org.lpiScore.toFixed(2)}
+                </span>
+                <span className="text-[11px] text-slate-400 font-medium">/ 10.00</span>
+              </div>
+            </div>
+
+            <div className="w-40 shrink-0">
+              <MiniPercentileGauge percentile={universePct} />
+              <div className="flex items-center gap-1.5 mt-2 flex-wrap">
+                <span
+                  className="px-2 py-0.5 rounded-full text-[10.5px] font-bold bg-white border border-slate-200"
+                  style={{ color: pctColor(universePct) }}
+                >
+                  {ordinal(universePct)} · RT Universe
+                </span>
+                <span
+                  className="px-2 py-0.5 rounded-full text-[10.5px] font-bold bg-white border border-slate-200"
+                  style={{ color: pctColor(portfolioPct) }}
+                >
+                  {ordinal(portfolioPct)} · Portfolio
+                </span>
+              </div>
+            </div>
           </div>
       </div>
 
