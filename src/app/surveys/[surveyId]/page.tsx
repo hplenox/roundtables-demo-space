@@ -3,8 +3,11 @@
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import { getSurveyById, getOrgsBySurveyId } from "@/lib/mock-data";
-import { ArrowRight, CheckCircle2, Clock, AlertCircle, TrendingUp, Upload, Users } from "lucide-react";
-import TransparencyScoreCard from "@/components/survey/TransparencyScoreCard";
+import { ArrowRight, CheckCircle2, Clock, AlertCircle, TrendingUp, Upload, Users, ShieldCheck } from "lucide-react";
+import { ordinal } from "@/components/report/benchmarkFormat";
+import {
+  computeTransparencyScore, transparencyBand, allPlatformTransparencyScores, transparencyPercentile,
+} from "@/lib/transparency-score";
 
 function SubmissionBar({ submitted, inProgress, notStarted, total }: {
   submitted: number; inProgress: number; notStarted: number; total: number;
@@ -27,6 +30,10 @@ export default function OverviewPage() {
   if (!survey) return null;
 
   const rate = survey.totalInvited === 0 ? 0 : Math.round((survey.submitted / survey.totalInvited) * 100);
+
+  const transparency = computeTransparencyScore(survey);
+  const transparencyBandInfo = transparencyBand(transparency.score);
+  const transparencyPct = transparencyPercentile(transparency.score, allPlatformTransparencyScores());
 
   const recentOrgs = [...orgs]
     .sort((a, b) => {
@@ -116,6 +123,13 @@ export default function OverviewPage() {
           <div>
             <p className="text-[11px] text-slate-400 font-medium">Response Rate</p>
             <p className="text-[22px] font-bold text-[#00897b] leading-none tabular-nums">{rate}%</p>
+            <p
+              className="text-[10px] font-semibold mt-1 flex items-center gap-1"
+              style={{ color: transparencyBandInfo.color }}
+            >
+              <ShieldCheck size={10} className="shrink-0" />
+              Transparency {transparency.score}/100 · {ordinal(transparencyPct)} pct
+            </p>
           </div>
         </div>
 
@@ -184,9 +198,6 @@ export default function OverviewPage() {
           </Link>
         ))}
       </div>
-
-      {/* ── Transparency Score ─────────────────────────────────────── */}
-      <TransparencyScoreCard survey={survey} />
 
       {/* ── Details + Recent Activity ──────────────────────────────── */}
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
