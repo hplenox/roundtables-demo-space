@@ -4,6 +4,7 @@ import { useParams } from "next/navigation";
 import Link from "next/link";
 import { getSurveyById, getOrgsBySurveyId } from "@/lib/mock-data";
 import { ArrowRight, CheckCircle2, Clock, AlertCircle, TrendingUp, Upload, Users } from "lucide-react";
+import TransparencyScoreCard from "@/components/survey/TransparencyScoreCard";
 
 function SubmissionBar({ submitted, inProgress, notStarted, total }: {
   submitted: number; inProgress: number; notStarted: number; total: number;
@@ -183,6 +184,9 @@ export default function OverviewPage() {
           </Link>
         ))}
       </div>
+
+      {/* ── Transparency Score ─────────────────────────────────────── */}
+      <TransparencyScoreCard survey={survey} />
 
       {/* ── Details + Recent Activity ──────────────────────────────── */}
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
