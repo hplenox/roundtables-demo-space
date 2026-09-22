@@ -1,4 +1,5 @@
 import { Survey, InvitedOrg, CustomAssetClass, Contact } from "@/types/survey";
+import { SUBMITTED_SURVEYS_KEY } from "@/lib/survey-draft-keys";
 import { PORTFOLIO_DEMO_ORGS } from "@/lib/mock-portfolio-org-reports";
 
 export const MOCK_SURVEYS: Survey[] = [
@@ -1454,7 +1455,19 @@ export const MOCK_ORGS: InvitedOrg[] = [
 ];
 
 export function getSurveyById(id: string): Survey | undefined {
-  return MOCK_SURVEYS.find((s) => s.id === id);
+  const found = MOCK_SURVEYS.find((s) => s.id === id);
+  if (found) return found;
+  // Fall back to surveys filed through the "New Survey" flow (/surveys/new),
+  // which persist to localStorage rather than this static seed list — see
+  // survey-draft-store.ts.
+  if (typeof window === "undefined") return undefined;
+  try {
+    const raw = window.localStorage.getItem(SUBMITTED_SURVEYS_KEY);
+    const custom: Survey[] = raw ? JSON.parse(raw) : [];
+    return custom.find((s) => s.id === id);
+  } catch {
+    return undefined;
+  }
 }
 
 export function getOrgsBySurveyId(surveyId: string): InvitedOrg[] {
