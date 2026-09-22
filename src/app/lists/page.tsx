@@ -1,13 +1,16 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import Link from "next/link";
 import {
   Bookmark, Plus, Search, X, Trash2, Edit2, Users,
   MapPin, FolderPlus, CheckCircle,
 } from "lucide-react";
 import { MOCK_PORTFOLIO_MANAGERS } from "@/lib/mock-portfolio-data";
 import { MOCK_PORTFOLIO_LISTS } from "@/lib/mock-lists-data";
+import { getOrgById } from "@/lib/mock-data";
 import { PortfolioManager, PortfolioList } from "@/types/portfolio";
+import PortfolioInsights from "@/components/lists/PortfolioInsights";
 
 // ─── helpers ─────────────────────────────────────────────────────────────────
 
@@ -59,6 +62,22 @@ function ManagerRow({
 }) {
   const ac = assetColor(manager.assetClass);
   const totalCommitted = manager.funds.reduce((s, f) => s + f.commitment, 0);
+  const org = manager.orgId ? getOrgById(manager.orgId) : undefined;
+  const reportHref = org ? `/surveys/${org.surveyId}/organizations/${org.id}/report` : undefined;
+
+  const identity = (
+    <>
+      <div className="w-8 h-8 rounded-lg bg-[#0f1923] flex items-center justify-center shrink-0">
+        <span className="text-[9px] font-bold text-white">{initials(manager.name)}</span>
+      </div>
+      <div className="flex-1 min-w-0">
+        <p className={`text-[12.5px] font-semibold text-slate-800 truncate ${reportHref ? "group-hover/id:text-[#00897b]" : ""}`}>{manager.name}</p>
+        <p className="text-[10.5px] text-slate-400 flex items-center gap-1 truncate">
+          <MapPin size={9} className="shrink-0" /> {manager.location}
+        </p>
+      </div>
+    </>
+  );
 
   return (
     <div className="group flex items-center gap-3 px-4 py-3 border-b border-slate-50 last:border-0 hover:bg-slate-50/80 transition-colors">
@@ -71,15 +90,13 @@ function ManagerRow({
           {checkbox.checked && <CheckCircle size={9} className="text-white" strokeWidth={3} />}
         </button>
       )}
-      <div className="w-8 h-8 rounded-lg bg-[#0f1923] flex items-center justify-center shrink-0">
-        <span className="text-[9px] font-bold text-white">{initials(manager.name)}</span>
-      </div>
-      <div className="flex-1 min-w-0">
-        <p className="text-[12.5px] font-semibold text-slate-800 truncate">{manager.name}</p>
-        <p className="text-[10.5px] text-slate-400 flex items-center gap-1 truncate">
-          <MapPin size={9} className="shrink-0" /> {manager.location}
-        </p>
-      </div>
+      {reportHref ? (
+        <Link href={reportHref} title="View most recent survey report" className="group/id flex items-center gap-3 flex-1 min-w-0">
+          {identity}
+        </Link>
+      ) : (
+        <div className="flex items-center gap-3 flex-1 min-w-0">{identity}</div>
+      )}
       <span className={`hidden sm:inline-flex shrink-0 text-[10px] font-medium px-1.5 py-0.5 rounded ${ac.bg} ${ac.text}`}>
         {manager.assetClass}
       </span>
@@ -412,7 +429,6 @@ export default function ListsPage() {
   const [lists, setLists] = useState<PortfolioList[]>(MOCK_PORTFOLIO_LISTS);
   const [selectedListId, setSelectedListId] = useState<string>(ALL_MANAGERS_ID);
   const [search, setSearch] = useState("");
-  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
 
   const [showCreate, setShowCreate] = useState(false);
   const [showAddManagers, setShowAddManagers] = useState(false);
@@ -438,18 +454,9 @@ export default function ListsPage() {
 
   const totalCommitted = viewManagers.reduce((s, m) => s + m.funds.reduce((fs, f) => fs + f.commitment, 0), 0);
 
-  function toggleSelect(id: string) {
-    setSelectedIds((prev) => {
-      const next = new Set(prev);
-      next.has(id) ? next.delete(id) : next.add(id);
-      return next;
-    });
-  }
-
   function handleCreateList(list: PortfolioList) {
     setLists((prev) => [...prev, list]);
     setSelectedListId(list.id);
-    setSelectedIds(new Set());
     setShowCreate(false);
   }
 
@@ -598,108 +605,74 @@ export default function ListsPage() {
 
         {/* Right: selected list content */}
         <div>
-          {/* Toolbar */}
-          <div className="flex flex-wrap items-center gap-2 mb-3">
-            <div>
-              <h2 className="text-[14px] font-semibold text-slate-800">
-                {selectedList ? selectedList.name : "All Managers"}
-              </h2>
-              <p className="text-[11px] text-slate-400 mt-0.5">
-                {viewManagers.length} manager{viewManagers.length !== 1 ? "s" : ""} · {fmt$M(totalCommitted)} committed
-                {selectedList && ` · created ${selectedList.createdDate}`}
-              </p>
-            </div>
-            <div className="ml-auto flex items-center gap-2">
-              <div className="relative">
-                <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
-                <input
-                  type="text"
-                  placeholder="Search…"
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  className="h-8 pl-8 pr-3 w-44 rounded-lg bg-white border border-slate-200 text-[12.5px] text-slate-700 placeholder:text-slate-400 focus:outline-none focus:border-slate-300"
-                />
-              </div>
-              {selectedList && (
-                <button
-                  onClick={() => setShowAddManagers(true)}
-                  className="flex items-center gap-1.5 h-8 px-3 rounded-lg border border-slate-200 bg-white text-[12px] font-medium text-slate-600 hover:bg-slate-50 transition-colors"
-                >
-                  <Plus size={13} />
-                  Add managers
-                </button>
-              )}
-            </div>
-          </div>
-
-          {/* Selection bar (All Managers view only) */}
-          {!selectedList && selectedIds.size > 0 && (
-            <div className="flex items-center gap-3 mb-3 px-4 py-2.5 rounded-xl bg-[#0f1923] text-white">
-              <div className="flex items-center gap-2 flex-1">
-                <CheckCircle size={14} className="text-[#00b8a9]" />
-                <span className="text-[12.5px] font-medium">
-                  {selectedIds.size} manager{selectedIds.size !== 1 ? "s" : ""} selected
-                </span>
-              </div>
-              <button
-                onClick={() => setShowCreate(true)}
-                className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-[#00b8a9] text-white text-[12px] font-medium hover:bg-[#00a99b] transition-colors"
-              >
-                <FolderPlus size={12} />
-                Save as list
-              </button>
-              <button
-                onClick={() => setSelectedIds(new Set())}
-                className="w-6 h-6 rounded-lg hover:bg-white/10 flex items-center justify-center text-white/50 hover:text-white transition-colors"
-              >
-                <X size={13} />
-              </button>
-            </div>
-          )}
-
-          {/* Content */}
-          <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-            <div className="flex items-center gap-3 px-4 py-2.5 bg-slate-50/60 border-b border-slate-100 text-[10.5px] font-semibold text-slate-400 uppercase tracking-wider">
-              {!selectedList && <div className="w-4 shrink-0" />}
-              <div className="w-8 shrink-0" />
-              <div className="flex-1">Manager</div>
-              <div className="hidden sm:block w-20">Asset Class</div>
-              <div className="hidden md:block w-20 text-right">Committed</div>
-              <div className="hidden lg:block w-14 text-right">LPI</div>
-              <div className="w-6 shrink-0" />
-            </div>
-
-            {viewManagers.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-14 gap-3">
-                <div className="w-11 h-11 rounded-full bg-slate-100 flex items-center justify-center">
-                  <Bookmark size={18} className="text-slate-400" />
+          {selectedList ? (
+            <>
+              {/* Toolbar */}
+              <div className="flex flex-wrap items-center gap-2 mb-3">
+                <div>
+                  <h2 className="text-[14px] font-semibold text-slate-800">{selectedList.name}</h2>
+                  <p className="text-[11px] text-slate-400 mt-0.5">
+                    {viewManagers.length} manager{viewManagers.length !== 1 ? "s" : ""} · {fmt$M(totalCommitted)} committed
+                    {` · created ${selectedList.createdDate}`}
+                  </p>
                 </div>
-                <p className="text-[12.5px] font-medium text-slate-500">
-                  {selectedList ? "No managers in this list yet" : "No managers match your search"}
-                </p>
-                {selectedList && (
+                <div className="ml-auto flex items-center gap-2">
+                  <div className="relative">
+                    <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+                    <input
+                      type="text"
+                      placeholder="Search…"
+                      value={search}
+                      onChange={(e) => setSearch(e.target.value)}
+                      className="h-8 pl-8 pr-3 w-44 rounded-lg bg-white border border-slate-200 text-[12.5px] text-slate-700 placeholder:text-slate-400 focus:outline-none focus:border-slate-300"
+                    />
+                  </div>
                   <button
                     onClick={() => setShowAddManagers(true)}
-                    className="text-[12px] text-[#00897b] hover:underline"
+                    className="flex items-center gap-1.5 h-8 px-3 rounded-lg border border-slate-200 bg-white text-[12px] font-medium text-slate-600 hover:bg-slate-50 transition-colors"
                   >
+                    <Plus size={13} />
                     Add managers
                   </button>
+                </div>
+              </div>
+
+              {/* Content */}
+              <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+                <div className="flex items-center gap-3 px-4 py-2.5 bg-slate-50/60 border-b border-slate-100 text-[10.5px] font-semibold text-slate-400 uppercase tracking-wider">
+                  <div className="w-8 shrink-0" />
+                  <div className="flex-1">Manager</div>
+                  <div className="hidden sm:block w-20">Asset Class</div>
+                  <div className="hidden md:block w-20 text-right">Committed</div>
+                  <div className="hidden lg:block w-14 text-right">LPI</div>
+                  <div className="w-6 shrink-0" />
+                </div>
+
+                {viewManagers.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center py-14 gap-3">
+                    <div className="w-11 h-11 rounded-full bg-slate-100 flex items-center justify-center">
+                      <Bookmark size={18} className="text-slate-400" />
+                    </div>
+                    <p className="text-[12.5px] font-medium text-slate-500">
+                      {viewManagers.length === 0 && search ? "No managers match your search" : "No managers in this list yet"}
+                    </p>
+                    <button
+                      onClick={() => setShowAddManagers(true)}
+                      className="text-[12px] text-[#00897b] hover:underline"
+                    >
+                      Add managers
+                    </button>
+                  </div>
+                ) : (
+                  viewManagers.map((m) => (
+                    <ManagerRow key={m.id} manager={m} removable onRemove={() => removeFromList(m.id)} />
+                  ))
                 )}
               </div>
-            ) : (
-              viewManagers.map((m) =>
-                selectedList ? (
-                  <ManagerRow key={m.id} manager={m} removable onRemove={() => removeFromList(m.id)} />
-                ) : (
-                  <ManagerRow
-                    key={m.id}
-                    manager={m}
-                    checkbox={{ checked: selectedIds.has(m.id), onToggle: () => toggleSelect(m.id) }}
-                  />
-                )
-              )
-            )}
-          </div>
+            </>
+          ) : (
+            <PortfolioInsights />
+          )}
         </div>
       </div>
 
@@ -707,7 +680,7 @@ export default function ListsPage() {
       {showCreate && (
         <CreateListModal
           managers={managers}
-          preselected={selectedIds}
+          preselected={new Set()}
           onCreate={handleCreateList}
           onClose={() => setShowCreate(false)}
         />
