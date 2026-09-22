@@ -22,6 +22,7 @@ import {
   Sparkles,
   ListChecks,
   Bookmark,
+  Palette,
 } from "lucide-react";
 import { getClientById } from "@/lib/mock-clients";
 
@@ -238,6 +239,16 @@ export default function Sidebar() {
         >
           <ListChecks size={16} className="shrink-0" strokeWidth={1.75} />
           {!collapsed && <span>Requirements</span>}
+        </Link>
+        <Link
+          href="/designs"
+          title={collapsed ? "Designs" : undefined}
+          className={`flex items-center gap-3 px-2.5 py-2 rounded-lg text-[13px] font-medium whitespace-nowrap transition-all duration-150 ${
+            pathname.startsWith("/designs") ? "bg-[#4361ee] text-white shadow-sm" : "text-white/70 hover:text-white hover:bg-white/[0.07]"
+          }`}
+        >
+          <Palette size={16} className="shrink-0" strokeWidth={1.75} />
+          {!collapsed && <span>Designs</span>}
         </Link>
         <Link
           href="/help"
