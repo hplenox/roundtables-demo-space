@@ -144,6 +144,7 @@ export const MOCK_PORTFOLIO_MANAGERS: PortfolioManager[] = [
   },
   {
     id: "pm-sequoia",
+    orgId: "org-sequoia",
     name: "Sequoia Capital",
     contactName: "Priya Nair",
     contactEmail: "p.nair@sequoiacap.com",
@@ -176,6 +177,7 @@ export const MOCK_PORTFOLIO_MANAGERS: PortfolioManager[] = [
   },
   {
     id: "pm-a16z",
+    orgId: "org-a16z",
     name: "Andreessen Horowitz",
     contactName: "Marcus Webb",
     contactEmail: "m.webb@a16z.com",
@@ -222,6 +224,7 @@ export const MOCK_PORTFOLIO_MANAGERS: PortfolioManager[] = [
   },
   {
     id: "pm-brookfield",
+    orgId: "org-brookfield",
     name: "Brookfield Asset Management",
     contactName: "Sandra Okafor",
     contactEmail: "s.okafor@brookfield.com",
@@ -301,6 +304,7 @@ export const MOCK_PORTFOLIO_MANAGERS: PortfolioManager[] = [
   },
   {
     id: "pm-ares",
+    orgId: "org-ares",
     name: "Ares Management",
     contactName: "David Fernandez",
     contactEmail: "d.fernandez@aresmgmt.com",
@@ -347,6 +351,7 @@ export const MOCK_PORTFOLIO_MANAGERS: PortfolioManager[] = [
   },
   {
     id: "pm-general-atlantic",
+    orgId: "org-general-atlantic",
     name: "General Atlantic",
     contactName: "Tanya Rivers",
     contactEmail: "t.rivers@generalatlantic.com",

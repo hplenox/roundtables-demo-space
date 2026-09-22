@@ -58,7 +58,7 @@ const BASE_TOP_ITEMS: NavItem[] = [
 const ORG_ITEMS: NavItem[] = [
   { label: "My Organization", href: "/organization", icon: Building2 },
   { label: "My Portfolio", href: "/portfolio", icon: Wallet, disabled: true },
-  { label: "Lists", href: "/lists", icon: Bookmark },
+  { label: "Portfolio", href: "/lists", icon: Bookmark },
   { label: "Calendar", href: "/roadmap", icon: Calendar, disabled: true },
   { label: "Community", href: "/roadmap", icon: Share2, disabled: true },
 ];

@@ -1,4 +1,5 @@
 import { Survey, InvitedOrg, CustomAssetClass, Contact } from "@/types/survey";
+import { PORTFOLIO_DEMO_ORGS } from "@/lib/mock-portfolio-org-reports";
 
 export const MOCK_SURVEYS: Survey[] = [
   {
@@ -1445,6 +1446,11 @@ export const MOCK_ORGS: InvitedOrg[] = [
     genderDemographics: null,
     racialDemographics: null,
   },
+
+  // ── Portfolio (Lists page) demo managers — see mock-portfolio-org-reports.ts.
+  // Keeps every manager shown on /lists clickable through to a report, even
+  // the ones that don't otherwise appear anywhere in the survey admin data.
+  ...PORTFOLIO_DEMO_ORGS,
 ];
 
 export function getSurveyById(id: string): Survey | undefined {
