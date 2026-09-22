@@ -2,15 +2,9 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { MOCK_SURVEYS } from "@/lib/mock-data";
 import { Survey, SurveyStatus } from "@/types/survey";
-import { ArrowRight, Clock, CheckCircle2, Circle, Plus, Filter } from "lucide-react";
-
-const TAB_CONFIG = [
-  { key: "active",   label: "Current",  count: MOCK_SURVEYS.filter((s) => s.status === "active").length },
-  { key: "upcoming", label: "Upcoming", count: MOCK_SURVEYS.filter((s) => s.status === "upcoming").length },
-  { key: "closed",   label: "Past",     count: MOCK_SURVEYS.filter((s) => s.status === "closed").length },
-] as const;
+import { ArrowRight, Clock, CheckCircle2, Circle, Plus, Filter, PenLine } from "lucide-react";
+import { computeOverallProgress, useAllSurveys, useDraft } from "@/lib/survey-draft-store";
 
 function StatusPill({ status }: { status: SurveyStatus }) {
   const map = {
@@ -127,7 +121,15 @@ function SurveyRow({ survey, index }: { survey: Survey; index: number }) {
 
 export default function SurveysPage() {
   const [activeTab, setActiveTab] = useState<SurveyStatus>("active");
-  const filtered = MOCK_SURVEYS.filter((s) => s.status === activeTab);
+  const surveys = useAllSurveys();
+  const draft = useDraft();
+  const filtered = surveys.filter((s) => s.status === activeTab);
+
+  const TAB_CONFIG = [
+    { key: "active", label: "Current", count: surveys.filter((s) => s.status === "active").length },
+    { key: "upcoming", label: "Upcoming", count: surveys.filter((s) => s.status === "upcoming").length },
+    { key: "closed", label: "Past", count: surveys.filter((s) => s.status === "closed").length },
+  ] as const;
 
   return (
     <div className="min-h-full bg-slate-50">
@@ -151,12 +153,41 @@ export default function SurveysPage() {
                 <Filter size={13} />
                 Filter
               </button>
-              <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#0f1923] text-[12px] font-medium text-white hover:bg-slate-800 transition-colors">
+              <Link
+                href="/surveys/new"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#0f1923] text-[12px] font-medium text-white hover:bg-slate-800 transition-colors"
+              >
                 <Plus size={13} />
                 New Survey
-              </button>
+              </Link>
             </div>
           </div>
+
+          {/* Continue where you left off */}
+          {draft && (
+            <Link
+              href="/surveys/new"
+              className="group flex items-center justify-between gap-4 mb-5 px-4 py-3 rounded-xl border border-[#00b8a9]/30 bg-[#00b8a9]/6 hover:bg-[#00b8a9]/10 transition-colors"
+            >
+              <div className="flex items-center gap-3 min-w-0">
+                <div className="shrink-0 w-8 h-8 rounded-lg bg-[#00b8a9]/15 flex items-center justify-center text-[#00897b]">
+                  <PenLine size={14} />
+                </div>
+                <div className="min-w-0">
+                  <p className="text-[13px] font-semibold text-slate-800 truncate">
+                    Continue where you left off — {draft.basics.name?.trim() || "Untitled survey"}
+                  </p>
+                  <p className="text-[11.5px] text-slate-500">
+                    {computeOverallProgress(draft).completed} of {computeOverallProgress(draft).total} sections complete
+                  </p>
+                </div>
+              </div>
+              <span className="shrink-0 inline-flex items-center gap-1 text-[12px] font-semibold text-[#00897b] group-hover:gap-1.5 transition-all">
+                Resume
+                <ArrowRight size={13} />
+              </span>
+            </Link>
+          )}
 
           {/* Tabs */}
           <div className="flex items-end gap-0">
@@ -216,7 +247,7 @@ export default function SurveysPage() {
 
         {/* Summary footer */}
         <p className="text-center text-[11.5px] text-slate-400 mt-4">
-          {filtered.length} survey{filtered.length !== 1 ? "s" : ""} · {MOCK_SURVEYS.reduce((a, s) => a + s.totalInvited, 0)} total organizations invited
+          {filtered.length} survey{filtered.length !== 1 ? "s" : ""} · {surveys.reduce((a, s) => a + s.totalInvited, 0)} total organizations invited
         </p>
       </div>
     </div>
