@@ -43,8 +43,8 @@ const REPORT_TYPES = [
   {
     key: "demographics",
     icon: BarChart2,
-    label: "Demographics Percentage Chart",
-    description: "Race & gender percentages across investment staff, committee, and full-time staff by US and global.",
+    label: "Investment Committee Report",
+    description: "Race & gender percentages for investment professionals, the investment committee, and all employees, by U.S. and global.",
     color: "text-sky-700",
     bg: "bg-sky-50",
     border: "border-sky-200",
