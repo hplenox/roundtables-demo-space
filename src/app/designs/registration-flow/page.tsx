@@ -104,32 +104,35 @@ const SUGGESTED_MATCHES: OrgSuggestion[] = [
     initials: "AG",
   },
   {
+    id: "org-arctos-management",
+    name: "Arctos Partners Management",
+    members: 12,
+    confidence: 38,
+    reason:
+      "Begins with \u201cArctos,\u201d but carries two extra words that do not appear in the name you were invited as.",
+    logoTint: "bg-amber-500",
+    initials: "AP",
+  },
+  {
     id: "org-arctos-spv",
     name: "Arctos SPV Holdings",
     members: 4,
-    confidence: 23,
+    confidence: 27,
     reason:
       "Only the word \u201cArctos\u201d overlaps \u2014 \u201cSPV Holdings\u201d reads as a separate vehicle, not the firm you were invited as.",
     logoTint: "bg-slate-400",
     initials: "AS",
   },
-];
-
-// Every other organization registered on RoundTables. These are not scored,
-// because they have no relationship to the invitation name or email domain —
-// they exist only so a contact whose firm was mis-typed on the invitation can
-// still find it.
-const OTHER_ORGS: OrgSuggestion[] = [
-  { id: "org-kkr", name: "KKR", members: 212, confidence: 0, reason: "", logoTint: "bg-slate-700", initials: "KK" },
-  { id: "org-apollo", name: "Apollo Global Management", members: 188, confidence: 0, reason: "", logoTint: "bg-indigo-600", initials: "AG" },
-  { id: "org-carlyle", name: "The Carlyle Group", members: 176, confidence: 0, reason: "", logoTint: "bg-slate-600", initials: "CG" },
-  { id: "org-bain", name: "Bain Capital", members: 154, confidence: 0, reason: "", logoTint: "bg-rose-600", initials: "BC" },
-  { id: "org-vista", name: "Vista Equity Partners", members: 121, confidence: 0, reason: "", logoTint: "bg-sky-600", initials: "VE" },
-  { id: "org-ssga", name: "State Street Global Advisors", members: 98, confidence: 0, reason: "", logoTint: "bg-blue-700", initials: "SS" },
-  { id: "org-gip", name: "Global Infrastructure Partners", members: 74, confidence: 0, reason: "", logoTint: "bg-teal-600", initials: "GI" },
-  { id: "org-bluebay", name: "BlueBay Asset Management", members: 52, confidence: 0, reason: "", logoTint: "bg-cyan-700", initials: "BB" },
-  { id: "org-aduro", name: "Aduro Advisors", members: 29, confidence: 0, reason: "", logoTint: "bg-violet-600", initials: "AA" },
-  { id: "org-meritage", name: "Meritage Group", members: 17, confidence: 0, reason: "", logoTint: "bg-orange-600", initials: "MG" },
+  {
+    id: "org-arctos-ventures",
+    name: "Arctos Ventures",
+    members: 9,
+    confidence: 19,
+    reason:
+      "Shares only the leading word; \u201cVentures\u201d is a different line of business from the name on your invitation.",
+    logoTint: "bg-slate-400",
+    initials: "AV",
+  },
 ];
 
 function ProgressBar({ step }: { step: Step }) {
@@ -446,8 +449,8 @@ function InfoTooltip() {
         <span className="absolute z-30 left-1/2 -translate-x-1/2 top-6 w-72 rounded-xl bg-slate-900 text-white text-[12.5px] leading-relaxed p-3 shadow-xl">
           We first pull every organization already registered under your email domain, then score each one purely on
           how closely its name resembles the organization name on your invitation. Nothing else moves the
-          percentage. Pick the top match if it looks right, and only create a new organization if none of these is
-          your firm.
+          percentage. Pick the top match if it looks right. If none of them is your firm, the only other option is
+          to submit a new organization for review.
         </span>
       )}
     </span>
@@ -472,7 +475,6 @@ function InvitedOrgHeader() {
 }
 
 function StepOrganization({ onNext }: { onNext: (choice: { name: string; created: boolean }) => void }) {
-  const [browseOpen, setBrowseOpen] = useState(false);
   const [createOpen, setCreateOpen] = useState(false);
   const [newOrgName, setNewOrgName] = useState("");
 
@@ -493,7 +495,7 @@ function StepOrganization({ onNext }: { onNext: (choice: { name: string; created
         <span className="font-semibold text-slate-800">{INVITED_CONTACT.emailDomain}</span>. Each percentage is
         based solely on how closely that organization&rsquo;s name matches{" "}
         <span className="font-semibold text-slate-800">{INVITED_CONTACT.invitedOrgName}</span>, the name you were
-        invited as &mdash; no other signal affects the score.
+        invited as &mdash; no other signal affects the score. This is the complete list for your domain.
       </p>
 
       <div className="space-y-2.5 pt-2">
@@ -505,49 +507,18 @@ function StepOrganization({ onNext }: { onNext: (choice: { name: string; created
       <div className="mt-6 pt-5 border-t border-dashed border-slate-200 space-y-3">
         <button
           type="button"
-          onClick={() => setBrowseOpen((o) => !o)}
-          className="flex items-center gap-1.5 text-[12.5px] font-medium text-slate-500 hover:text-slate-700 transition-colors duration-150"
-        >
-          <ChevronDown size={14} className={`transition-transform duration-150 ${browseOpen ? "rotate-180" : ""}`} />
-          None of these? Browse every organization on RoundTables
-        </button>
-        {browseOpen && (
-          <div className="max-h-52 overflow-y-auto rounded-xl border border-slate-200 divide-y divide-slate-100">
-            {OTHER_ORGS.map((org) => (
-              <div key={org.id} className="flex items-center gap-3 px-4 py-2.5 hover:bg-slate-50 transition-colors duration-100">
-                <div className={`w-8 h-8 rounded-lg ${org.logoTint} flex items-center justify-center shrink-0 text-white text-[11px] font-bold`}>
-                  {org.initials}
-                </div>
-                <div className="min-w-0 flex-1">
-                  <p className="text-[13.5px] font-medium text-slate-800 truncate">{org.name}</p>
-                  <p className="text-[11.5px] text-slate-400">{org.members} members</p>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => onNext({ name: org.name, created: false })}
-                  className="shrink-0 rounded-lg border border-slate-300 hover:border-[#4361ee] hover:text-[#4361ee] text-slate-600 text-[12.5px] font-semibold px-3 py-1.5 transition-colors duration-150"
-                >
-                  Join
-                </button>
-              </div>
-            ))}
-          </div>
-        )}
-
-        <button
-          type="button"
           onClick={() => setCreateOpen((o) => !o)}
           className="flex items-center gap-1.5 text-[12.5px] text-slate-400 hover:text-slate-600 transition-colors duration-150"
         >
           <X size={13} className={`transition-transform duration-150 ${createOpen ? "rotate-0" : "rotate-45"}`} />
-          Can&rsquo;t find your organization anywhere above?
+          None of these is my organization
         </button>
         {createOpen && (
           <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
             <p className="text-[12px] text-slate-500 mb-3 leading-relaxed">
-              This should be rare &mdash; most contacts belong to an organization that&rsquo;s already registered.
-              Creating a new one starts your firm&rsquo;s survey history from scratch and goes to RoundTables staff
-              for review before it&rsquo;s active.
+              This should be rare &mdash; your invitation was addressed to an organization, so it is almost always
+              one of the matches above. Creating a new one starts your firm&rsquo;s survey history from scratch and
+              goes to RoundTables staff for review before you can begin the survey.
             </p>
             <label className="block text-[12.5px] font-semibold text-slate-700 mb-1.5">New organization name</label>
             <input
