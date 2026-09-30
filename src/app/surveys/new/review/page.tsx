@@ -66,11 +66,11 @@ export default function ReviewPage() {
       <div className="space-y-4">
         <SummaryCard title="Survey Basics" editHref="/surveys/new/basics">
           <div className="grid grid-cols-2 gap-y-2.5 text-[12.5px]">
-            <p className="text-slate-400">Organization</p>
+            <p className="text-slate-400">Client</p>
             <p className="text-slate-800 font-medium">{basics.organization}</p>
             <p className="text-slate-400">Request Type</p>
             <p className="text-slate-800 font-medium">{basics.requestType}</p>
-            <p className="text-slate-400">Name</p>
+            <p className="text-slate-400">Survey Title</p>
             <p className="text-slate-800 font-medium">{basics.name}</p>
             <p className="text-slate-400">Timeline</p>
             <p className="text-slate-800 font-medium">{basics.startDate} → {basics.dueDate}</p>
@@ -100,7 +100,9 @@ export default function ReviewPage() {
             {enabledPractices.map((q) => (
               <li key={q.key} className="text-[12px] text-slate-500 flex items-start gap-1.5">
                 <CheckCircle2 size={11} className="text-emerald-500 mt-0.5 shrink-0" />
-                {q.question}
+                <span>
+                  <span className="font-semibold text-slate-600">{q.code}</span> · {q.question}
+                </span>
               </li>
             ))}
           </ul>

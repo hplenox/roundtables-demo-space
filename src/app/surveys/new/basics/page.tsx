@@ -49,7 +49,7 @@ export default function BasicsPage() {
       description="Who this survey is for, what type it is, and who to contact about it."
     >
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-        <Field label="Organization" required>
+        <Field label="Client" required>
           <select
             className={inputCls}
             value={basics.organization}
@@ -79,7 +79,7 @@ export default function BasicsPage() {
         </Field>
 
         <div className="sm:col-span-2">
-          <Field label="Survey Name" required>
+          <Field label="Survey Title" required>
             <input
               className={inputCls}
               placeholder={`2026 ${basics.requestType || "Survey"} + ${basics.organization}`}
@@ -89,11 +89,11 @@ export default function BasicsPage() {
           </Field>
         </div>
 
-        <Field label="Start Date" required>
+        <Field label="Launch Date" required>
           <input type="date" className={inputCls} value={basics.startDate} onChange={(e) => set("startDate", e.target.value)} />
         </Field>
 
-        <Field label="Due Date" required>
+        <Field label="Initial Due Date" required>
           <input type="date" className={inputCls} value={basics.dueDate} onChange={(e) => set("dueDate", e.target.value)} />
         </Field>
 

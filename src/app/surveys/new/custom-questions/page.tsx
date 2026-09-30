@@ -12,9 +12,13 @@ import {
   updateCustomSection,
   useDraft,
 } from "@/lib/survey-draft-store";
-import { CUSTOM_QUESTION_TYPES } from "@/lib/survey-draft-config";
+import {
+  CUSTOM_QUESTIONS_INTRO,
+  CUSTOM_QUESTIONS_NONE_LABEL,
+  CUSTOM_QUESTION_TYPES,
+} from "@/lib/survey-draft-config";
 import SectionPageShell from "@/components/surveys/SectionPageShell";
-import { Plus, Trash2, Type, AlignLeft, Hash, List, ListChecks } from "lucide-react";
+import { Plus, Trash2, Type, AlignLeft, Hash, List, ListChecks, Info } from "lucide-react";
 import { CustomQuestionType } from "@/types/survey-draft";
 
 const TYPE_ICON: Record<CustomQuestionType, typeof Type> = {
@@ -43,9 +47,17 @@ export default function CustomQuestionsPage() {
       title="Custom Questions"
       description="Optional — add your own sections and questions on top of the standard survey."
     >
+      <div className="flex gap-2.5 mb-5 px-4 py-3 rounded-xl bg-slate-50 border border-slate-100">
+        <Info size={14} className="text-slate-400 shrink-0 mt-0.5" />
+        <p className="text-[12.5px] text-slate-600 leading-snug">{CUSTOM_QUESTIONS_INTRO}</p>
+      </div>
+
       <div className="space-y-5">
         {draft.customSections.length === 0 && (
-          <p className="text-[12.5px] text-slate-400 py-4">No custom sections yet. Add one below.</p>
+          <p className="text-[12.5px] text-slate-500 py-4">
+            <span className="font-semibold text-slate-700">None</span> — {CUSTOM_QUESTIONS_NONE_LABEL} Add a section
+            below to include custom questions.
+          </p>
         )}
 
         {draft.customSections.map((section) => (

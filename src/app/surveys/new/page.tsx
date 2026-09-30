@@ -9,6 +9,7 @@ import {
   MessageSquareText,
   LayoutGrid,
   ArrowRight,
+  Check,
   Send,
   RotateCcw,
   Lock,
@@ -21,7 +22,7 @@ import {
   sectionProgressLabel,
   useDraft,
 } from "@/lib/survey-draft-store";
-import { SectionKey } from "@/types/survey-draft";
+import { SectionKey, SectionStatus } from "@/types/survey-draft";
 import StatusBadge from "@/components/surveys/StatusBadge";
 
 const SECTIONS: {
@@ -36,7 +37,7 @@ const SECTIONS: {
     key: "basics",
     href: "/surveys/new/basics",
     label: "Survey Basics",
-    description: "Organization, request type, name, timeline, and points of contact.",
+    description: "Client, request type, survey title, timeline, and points of contact.",
     icon: ClipboardList,
   },
   {
@@ -50,7 +51,7 @@ const SECTIONS: {
     key: "practices",
     href: "/surveys/new/practices",
     label: "Practices Questions",
-    description: "Enable the governance and talent practice questions to include.",
+    description: "Optional — pick the Organizational Activities, ESG, and Impact questions to include.",
     icon: ListChecks,
   },
   {
@@ -70,6 +71,12 @@ const SECTIONS: {
   },
 ];
 
+function ctaLabel(status: SectionStatus): string {
+  if (status === "complete") return "Review";
+  if (status === "in-progress") return "Continue";
+  return "Start";
+}
+
 export default function NewSurveyHubPage() {
   const draft = useDraft();
   const router = useRouter();
@@ -80,6 +87,12 @@ export default function NewSurveyHubPage() {
 
   const progress = computeOverallProgress(draft);
   const ready = isReadyToSubmit(draft);
+  const remaining = progress.total - progress.completed;
+
+  // The first unfinished section is the one we spotlight — this is what makes
+  // the stack read chronologically instead of as a menu of equal choices.
+  const activeKey =
+    SECTIONS.find((s) => computeSectionStatus(draft, s.key) !== "complete")?.key ?? null;
 
   function handleDiscard() {
     if (window.confirm("Discard this draft? This can't be undone.")) {
@@ -90,80 +103,144 @@ export default function NewSurveyHubPage() {
 
   return (
     <div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        {SECTIONS.map((section) => {
-          const status = computeSectionStatus(draft, section.key);
-          const Icon = section.icon;
-          return (
-            <Link
-              key={section.key}
-              href={section.href}
-              className="group bg-white rounded-2xl border border-slate-200 p-5 shadow-sm hover:border-[#00b8a9]/40 hover:shadow-md transition-all"
-            >
-              <div className="flex items-start justify-between gap-3 mb-3">
-                <div className="shrink-0 w-10 h-10 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-500 group-hover:text-[#00897b] group-hover:bg-[#00b8a9]/8 transition-colors">
-                  <Icon size={18} />
-                </div>
-                <StatusBadge status={status} />
-              </div>
-              <h3 className="text-[14.5px] font-bold text-slate-900 flex items-center gap-1.5">
-                {section.label}
-                {section.optional && (
-                  <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wide">Optional</span>
-                )}
-              </h3>
-              <p className="text-[12.5px] text-slate-500 leading-snug mt-1">{section.description}</p>
-              <div className="flex items-center justify-between mt-4 pt-3 border-t border-slate-100">
-                <span className="text-[11.5px] text-slate-400">{sectionProgressLabel(draft, section.key)}</span>
-                <span className="inline-flex items-center gap-1 text-[12px] font-semibold text-[#3650d4] group-hover:gap-2 transition-all">
-                  {status === "not-started" ? "Start" : "Edit"}
-                  <ArrowRight size={12} />
-                </span>
-              </div>
-            </Link>
-          );
-        })}
+      <div className="flex items-center justify-between gap-4 mb-3">
+        <h2 className="text-[12px] font-bold text-slate-500 uppercase tracking-wide">Your survey sections</h2>
+        <button
+          onClick={handleDiscard}
+          className="inline-flex items-center gap-1.5 text-[12px] font-medium text-slate-400 hover:text-slate-700 transition-colors"
+        >
+          <RotateCcw size={12} />
+          Start over
+        </button>
       </div>
 
-      {/* Review & Submit — TurboTax-style "File" panel */}
-      <div className="mt-6 bg-white rounded-2xl border border-slate-200 shadow-sm p-6 flex items-center justify-between gap-6">
-        <div>
-          <h3 className="text-[15px] font-bold text-slate-900">Review &amp; submit</h3>
-          <p className="text-[12.5px] text-slate-500 mt-1">
-            {ready
-              ? "Every required section is complete. Review your survey and send it live."
-              : `Complete the remaining ${progress.total - progress.completed} required section${
-                  progress.total - progress.completed === 1 ? "" : "s"
-                } to submit.`}
-          </p>
-        </div>
-        <div className="flex items-center gap-2 shrink-0">
-          <button
-            onClick={handleDiscard}
-            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg border border-slate-200 text-[12.5px] font-medium text-slate-500 hover:bg-slate-50 transition-colors"
+      {/* Stacked, chronological step list — one section per row, joined by a rail */}
+      <ol className="relative">
+        {SECTIONS.map((section, index) => {
+          const status = computeSectionStatus(draft, section.key);
+          const isActive = section.key === activeKey;
+          const isComplete = status === "complete";
+          const Icon = section.icon;
+          return (
+            <li key={section.key} className="relative pl-12 pb-3">
+              <span
+                aria-hidden
+                className={`absolute left-[15px] top-10 bottom-0 w-[2px] ${
+                  isComplete ? "bg-[#00b8a9]/40" : "bg-slate-200"
+                }`}
+              />
+              <span
+                aria-hidden
+                className={`absolute left-0 top-4 w-8 h-8 rounded-full flex items-center justify-center text-[12px] font-bold border-2 transition-colors ${
+                  isComplete
+                    ? "bg-[#00b8a9] border-[#00b8a9] text-white"
+                    : isActive
+                      ? "bg-white border-[#00b8a9] text-[#00897b] shadow-[0_0_0_4px_rgba(0,184,169,0.12)]"
+                      : "bg-white border-slate-200 text-slate-400"
+                }`}
+              >
+                {isComplete ? <Check size={15} strokeWidth={3} /> : index + 1}
+              </span>
+
+              <Link
+                href={section.href}
+                className={`group block bg-white rounded-2xl border p-5 transition-all ${
+                  isActive
+                    ? "border-[#00b8a9]/50 shadow-md"
+                    : "border-slate-200 shadow-sm hover:border-[#00b8a9]/40 hover:shadow-md"
+                }`}
+              >
+                <div className="flex items-start gap-4">
+                  <div
+                    className={`shrink-0 w-10 h-10 rounded-xl border flex items-center justify-center transition-colors ${
+                      isActive
+                        ? "bg-[#00b8a9]/8 border-[#00b8a9]/20 text-[#00897b]"
+                        : "bg-slate-50 border-slate-100 text-slate-500 group-hover:text-[#00897b] group-hover:bg-[#00b8a9]/8"
+                    }`}
+                  >
+                    <Icon size={18} />
+                  </div>
+
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <h3 className="text-[14.5px] font-bold text-slate-900">{section.label}</h3>
+                      {section.optional && (
+                        <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wide">
+                          Optional
+                        </span>
+                      )}
+                      <StatusBadge status={status} />
+                    </div>
+                    <p className="text-[12.5px] text-slate-500 leading-snug mt-1">{section.description}</p>
+                    <p className="text-[11.5px] text-slate-400 mt-1.5">{sectionProgressLabel(draft, section.key)}</p>
+                  </div>
+
+                  <span
+                    className={`shrink-0 self-center inline-flex items-center gap-1.5 rounded-lg text-[12.5px] font-semibold transition-all ${
+                      isActive
+                        ? "px-4 py-2 bg-[#00b8a9] text-white group-hover:bg-[#00a094]"
+                        : "px-1 text-[#3650d4] group-hover:gap-2.5"
+                    }`}
+                  >
+                    {ctaLabel(status)}
+                    <ArrowRight size={13} />
+                  </span>
+                </div>
+              </Link>
+            </li>
+          );
+        })}
+
+        {/* Final step: Review & Submit — TurboTax's "File" row, on the same rail */}
+        <li className="relative pl-12">
+          <span
+            aria-hidden
+            className={`absolute left-0 top-4 w-8 h-8 rounded-full flex items-center justify-center border-2 transition-colors ${
+              ready
+                ? "bg-[#3fae4a] border-[#3fae4a] text-white shadow-[0_0_0_4px_rgba(63,174,74,0.15)]"
+                : "bg-white border-slate-200 text-slate-400"
+            }`}
           >
-            <RotateCcw size={13} />
-            Start over
-          </button>
-          {ready ? (
-            <Link
-              href="/surveys/new/review"
-              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-[#3fae4a] text-[13px] font-semibold text-white hover:bg-[#379a41] transition-colors"
-            >
-              <Send size={13} />
-              Review &amp; Submit
-            </Link>
-          ) : (
-            <button
-              disabled
-              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-slate-100 text-[13px] font-semibold text-slate-400 cursor-not-allowed"
-            >
-              <Lock size={13} />
-              Review &amp; Submit
-            </button>
-          )}
-        </div>
-      </div>
+            {ready ? <Send size={14} /> : <Lock size={13} />}
+          </span>
+
+          <div
+            className={`bg-white rounded-2xl border p-5 shadow-sm ${
+              ready ? "border-[#3fae4a]/40" : "border-slate-200"
+            }`}
+          >
+            <div className="flex items-start gap-4">
+              <div className="min-w-0 flex-1">
+                <h3 className="text-[14.5px] font-bold text-slate-900">Review &amp; submit</h3>
+                <p className="text-[12.5px] text-slate-500 leading-snug mt-1">
+                  {ready
+                    ? "Every required section is complete. Review your survey and send it live."
+                    : `Complete the remaining ${remaining} required section${
+                        remaining === 1 ? "" : "s"
+                      } to unlock submission.`}
+                </p>
+              </div>
+              {ready ? (
+                <Link
+                  href="/surveys/new/review"
+                  className="shrink-0 self-center inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-[#3fae4a] text-[12.5px] font-semibold text-white hover:bg-[#379a41] transition-colors"
+                >
+                  <Send size={13} />
+                  Review &amp; Submit
+                </Link>
+              ) : (
+                <button
+                  disabled
+                  className="shrink-0 self-center inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-slate-100 text-[12.5px] font-semibold text-slate-400 cursor-not-allowed"
+                >
+                  <Lock size={13} />
+                  Review &amp; Submit
+                </button>
+              )}
+            </div>
+          </div>
+        </li>
+      </ol>
     </div>
   );
 }
