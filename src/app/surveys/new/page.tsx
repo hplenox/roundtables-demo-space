@@ -13,6 +13,8 @@ import {
   Send,
   RotateCcw,
   Lock,
+  ExternalLink,
+  Link2,
 } from "lucide-react";
 import {
   computeOverallProgress,
@@ -88,6 +90,9 @@ export default function NewSurveyHubPage() {
   const progress = computeOverallProgress(draft);
   const ready = isReadyToSubmit(draft);
   const remaining = progress.total - progress.completed;
+  const context = draft.context;
+  const filed = draft.lifecycle !== "configuring";
+  const locked = draft.lifecycle === "locked";
 
   // The first unfinished section is the one we spotlight — this is what makes
   // the stack read chronologically instead of as a menu of equal choices.
@@ -95,23 +100,53 @@ export default function NewSurveyHubPage() {
     SECTIONS.find((s) => computeSectionStatus(draft, s.key) !== "complete")?.key ?? null;
 
   function handleDiscard() {
-    if (window.confirm("Discard this draft? This can't be undone.")) {
+    const message = context
+      ? `Discard this survey and reset onboarding step 1 for ${context.clientName}? This can't be undone.`
+      : "Discard this draft? This can't be undone.";
+    if (window.confirm(message)) {
       discardDraft();
-      router.push("/surveys");
+      router.push(context?.returnTo ?? "/surveys");
     }
   }
 
   return (
     <div>
+      {filed && draft.surveyId && (
+        <div
+          className={`mb-4 rounded-2xl border px-5 py-3.5 flex items-center justify-between gap-3 ${
+            locked ? "border-emerald-200 bg-emerald-50/60" : "border-amber-200 bg-amber-50/60"
+          }`}
+        >
+          <div className="min-w-0">
+            <p className={`text-[13px] font-bold ${locked ? "text-emerald-800" : "text-amber-800"}`}>
+              {locked ? "This survey has launched" : "Linked to a live survey record"}
+            </p>
+            <p className={`text-[12px] mt-0.5 ${locked ? "text-emerald-700/80" : "text-amber-700/80"}`}>
+              {locked
+                ? "Its question set is locked. You can review it here, but changes are no longer saved."
+                : "Edits you make here update the survey on the dashboard when you save from Review."}
+            </p>
+          </div>
+          <Link
+            href={`/surveys/${draft.surveyId}`}
+            className="shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white border border-slate-200 text-[12px] font-semibold text-slate-700 hover:bg-slate-50 transition-colors"
+          >
+            Open survey <ExternalLink size={12} />
+          </Link>
+        </div>
+      )}
+
       <div className="flex items-center justify-between gap-4 mb-3">
         <h2 className="text-[12px] font-bold text-slate-500 uppercase tracking-wide">Your survey sections</h2>
-        <button
-          onClick={handleDiscard}
-          className="inline-flex items-center gap-1.5 text-[12px] font-medium text-slate-400 hover:text-slate-700 transition-colors"
-        >
-          <RotateCcw size={12} />
-          Start over
-        </button>
+        {!locked && (
+          <button
+            onClick={handleDiscard}
+            className="inline-flex items-center gap-1.5 text-[12px] font-medium text-slate-400 hover:text-slate-700 transition-colors"
+          >
+            <RotateCcw size={12} />
+            {context ? "Discard survey" : "Start over"}
+          </button>
+        )}
       </div>
 
       {/* Stacked, chronological step list — one section per row, joined by a rail */}
@@ -211,22 +246,32 @@ export default function NewSurveyHubPage() {
           >
             <div className="flex items-start gap-4">
               <div className="min-w-0 flex-1">
-                <h3 className="text-[14.5px] font-bold text-slate-900">Review &amp; submit</h3>
+                <h3 className="text-[14.5px] font-bold text-slate-900">
+                  {filed ? "Review & save" : "Review & submit"}
+                </h3>
                 <p className="text-[12.5px] text-slate-500 leading-snug mt-1">
-                  {ready
-                    ? "Every required section is complete. Review your survey and send it live."
-                    : `Complete the remaining ${remaining} required section${
+                  {!ready
+                    ? `Complete the remaining ${remaining} required section${
                         remaining === 1 ? "" : "s"
-                      } to unlock submission.`}
+                      } to unlock submission.`
+                    : locked
+                      ? "This survey has launched — review the final question set below."
+                      : filed
+                        ? "Review your changes and save them back to the linked survey."
+                        : context
+                          ? `Every required section is complete. Review and file this survey against ${context.clientName}.`
+                          : "Every required section is complete. Review your survey and send it live."}
                 </p>
               </div>
               {ready ? (
                 <Link
                   href="/surveys/new/review"
-                  className="shrink-0 self-center inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-[#3fae4a] text-[12.5px] font-semibold text-white hover:bg-[#379a41] transition-colors"
+                  className={`shrink-0 self-center inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-[12.5px] font-semibold text-white transition-colors ${
+                    locked ? "bg-slate-600 hover:bg-slate-700" : "bg-[#3fae4a] hover:bg-[#379a41]"
+                  }`}
                 >
-                  <Send size={13} />
-                  Review &amp; Submit
+                  {locked ? <Lock size={13} /> : filed ? <Link2 size={13} /> : <Send size={13} />}
+                  {locked ? "View Summary" : filed ? "Review & Save" : "Review & Submit"}
                 </Link>
               ) : (
                 <button

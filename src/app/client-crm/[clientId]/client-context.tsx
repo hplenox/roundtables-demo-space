@@ -30,6 +30,17 @@ interface ClientCtxValue {
   updateKeyDates: (cycleId: string, patch: Partial<ClientKeyDates>) => void;
   setOnboardingStepStatus: (cycleId: string, key: OnboardingStepKey, status: OnboardingStepStatus) => void;
   requestOnboardingStepAction: (cycleId: string, key: OnboardingStepKey) => void;
+  /**
+   * Attaches the Survey filed from onboarding step 1 to this cycle, which is
+   * what unlocks the survey-scoped links used by the later steps (contact
+   * list, activity, reports). Silent — it's a consequence of an action the
+   * admin already got feedback for.
+   */
+  linkCycleSurvey: (cycleId: string, surveyId: string) => void;
+  /** Step 1 reached its end state: the question set is approved and locked. */
+  completeQuestionBuildout: (cycleId: string) => void;
+  /** Step 1 was torn down — unlink the survey and reset the step. */
+  resetQuestionBuildout: (cycleId: string) => void;
   sendFinalizationEmail: (cycleId: string) => void;
   setClientStatus: (status: ClientStatus) => void;
   setCycleStatus: (cycleId: string, status: SurveyCycleStatus) => void;
@@ -149,6 +160,63 @@ export function ClientProvider({ initialClient, children }: { initialClient: Cli
         : `Reminder sent to ${client.primaryContactName} for "${step.label}".`,
       "success"
     );
+  }
+
+  function linkCycleSurvey(cycleId: string, surveyId: string) {
+    setClient((prev) => ({
+      ...prev,
+      surveys: prev.surveys.map((s) => (s.id === cycleId && s.surveyId !== surveyId ? { ...s, surveyId } : s)),
+    }));
+  }
+
+  function completeQuestionBuildout(cycleId: string) {
+    const cycle = findCycle(cycleId);
+    if (!cycle) return;
+    const willCompleteAll = cycle.onboarding.every((s) => s.key === "questions" || s.status === "approved");
+
+    setClient((prev) => ({
+      ...prev,
+      surveys: prev.surveys.map((s) =>
+        s.id !== cycleId
+          ? s
+          : {
+              ...s,
+              onboarding: s.onboarding.map((o) =>
+                o.key === "questions" ? { ...o, status: "approved", updatedAt: TODAY_ISO } : o
+              ),
+              checklist: s.checklist.map((c) =>
+                c.key === "question_buildout" && !c.done
+                  ? { ...c, done: true, completedAt: TODAY_ISO, completedBy: CURRENT_USER }
+                  : c
+              ),
+            }
+      ),
+    }));
+
+    if (willCompleteAll) {
+      pushToast(`Onboarding for ${cycle.name} '${String(cycle.year).slice(2)} is fully approved.`, "success");
+    }
+  }
+
+  function resetQuestionBuildout(cycleId: string) {
+    setClient((prev) => ({
+      ...prev,
+      surveys: prev.surveys.map((s) =>
+        s.id !== cycleId
+          ? s
+          : {
+              ...s,
+              surveyId: null,
+              onboarding: s.onboarding.map((o) =>
+                o.key === "questions" ? { ...o, status: "not_started", updatedAt: TODAY_ISO } : o
+              ),
+              checklist: s.checklist.map((c) =>
+                c.key === "question_buildout" ? { ...c, done: false, completedAt: null, completedBy: null } : c
+              ),
+            }
+      ),
+    }));
+    pushToast("Survey configuration discarded — step 1 reset.", "warning");
   }
 
   function sendFinalizationEmail(cycleId: string) {
@@ -272,6 +340,9 @@ export function ClientProvider({ initialClient, children }: { initialClient: Cli
         updateKeyDates,
         setOnboardingStepStatus,
         requestOnboardingStepAction,
+        linkCycleSurvey,
+        completeQuestionBuildout,
+        resetQuestionBuildout,
         sendFinalizationEmail,
         setClientStatus,
         setCycleStatus,

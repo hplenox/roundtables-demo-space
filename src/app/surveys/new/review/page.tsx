@@ -3,19 +3,32 @@
 import { useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, CheckCircle2, Send, PenLine } from "lucide-react";
+import { ArrowLeft, CheckCircle2, Send, PenLine, Link2, Lock } from "lucide-react";
 import { ensureDraft, isReadyToSubmit, submitDraft, useDraft } from "@/lib/survey-draft-store";
 import { LPI_SETTINGS_CONFIG, PRACTICES_CONFIG, STANDARD_QUESTIONS_CONFIG } from "@/lib/survey-draft-config";
 
-function SummaryCard({ title, editHref, children }: { title: string; editHref: string; children: React.ReactNode }) {
+function SummaryCard({
+  title,
+  editHref,
+  locked,
+  children,
+}: {
+  title: string;
+  editHref: string;
+  /** A launched survey's sections are read-only, so don't offer an edit link into them. */
+  locked?: boolean;
+  children: React.ReactNode;
+}) {
   return (
     <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-5">
       <div className="flex items-center justify-between mb-3">
         <h3 className="text-[13.5px] font-bold text-slate-900">{title}</h3>
-        <Link href={editHref} className="inline-flex items-center gap-1 text-[12px] font-medium text-[#3650d4] hover:underline">
-          <PenLine size={11} />
-          Edit
-        </Link>
+        {!locked && (
+          <Link href={editHref} className="inline-flex items-center gap-1 text-[12px] font-medium text-[#3650d4] hover:underline">
+            <PenLine size={11} />
+            Edit
+          </Link>
+        )}
       </div>
       {children}
     </div>
@@ -44,9 +57,15 @@ export default function ReviewPage() {
   const enabledPractices = PRACTICES_CONFIG.flatMap((cat) => cat.questions.filter((q) => currentDraft.practices[q.key]?.enabled));
   const enabledStandard = STANDARD_QUESTIONS_CONFIG.filter((q) => currentDraft.standardQuestions[q.key]?.enabled);
 
+  const context = currentDraft.context;
+  const filed = currentDraft.lifecycle !== "configuring";
+  const locked = currentDraft.lifecycle === "locked";
+
   function handleSubmit() {
     const id = submitDraft(currentDraft);
-    router.push(`/surveys/${id}`);
+    // A cycle-bound draft belongs to the client's onboarding step — hand the
+    // admin back there rather than dropping them on the survey detail page.
+    router.push(context ? context.returnTo : `/surveys/${id}`);
   }
 
   return (
@@ -57,14 +76,22 @@ export default function ReviewPage() {
       </Link>
 
       <div className="mb-5">
-        <h2 className="text-[19px] font-bold text-slate-900">Review &amp; submit</h2>
+        <h2 className="text-[19px] font-bold text-slate-900">
+          {locked ? "Final question set" : filed ? "Review & save" : "Review & submit"}
+        </h2>
         <p className="text-[12.5px] text-slate-500 mt-1">
-          Double check everything below, then submit to send this survey live and start inviting organizations.
+          {locked
+            ? "This survey has launched. The configuration below is locked and shown for reference."
+            : filed
+              ? "Double check your changes below, then save them back to the linked survey."
+              : context
+                ? `Double check everything below, then file this survey against ${context.clientName} and link it to their ${context.cycleLabel} cycle.`
+                : "Double check everything below, then submit to send this survey live and start inviting organizations."}
         </p>
       </div>
 
       <div className="space-y-4">
-        <SummaryCard title="Survey Basics" editHref="/surveys/new/basics">
+        <SummaryCard title="Survey Basics" editHref="/surveys/new/basics" locked={locked}>
           <div className="grid grid-cols-2 gap-y-2.5 text-[12.5px]">
             <p className="text-slate-400">Client</p>
             <p className="text-slate-800 font-medium">{basics.organization}</p>
@@ -79,7 +106,7 @@ export default function ReviewPage() {
           </div>
         </SummaryCard>
 
-        <SummaryCard title="LPI Data Fields" editHref="/surveys/new/lpi-settings">
+        <SummaryCard title="LPI Data Fields" editHref="/surveys/new/lpi-settings" locked={locked}>
           {enabledLpi.length === 0 ? (
             <p className="text-[12.5px] text-slate-400">No data groups enabled.</p>
           ) : (
@@ -94,7 +121,7 @@ export default function ReviewPage() {
           )}
         </SummaryCard>
 
-        <SummaryCard title="Practices Questions" editHref="/surveys/new/practices">
+        <SummaryCard title="Practices Questions" editHref="/surveys/new/practices" locked={locked}>
           <p className="text-[12.5px] text-slate-600 mb-2">{enabledPractices.length} question{enabledPractices.length === 1 ? "" : "s"} enabled</p>
           <ul className="space-y-1">
             {enabledPractices.map((q) => (
@@ -108,7 +135,7 @@ export default function ReviewPage() {
           </ul>
         </SummaryCard>
 
-        <SummaryCard title="Standard Questions" editHref="/surveys/new/standard-questions">
+        <SummaryCard title="Standard Questions" editHref="/surveys/new/standard-questions" locked={locked}>
           {enabledStandard.length === 0 ? (
             <p className="text-[12.5px] text-slate-400">No standard questions enabled.</p>
           ) : (
@@ -123,7 +150,7 @@ export default function ReviewPage() {
           )}
         </SummaryCard>
 
-        <SummaryCard title="Custom Questions" editHref="/surveys/new/custom-questions">
+        <SummaryCard title="Custom Questions" editHref="/surveys/new/custom-questions" locked={locked}>
           {currentDraft.customSections.length === 0 ? (
             <p className="text-[12.5px] text-slate-400">No custom sections added.</p>
           ) : (
@@ -140,13 +167,23 @@ export default function ReviewPage() {
       </div>
 
       <div className="flex justify-end mt-6">
-        <button
-          onClick={handleSubmit}
-          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-[#3fae4a] text-[14px] font-semibold text-white hover:bg-[#379a41] transition-colors shadow-sm"
-        >
-          <Send size={15} />
-          Submit Survey
-        </button>
+        {locked ? (
+          <Link
+            href={context?.returnTo ?? "/surveys"}
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-slate-600 text-[14px] font-semibold text-white hover:bg-slate-700 transition-colors shadow-sm"
+          >
+            <Lock size={15} />
+            Done
+          </Link>
+        ) : (
+          <button
+            onClick={handleSubmit}
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-[#3fae4a] text-[14px] font-semibold text-white hover:bg-[#379a41] transition-colors shadow-sm"
+          >
+            {filed ? <Link2 size={15} /> : <Send size={15} />}
+            {filed ? "Save Changes" : context ? "Create & Link Survey" : "Submit Survey"}
+          </button>
+        )}
       </div>
     </div>
   );

@@ -1,14 +1,37 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useClientCtx } from "../client-context";
 import { CyclePicker, useSelectedCycle } from "../cycle-picker";
 import { fmtDate } from "@/lib/mock-clients";
 import type { Client, ClientSurveyCycle, OnboardingStep, OnboardingStepStatus } from "@/types/client";
+import type { SurveyDraft } from "@/types/survey-draft";
+import {
+  approveDraftQuestions,
+  beginCycleDraft,
+  computeOverallProgress,
+  discardDraftById,
+  draftContentSummary,
+  isReadyToSubmit,
+  lockDraft,
+  reopenDraftQuestions,
+  useAllSurveys,
+  useCycleDraft,
+} from "@/lib/survey-draft-store";
+import {
+  PANEL_STATE_CONFIG,
+  buildBasicsPrefill,
+  buildCycleContext,
+  cycleHasLaunched,
+  panelStateForDraft,
+  stepStatusForDraft,
+} from "@/lib/cycle-survey-link";
 import {
   FileText, Users, Mail, ChevronDown, ExternalLink, Send, X,
   CheckCircle2, Paperclip, FileSignature, ClipboardList,
+  PencilRuler, Lock, RotateCcw, Trash2, ArrowRight, Layers,
 } from "lucide-react";
 
 const STEP_STATUS_CONFIG: Record<OnboardingStepStatus, { label: string; badge: string }> = {
@@ -283,14 +306,206 @@ function StepEmailAction({
   );
 }
 
-function QuestionsStep({
+// ─── Step 1: Survey buildout ────────────────────────────────────────────────
+//
+// This step owns exactly one survey draft per cycle (see cycle-survey-link.ts).
+// Before one exists it reads as a request — requirements, prior-year questions,
+// a "Configure Survey" hand-off into the TurboTax-style flow at /surveys/new.
+// Once a draft exists the step *becomes* the survey: the request framing drops
+// away and the panel below shows what's configured, what's left, and the one
+// action that moves it forward.
+
+function SummaryStat({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="min-w-0">
+      <p className="text-[10.5px] font-semibold text-slate-400 uppercase tracking-wide">{label}</p>
+      <p className="text-[12.5px] text-slate-700 font-medium mt-0.5 truncate">{value || "—"}</p>
+    </div>
+  );
+}
+
+function SurveyPanel({
+  draft,
+  onEdit,
+  onApprove,
+  onReopen,
+  onDiscard,
+}: {
+  draft: SurveyDraft;
+  onEdit: () => void;
+  onApprove: () => void;
+  onReopen: () => void;
+  onDiscard: () => void;
+}) {
+  const state = panelStateForDraft(draft);
+  const cfg = PANEL_STATE_CONFIG[state];
+  const progress = computeOverallProgress(draft);
+  const counts = draftContentSummary(draft);
+  const ready = isReadyToSubmit(draft);
+  const locked = state === "locked";
+
+  const contentChips = [
+    `${counts.lpiGroups} LPI data group${counts.lpiGroups === 1 ? "" : "s"}`,
+    `${counts.practices} practices question${counts.practices === 1 ? "" : "s"}`,
+    `${counts.standardQuestions} standard question${counts.standardQuestions === 1 ? "" : "s"}`,
+    counts.customSections > 0
+      ? `${counts.customQuestions} custom question${counts.customQuestions === 1 ? "" : "s"} in ${counts.customSections} section${counts.customSections === 1 ? "" : "s"}`
+      : "No custom questions",
+  ];
+
+  return (
+    <div className="px-5 py-4 space-y-4">
+      <div className="rounded-xl border border-slate-200 bg-slate-50/60 overflow-hidden">
+        <div className="flex items-start justify-between gap-3 px-4 py-3.5 bg-white border-b border-slate-100">
+          <div className="flex items-start gap-3 min-w-0">
+            <div className="w-8 h-8 rounded-lg bg-violet-50 flex items-center justify-center shrink-0 mt-0.5">
+              <Layers size={15} className="text-violet-600" />
+            </div>
+            <div className="min-w-0">
+              <p className="text-[13px] font-semibold text-slate-800 truncate">
+                {draft.basics.name?.trim() || "Untitled survey"}
+              </p>
+              <p className="text-[11.5px] text-slate-400 mt-0.5">{cfg.blurb}</p>
+            </div>
+          </div>
+          <span className={`shrink-0 inline-flex items-center px-2 py-0.5 rounded-full text-[10.5px] font-medium border ${cfg.badge}`}>
+            {cfg.label}
+          </span>
+        </div>
+
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 px-4 py-3.5">
+          <SummaryStat label="Request Type" value={draft.basics.requestType} />
+          <SummaryStat label="Launches" value={draft.basics.startDate} />
+          <SummaryStat label="Due" value={draft.basics.dueDate} />
+          <SummaryStat label="Primary Contact" value={draft.basics.primaryContact} />
+        </div>
+
+        {state === "configuring" ? (
+          <div className="px-4 pb-4">
+            <div className="flex items-center justify-between gap-3 mb-1.5">
+              <p className="text-[11.5px] text-slate-500">
+                {progress.completed} of {progress.total} required sections complete
+              </p>
+              <p className="text-[11.5px] font-semibold text-slate-600 tabular-nums">{progress.percent}%</p>
+            </div>
+            <div className="h-1.5 bg-slate-200 rounded-full overflow-hidden">
+              <div
+                className="h-full rounded-full bg-[#00b8a9] transition-all duration-500"
+                style={{ width: `${progress.percent}%` }}
+              />
+            </div>
+            {ready && (
+              <p className="text-[11.5px] text-emerald-700 mt-2">
+                All sections are done — open the builder and submit to create the survey.
+              </p>
+            )}
+          </div>
+        ) : (
+          <div className="px-4 pb-4 flex flex-wrap gap-1.5">
+            {contentChips.map((chip) => (
+              <span
+                key={chip}
+                className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-white border border-slate-200 text-[11px] font-medium text-slate-600"
+              >
+                <CheckCircle2 size={10} className="text-emerald-500" />
+                {chip}
+              </span>
+            ))}
+          </div>
+        )}
+      </div>
+
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <div className="flex flex-wrap items-center gap-2">
+          <button
+            onClick={onEdit}
+            className={`flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-[12.5px] font-medium transition-colors ${
+              locked
+                ? "border border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
+                : state === "configuring"
+                  ? "bg-[#0f1923] text-white hover:bg-[#1a2733]"
+                  : "border border-[#00b8a9]/30 bg-[#00b8a9]/5 text-[#00897b] hover:bg-[#00b8a9]/10"
+            }`}
+          >
+            {locked ? <Lock size={13} /> : <PencilRuler size={13} />}
+            {locked ? "View Question Set" : state === "configuring" ? "Continue Configuring" : "Edit Survey Setup"}
+            {!locked && <ArrowRight size={12} />}
+          </button>
+
+          {draft.surveyId && (
+            <Link
+              href={`/surveys/${draft.surveyId}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1.5 px-3 py-2 rounded-lg border border-slate-200 bg-white text-[12.5px] font-medium text-slate-600 hover:bg-slate-50 transition-colors"
+            >
+              Open Survey <ExternalLink size={12} />
+            </Link>
+          )}
+        </div>
+
+        <div className="flex items-center gap-2">
+          {state === "review" && (
+            <button
+              onClick={onApprove}
+              className="flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-emerald-600 text-white text-[12.5px] font-medium hover:bg-emerald-700 transition-colors"
+            >
+              <CheckCircle2 size={13} /> Mark Question Set Approved
+            </button>
+          )}
+          {state === "approved" && (
+            <button
+              onClick={onReopen}
+              className="flex items-center gap-1.5 px-3 py-2 rounded-lg border border-slate-200 bg-white text-[12.5px] font-medium text-slate-500 hover:text-slate-800 hover:bg-slate-50 transition-colors"
+            >
+              <RotateCcw size={12} /> Reopen for Changes
+            </button>
+          )}
+          {!locked && (
+            <button
+              onClick={onDiscard}
+              className="flex items-center gap-1.5 px-2.5 py-2 rounded-lg text-[12.5px] font-medium text-slate-400 hover:text-red-600 transition-colors"
+            >
+              <Trash2 size={12} /> Discard
+            </button>
+          )}
+        </div>
+      </div>
+
+      <p className="text-[11px] text-slate-400">
+        {draft.approvedAt && `Approved ${fmtDate(draft.approvedAt.slice(0, 10))} · `}
+        Last edited {fmtDate(draft.updatedAt.slice(0, 10))}
+      </p>
+    </div>
+  );
+}
+
+function SurveyBuildStep({
   step,
+  status,
   client,
+  draft,
+  legacySurvey,
+  onConfigure,
+  onEdit,
+  onApprove,
+  onReopen,
+  onDiscard,
   onSetStatus,
   onRequestAction,
 }: {
   step: OnboardingStep;
+  /** Derived from the draft once one exists, so the badge can't drift from the panel. */
+  status: OnboardingStepStatus;
   client: Client;
+  draft: SurveyDraft | null;
+  /** A survey this cycle was already linked to before the buildout flow existed. */
+  legacySurvey: { id: string; name: string } | null;
+  onConfigure: () => void;
+  onEdit: () => void;
+  onApprove: () => void;
+  onReopen: () => void;
+  onDiscard: () => void;
   onSetStatus: (v: OnboardingStepStatus) => void;
   onRequestAction: () => void;
 }) {
@@ -306,43 +521,86 @@ function QuestionsStep({
           </div>
           <div className="min-w-0">
             <p className="text-[13px] font-semibold text-slate-800">1. {step.label}</p>
-            <p className="text-[11.5px] text-slate-400 mt-0.5 max-w-md">{step.description}</p>
+            <p className="text-[11.5px] text-slate-400 mt-0.5 max-w-md">
+              {draft
+                ? `The survey for this cycle, built and tracked right here.`
+                : step.description}
+            </p>
           </div>
         </div>
-        <span className={`shrink-0 inline-flex items-center px-2 py-0.5 rounded-full text-[10.5px] font-medium border ${STEP_STATUS_CONFIG[step.status].badge}`}>
-          {STEP_STATUS_CONFIG[step.status].label}
+        <span className={`shrink-0 inline-flex items-center px-2 py-0.5 rounded-full text-[10.5px] font-medium border ${STEP_STATUS_CONFIG[status].badge}`}>
+          {STEP_STATUS_CONFIG[status].label}
         </span>
       </div>
 
-      <RequirementsList step={step} />
-
-      <div className="px-5 py-3.5 flex items-center justify-between gap-3">
-        <button
-          onClick={() => setShowPreview((v) => !v)}
-          className="flex items-center gap-1.5 text-[12px] font-medium text-slate-600 hover:text-[#00897b] transition-colors"
-        >
-          <ChevronDown size={13} className={`transition-transform ${showPreview ? "rotate-180" : ""}`} />
-          Review previous year&rsquo;s questions
-        </button>
-        <StatusSelect value={step.status} onChange={onSetStatus} />
-      </div>
-
-      {showPreview && (
-        <div className="px-5 pb-4">
-          <div className="bg-slate-50 rounded-lg border border-slate-100 p-3.5 space-y-1.5">
-            {SAMPLE_QUESTIONS.map((q) => (
-              <div key={q} className="flex items-center gap-2 text-[12px] text-slate-600">
-                <span className="w-1.5 h-1.5 rounded-full bg-violet-300 shrink-0" />
-                {q}
-              </div>
-            ))}
+      {draft ? (
+        <SurveyPanel draft={draft} onEdit={onEdit} onApprove={onApprove} onReopen={onReopen} onDiscard={onDiscard} />
+      ) : legacySurvey ? (
+        // Cycles that predate the buildout flow already point at a survey.
+        // There's no draft to edit, so the step just surfaces what's linked.
+        <div className="px-5 py-4 flex items-center justify-between gap-3">
+          <div className="flex items-start gap-3 min-w-0">
+            <div className="w-8 h-8 rounded-lg bg-violet-50 flex items-center justify-center shrink-0 mt-0.5">
+              <Layers size={15} className="text-violet-600" />
+            </div>
+            <div className="min-w-0">
+              <p className="text-[13px] font-semibold text-slate-800 truncate">{legacySurvey.name}</p>
+              <p className="text-[11.5px] text-slate-400 mt-0.5">
+                This cycle is already linked to a survey built outside this flow.
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2 shrink-0">
+            <Link
+              href={`/surveys/${legacySurvey.id}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1.5 px-3 py-2 rounded-lg border border-slate-200 bg-white text-[12.5px] font-medium text-slate-600 hover:bg-slate-50 transition-colors"
+            >
+              Open Survey <ExternalLink size={12} />
+            </Link>
+            <StatusSelect value={status} onChange={onSetStatus} />
           </div>
         </div>
-      )}
+      ) : (
+        <>
+          <RequirementsList step={step} />
 
-      <div className="px-5 py-3.5 border-t border-slate-100 flex justify-end">
-        <StepEmailAction step={step} onOpen={() => setShowEmail(true)} />
-      </div>
+          <div className="px-5 py-3.5 flex items-center justify-between gap-3">
+            <button
+              onClick={() => setShowPreview((v) => !v)}
+              className="flex items-center gap-1.5 text-[12px] font-medium text-slate-600 hover:text-[#00897b] transition-colors"
+            >
+              <ChevronDown size={13} className={`transition-transform ${showPreview ? "rotate-180" : ""}`} />
+              Review previous year&rsquo;s questions
+            </button>
+            <StatusSelect value={status} onChange={onSetStatus} />
+          </div>
+
+          {showPreview && (
+            <div className="px-5 pb-4">
+              <div className="bg-slate-50 rounded-lg border border-slate-100 p-3.5 space-y-1.5">
+                {SAMPLE_QUESTIONS.map((q) => (
+                  <div key={q} className="flex items-center gap-2 text-[12px] text-slate-600">
+                    <span className="w-1.5 h-1.5 rounded-full bg-violet-300 shrink-0" />
+                    {q}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          <div className="px-5 py-3.5 border-t border-slate-100 flex items-center justify-between gap-3">
+            <button
+              onClick={onConfigure}
+              className="flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-[#0f1923] text-white text-[12.5px] font-medium hover:bg-[#1a2733] transition-colors"
+            >
+              <PencilRuler size={13} /> Configure Survey <ArrowRight size={12} />
+            </button>
+            <StepEmailAction step={step} onOpen={() => setShowEmail(true)} />
+          </div>
+        </>
+      )}
 
       {showEmail && (
         <RequestActionModal step={step} client={client} onClose={() => setShowEmail(false)} onSend={onRequestAction} />
@@ -469,12 +727,64 @@ function FinalizationStep({
 // ─── Page ────────────────────────────────────────────────────────────────
 
 export default function ClientOnboardingPage() {
-  const { client, activeCycle, startOnboarding, setOnboardingStepStatus, requestOnboardingStepAction, sendFinalizationEmail } = useClientCtx();
+  const {
+    client, activeCycle, startOnboarding, setOnboardingStepStatus, requestOnboardingStepAction,
+    sendFinalizationEmail, linkCycleSurvey, completeQuestionBuildout, resetQuestionBuildout,
+  } = useClientCtx();
   const { selected: cycle, selectCycle } = useSelectedCycle(client, activeCycle);
+  const router = useRouter();
+
+  // Step 1's survey lives in the draft store, which is persisted; the client
+  // record here is in-memory demo state. The draft is therefore the source of
+  // truth, and these effects push its state back into the CRM record so the
+  // step badge, the cycle's survey link, and the launch checklist all agree.
+  const draft = useCycleDraft(cycle?.id ?? null);
+  const allSurveys = useAllSurveys();
+  const questionsStep = cycle?.onboarding.find((s) => s.key === "questions");
+  const derivedStepStatus = draft ? stepStatusForDraft(draft) : questionsStep?.status ?? "not_started";
+
+  useEffect(() => {
+    if (!cycle || !draft?.surveyId) return;
+    if (cycle.surveyId !== draft.surveyId) linkCycleSurvey(cycle.id, draft.surveyId);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [cycle?.id, cycle?.surveyId, draft?.surveyId]);
+
+  // Launching the cycle is what freezes the question set — "editable until the
+  // survey is launched", enforced in one place rather than at every edit site.
+  useEffect(() => {
+    if (!cycle || !draft) return;
+    if (cycleHasLaunched(cycle) && draft.lifecycle === "submitted") lockDraft(draft.id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [cycle?.id, cycle?.status, draft?.id, draft?.lifecycle]);
+
+  useEffect(() => {
+    if (!cycle || !draft || !questionsStep || questionsStep.status === derivedStepStatus) return;
+    if (derivedStepStatus === "approved") completeQuestionBuildout(cycle.id);
+    else setOnboardingStepStatus(cycle.id, "questions", derivedStepStatus);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [cycle?.id, questionsStep?.status, derivedStepStatus, draft?.id]);
 
   function handleStartOnboarding() {
     const id = startOnboarding();
     selectCycle(id);
+  }
+
+  /** Opens this cycle's draft in the creation flow, creating it the first time. */
+  function openSurveyBuilder() {
+    if (!cycle) return;
+    beginCycleDraft(buildCycleContext(client, cycle), buildBasicsPrefill(client, cycle));
+    router.push("/surveys/new");
+  }
+
+  function handleDiscardSurvey() {
+    if (!cycle || !draft) return;
+    const filed = draft.lifecycle !== "configuring";
+    const message = filed
+      ? "Discard this survey? It will be removed from the Survey Dashboard and step 1 will reset."
+      : "Discard this survey draft? This can't be undone.";
+    if (!window.confirm(message)) return;
+    discardDraftById(draft.id);
+    resetQuestionBuildout(cycle.id);
   }
 
   if (!cycle) {
@@ -495,8 +805,14 @@ export default function ClientOnboardingPage() {
     );
   }
 
-  const questions = cycle.onboarding.find((s) => s.key === "questions");
   const contacts = cycle.onboarding.find((s) => s.key === "contacts");
+
+  // A pre-existing link (from the seeded CRM data) only counts as "legacy"
+  // while this cycle has no draft of its own to show instead.
+  const legacyMatch = !draft && cycle.surveyId ? allSurveys.find((s) => s.id === cycle.surveyId) : undefined;
+  const legacySurvey = cycle.surveyId && !draft
+    ? { id: cycle.surveyId, name: legacyMatch?.name ?? "Linked survey" }
+    : null;
   const finalization = cycle.onboarding.find((s) => s.key === "finalization");
 
   return (
@@ -522,10 +838,18 @@ export default function ClientOnboardingPage() {
         )}
       </div>
 
-      {questions && (
-        <QuestionsStep
-          step={questions}
+      {questionsStep && (
+        <SurveyBuildStep
+          step={questionsStep}
+          status={derivedStepStatus}
           client={client}
+          draft={draft}
+          legacySurvey={legacySurvey}
+          onConfigure={openSurveyBuilder}
+          onEdit={openSurveyBuilder}
+          onApprove={() => draft && approveDraftQuestions(draft.id)}
+          onReopen={() => draft && reopenDraftQuestions(draft.id)}
+          onDiscard={handleDiscardSurvey}
           onSetStatus={(v) => setOnboardingStepStatus(cycle.id, "questions", v)}
           onRequestAction={() => requestOnboardingStepAction(cycle.id, "questions")}
         />
@@ -533,7 +857,7 @@ export default function ClientOnboardingPage() {
       {contacts && (
         <ContactsStep
           step={contacts}
-          surveyId={cycle.surveyId}
+          surveyId={cycle.surveyId ?? draft?.surveyId ?? null}
           client={client}
           onSetStatus={(v) => setOnboardingStepStatus(cycle.id, "contacts", v)}
           onRequestAction={() => requestOnboardingStepAction(cycle.id, "contacts")}

@@ -61,10 +61,48 @@ export interface CustomSection {
   questions: CustomQuestion[];
 }
 
+/**
+ * Binds a draft to a single client CRM survey cycle, so the "Survey Build"
+ * step of onboarding (src/app/client-crm/[clientId]/onboarding/page.tsx) has
+ * exactly one draft it owns, can resume, and can hand back to.
+ */
+export interface DraftCycleContext {
+  clientId: string;
+  clientName: string;
+  cycleId: string;
+  /** Display label for the cycle, e.g. "Diversity, Equity, & Inclusion '26". */
+  cycleLabel: string;
+  /** Where the creation flow's Exit / Save links return to. */
+  returnTo: string;
+}
+
+/**
+ * Where a draft sits in the onboarding closed loop:
+ *  - configuring: still being built; nothing exists on the Survey Dashboard yet
+ *  - submitted:   a real Survey record exists and is linked to the cycle, but
+ *                 it hasn't launched — the question set is still editable,
+ *                 whether or not the client has signed off on it yet
+ *  - locked:      the survey launched; the question set is read-only
+ */
+export type DraftLifecycle = "configuring" | "submitted" | "locked";
+
 export interface SurveyDraft {
   id: string;
   createdAt: string;
   updatedAt: string;
+  /** Null for an ad-hoc draft started from the Survey Dashboard. */
+  context: DraftCycleContext | null;
+  lifecycle: DraftLifecycle;
+  /** The Survey this draft filed, once submitted. */
+  surveyId: string | null;
+  submittedAt: string | null;
+  /**
+   * When the client signed off on the question set. This is what completes
+   * onboarding step 1 — it does *not* freeze the survey, which stays editable
+   * (and can be reopened) until the cycle launches.
+   */
+  approvedAt: string | null;
+  lockedAt: string | null;
   basics: DraftBasics;
   lpiSettings: LpiSettingsState;
   practices: PracticesState;

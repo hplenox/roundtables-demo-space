@@ -2,9 +2,10 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Survey, SurveyStatus } from "@/types/survey";
 import { ArrowRight, Clock, CheckCircle2, Circle, Plus, Filter, PenLine } from "lucide-react";
-import { computeOverallProgress, useAllSurveys, useDraft } from "@/lib/survey-draft-store";
+import { beginAdHocDraft, computeOverallProgress, setActiveDraft, useAdHocDraft, useAllSurveys } from "@/lib/survey-draft-store";
 
 function StatusPill({ status }: { status: SurveyStatus }) {
   const map = {
@@ -122,8 +123,21 @@ function SurveyRow({ survey, index }: { survey: Survey; index: number }) {
 export default function SurveysPage() {
   const [activeTab, setActiveTab] = useState<SurveyStatus>("active");
   const surveys = useAllSurveys();
-  const draft = useDraft();
+  // Only ad-hoc drafts surface here — a client's onboarding draft belongs to
+  // their CRM record and is resumed from there.
+  const draft = useAdHocDraft();
   const filtered = surveys.filter((s) => s.status === activeTab);
+  const router = useRouter();
+
+  function startNewSurvey() {
+    beginAdHocDraft();
+    router.push("/surveys/new");
+  }
+
+  function resumeDraft(draftId: string) {
+    setActiveDraft(draftId);
+    router.push("/surveys/new");
+  }
 
   const TAB_CONFIG = [
     { key: "active", label: "Current", count: surveys.filter((s) => s.status === "active").length },
@@ -153,21 +167,21 @@ export default function SurveysPage() {
                 <Filter size={13} />
                 Filter
               </button>
-              <Link
-                href="/surveys/new"
+              <button
+                onClick={startNewSurvey}
                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#0f1923] text-[12px] font-medium text-white hover:bg-slate-800 transition-colors"
               >
                 <Plus size={13} />
                 New Survey
-              </Link>
+              </button>
             </div>
           </div>
 
           {/* Continue where you left off */}
           {draft && (
-            <Link
-              href="/surveys/new"
-              className="group flex items-center justify-between gap-4 mb-5 px-4 py-3 rounded-xl border border-[#00b8a9]/30 bg-[#00b8a9]/6 hover:bg-[#00b8a9]/10 transition-colors"
+            <button
+              onClick={() => resumeDraft(draft.id)}
+              className="group w-full text-left flex items-center justify-between gap-4 mb-5 px-4 py-3 rounded-xl border border-[#00b8a9]/30 bg-[#00b8a9]/6 hover:bg-[#00b8a9]/10 transition-colors"
             >
               <div className="flex items-center gap-3 min-w-0">
                 <div className="shrink-0 w-8 h-8 rounded-lg bg-[#00b8a9]/15 flex items-center justify-center text-[#00897b]">
@@ -186,7 +200,7 @@ export default function SurveysPage() {
                 Resume
                 <ArrowRight size={13} />
               </span>
-            </Link>
+            </button>
           )}
 
           {/* Tabs */}
