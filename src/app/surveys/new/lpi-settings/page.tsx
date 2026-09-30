@@ -45,7 +45,7 @@ export default function LpiSettingsPage() {
           const rowState = draft.lpiSettings[row.key];
           return (
             <div key={row.key} className="py-4 flex items-start gap-4">
-              <div className="flex items-center gap-2 w-56 shrink-0 pt-0.5">
+              <div className="flex items-start gap-2 w-64 shrink-0 pt-0.5">
                 <Toggle
                   checked={rowState.enabled}
                   disabled={row.locked}
@@ -56,11 +56,18 @@ export default function LpiSettingsPage() {
                     {row.label}
                     {row.locked && <Lock size={10} className="text-slate-400" />}
                   </p>
-                  {row.locked && <p className="text-[11px] text-slate-400">Enabled, not customizable</p>}
+                  <p className="text-[11px] text-slate-400 leading-snug mt-0.5">{row.description}</p>
+                  {row.locked && <p className="text-[11px] text-slate-400 mt-0.5">Enabled, not customizable</p>}
                 </div>
               </div>
               {row.options.length > 0 && (
-                <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-y-1.5">
+                <div className="flex-1">
+                  {row.optionsLabel && (
+                    <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wide mb-1.5">
+                      {row.optionsLabel}
+                    </p>
+                  )}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-1.5">
                   {row.options.map((opt) => (
                     <label key={opt.key} className="inline-flex items-center gap-2 text-[12.5px] text-slate-600">
                       <input
@@ -72,6 +79,7 @@ export default function LpiSettingsPage() {
                       {opt.label}
                     </label>
                   ))}
+                  </div>
                 </div>
               )}
             </div>

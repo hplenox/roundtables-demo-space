@@ -37,7 +37,7 @@ const SECTIONS: {
     key: "basics",
     href: "/surveys/new/basics",
     label: "Survey Basics",
-    description: "Organization, request type, name, timeline, and points of contact.",
+    description: "Client, request type, survey title, timeline, and points of contact.",
     icon: ClipboardList,
   },
   {
@@ -51,7 +51,7 @@ const SECTIONS: {
     key: "practices",
     href: "/surveys/new/practices",
     label: "Practices Questions",
-    description: "Enable the governance and talent practice questions to include.",
+    description: "Optional — pick the Organizational Activities, ESG, and Impact questions to include.",
     icon: ListChecks,
   },
   {

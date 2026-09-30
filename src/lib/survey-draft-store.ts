@@ -99,10 +99,44 @@ let cachedRaw: string | null = null;
 let cachedDraft: SurveyDraft | null = null;
 const listeners = new Set<() => void>();
 
+// A draft saved before the question set changed still carries the old keys.
+// Rebuild the toggle maps from the current config — keeping any answer the
+// admin already gave — so counts like "3 of 37 enabled" can't drift and stale
+// keys don't linger in "Enable All".
+function reconcile(draft: SurveyDraft): SurveyDraft {
+  const lpiSettings: LpiSettingsState = {};
+  LPI_SETTINGS_CONFIG.forEach((row) => {
+    const prev = draft.lpiSettings?.[row.key];
+    const options: Record<string, boolean> = {};
+    row.options.forEach((opt) => {
+      options[opt.key] = prev?.options?.[opt.key] ?? opt.defaultChecked;
+    });
+    lpiSettings[row.key] = { enabled: prev?.enabled ?? row.defaultEnabled, options };
+  });
+
+  const practices: PracticesState = {};
+  PRACTICES_CONFIG.forEach((category) => {
+    category.questions.forEach((q) => {
+      practices[q.key] = { enabled: draft.practices?.[q.key]?.enabled ?? q.defaultEnabled };
+    });
+  });
+
+  const standardQuestions: StandardQuestionsState = {};
+  STANDARD_QUESTIONS_CONFIG.forEach((q) => {
+    const prev = draft.standardQuestions?.[q.key];
+    standardQuestions[q.key] = {
+      enabled: prev?.enabled ?? q.defaultEnabled,
+      text: prev?.text ?? q.defaultText,
+    };
+  });
+
+  return { ...draft, lpiSettings, practices, standardQuestions };
+}
+
 function parseDraft(raw: string | null): SurveyDraft | null {
   if (!raw) return null;
   try {
-    return JSON.parse(raw) as SurveyDraft;
+    return reconcile(JSON.parse(raw) as SurveyDraft);
   } catch {
     return null;
   }
