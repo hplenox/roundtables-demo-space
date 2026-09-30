@@ -166,8 +166,8 @@ export default function AdminTwoPagerViewerPage() {
         <p className="text-[13px] text-slate-400 mb-4">
           No organization with this ID is registered on the platform.
         </p>
-        <Link href="/admin/two-pagers" className="text-[12.5px] font-medium text-blue-600 hover:underline">
-          ← Back to all 2-pagers
+        <Link href="/admin/organizations" className="text-[12.5px] font-medium text-blue-600 hover:underline">
+          ← Back to Organizations
         </Link>
       </div>
     );
@@ -179,10 +179,10 @@ export default function AdminTwoPagerViewerPage() {
     return (
       <div className="max-w-xl mx-auto px-6 pt-10 space-y-4">
         <Link
-          href="/admin/two-pagers"
+          href="/admin/organizations"
           className="inline-flex items-center gap-1.5 text-[12.5px] font-medium text-slate-500 hover:text-slate-800 transition-colors"
         >
-          <ArrowLeft size={13} /> All 2-pagers
+          <ArrowLeft size={13} /> Organizations
         </Link>
         <div className="bg-white rounded-2xl border border-slate-200 p-10 text-center">
           <FileText size={22} className="mx-auto text-slate-300 mb-3" />
@@ -218,12 +218,12 @@ export default function AdminTwoPagerViewerPage() {
         <div className="h-[3px] bg-gradient-to-r from-[#00b8a9] via-[#00b8a9]/70 to-transparent" />
         <div className="max-w-5xl mx-auto px-6 py-2 flex items-center gap-2.5">
           <Link
-            href="/admin/two-pagers"
+            href="/admin/organizations"
             className="flex items-center gap-1.5 shrink-0 text-[12px] font-medium text-slate-500 hover:text-slate-800 transition-colors"
-            title="Back to all 2-pagers"
+            title="Back to Organizations"
           >
             <ArrowLeft size={13} />
-            <span className="hidden sm:inline">All</span>
+            <span className="hidden sm:inline">Organizations</span>
           </Link>
 
           <span className="w-px h-5 bg-slate-200 shrink-0" />
