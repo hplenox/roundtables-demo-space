@@ -4,7 +4,7 @@ import { useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import {
   Search, X, ChevronDown, SlidersHorizontal, Plus, CheckCircle2, Copy, Building2,
-  AlertTriangle, Loader2, Check, Info, FileText, ExternalLink,
+  AlertTriangle, Loader2, Check, Info, ExternalLink,
 } from "lucide-react";
 import { ORG_REGISTRY, OrgRegistryRow } from "@/lib/mock-organizations";
 import { hasTwoPager } from "@/lib/admin-two-pager";
@@ -474,21 +474,13 @@ export default function AdminOrganizationsPage() {
             and its current LPI score.
           </p>
         </div>
-        <div className="shrink-0 flex items-center gap-2">
-          <Link
-            href="/admin/two-pagers"
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-md border border-gray-300 bg-white text-[12.5px] font-semibold text-gray-700 hover:border-gray-400 transition-colors"
-          >
-            <FileText size={13} className="text-gray-400" /> Browse 2-Pagers
-          </Link>
-          <button
-            type="button"
-            onClick={() => setCreateModalOpen(true)}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-blue-600 text-white text-[12.5px] font-semibold hover:bg-blue-700 transition-colors"
-          >
-            <Plus size={13} /> Create Organization
-          </button>
-        </div>
+        <button
+          type="button"
+          onClick={() => setCreateModalOpen(true)}
+          className="shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-blue-600 text-white text-[12.5px] font-semibold hover:bg-blue-700 transition-colors"
+        >
+          <Plus size={13} /> Create Organization
+        </button>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_280px] gap-4 items-start">
@@ -532,17 +524,21 @@ export default function AdminOrganizationsPage() {
             </div>
           </div>
 
-          <div className="overflow-x-auto">
-            <div className="min-w-[720px]">
+          {/* No horizontal scroll: every column but Name is narrow and fixed,
+              Name absorbs the slack and truncates, and the two lowest-value
+              columns drop out before the row can outgrow its container —
+              which it otherwise does at the lg breakpoint, where the 280px
+              right rail appears. */}
+          <div>
               <div className="flex items-center gap-2 px-4 py-2.5 border-b border-gray-200 bg-gray-50/60 text-[13px] font-semibold text-gray-900">
-                <div className="w-14 shrink-0">ID</div>
-                <div className="flex-1 min-w-[140px]">Name</div>
-                <div className="w-24 shrink-0">Org Code</div>
-                <div className="w-20 shrink-0">LPI Score</div>
-                <div className="w-28 shrink-0">Last Updated</div>
-                <div className="w-24 shrink-0">Total Users</div>
-                <div className="w-20 shrink-0">Status</div>
-                <div className="w-24 shrink-0 text-right">2-Pager</div>
+                <div className="w-12 shrink-0">ID</div>
+                <div className="flex-1 min-w-0">Name</div>
+                <div className="w-20 shrink-0">Org Code</div>
+                <div className="w-16 shrink-0">LPI</div>
+                <div className="w-24 shrink-0 hidden xl:block">Last Updated</div>
+                <div className="w-14 shrink-0 hidden xl:block">Users</div>
+                <div className="w-16 shrink-0">Status</div>
+                <div className="w-14 shrink-0 text-right">2-Pager</div>
               </div>
 
               {filtered.length === 0 ? (
@@ -563,22 +559,22 @@ export default function AdminOrganizationsPage() {
                       className="absolute inset-0"
                       aria-label={`Open ${row.name}`}
                     />
-                    <div className="w-14 shrink-0 text-gray-400 tabular-nums">{row.displayId}</div>
-                    <div className="flex-1 min-w-[140px] text-blue-600 font-medium truncate" title={row.name}>
+                    <div className="w-12 shrink-0 text-gray-400 tabular-nums">{row.displayId}</div>
+                    <div className="flex-1 min-w-0 text-blue-600 font-medium truncate" title={row.name}>
                       {row.name}
                     </div>
-                    <div className="w-24 shrink-0 text-gray-600 tabular-nums">{row.orgCode ?? "—"}</div>
-                    <div className="w-20 shrink-0 tabular-nums">
+                    <div className="w-20 shrink-0 text-gray-600 tabular-nums">{row.orgCode ?? "—"}</div>
+                    <div className="w-16 shrink-0 tabular-nums">
                       {row.lpiScore !== null ? (
                         <span className="text-violet-600 font-medium">{row.lpiScore.toFixed(3)}</span>
                       ) : (
                         <span className="text-violet-300 italic">N/A</span>
                       )}
                     </div>
-                    <div className="w-28 shrink-0 text-gray-400">{formatDate(row.lastUpdated)}</div>
-                    <div className="w-24 shrink-0 text-gray-700 tabular-nums">{row.totalUsers}</div>
-                    <div className="w-20 shrink-0 text-gray-600">{row.status}</div>
-                    <div className="w-24 shrink-0 flex justify-end">
+                    <div className="w-24 shrink-0 text-gray-400 hidden xl:block">{formatDate(row.lastUpdated)}</div>
+                    <div className="w-14 shrink-0 text-gray-700 tabular-nums hidden xl:block">{row.totalUsers}</div>
+                    <div className="w-16 shrink-0 text-gray-600">{row.status}</div>
+                    <div className="w-14 shrink-0 flex justify-end">
                       {hasTwoPager(row.orgId) ? (
                         <Link
                           href={`/admin/two-pagers/${row.orgId}`}
@@ -587,7 +583,7 @@ export default function AdminOrganizationsPage() {
                           title={`Open ${row.name}'s 2-pager in a new tab`}
                           className="relative z-10 flex items-center gap-1 px-2 py-1 rounded-md border border-blue-200 bg-blue-50 text-[11.5px] font-semibold text-blue-700 hover:bg-blue-100 transition-colors"
                         >
-                          <FileText size={10} /> View <ExternalLink size={9} />
+                          View <ExternalLink size={9} />
                         </Link>
                       ) : (
                         <span className="text-[11.5px] text-gray-300" title="No survey submission on record">
@@ -598,7 +594,6 @@ export default function AdminOrganizationsPage() {
                   </div>
                 ))
               )}
-            </div>
           </div>
 
           <p className="text-center text-[11.5px] text-gray-400 py-3">
