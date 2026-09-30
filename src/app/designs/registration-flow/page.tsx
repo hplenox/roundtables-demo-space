@@ -65,12 +65,14 @@ const INTEREST_OPTIONS = [
 
 // ─── Step 3 organization matching fixture data ──────────────────────────
 //
-// Every candidate below is an organization already registered under the
-// contact's email domain. The percentage is a NAME-SIMILARITY score and
-// nothing else: how closely each registered organization's name resembles
-// the organization name on the invitation ("Arctos LLC"). Keeping the score
-// to one comparison is what makes it explainable on screen — the contact can
-// read the two names side by side and see why the number is what it is.
+// Candidates are surfaced two ways: organizations registered under the
+// contact's email domain, and organizations anywhere on RoundTables whose
+// name closely resembles the one on the invitation. However a candidate is
+// surfaced, the percentage is a NAME-SIMILARITY score and nothing else: how
+// closely that organization's name resembles the invitation name ("Arctos
+// LLC"). Keeping the score to one comparison is what makes it explainable on
+// screen — the contact can read the two names side by side and see why the
+// number is what it is.
 
 type OrgSuggestion = {
   id: string;
@@ -99,7 +101,7 @@ const SUGGESTED_MATCHES: OrgSuggestion[] = [
     members: 61,
     confidence: 54,
     reason:
-      "Also leads with \u201cArctos,\u201d but the qualifier \u201cGlobal\u201d is a different entity name than the one on your invitation.",
+      "Surfaced on name alone \u2014 it is registered under arctosglobal.com, not your domain \u2014 and the qualifier \u201cGlobal\u201d is a different entity name than the one on your invitation.",
     logoTint: "bg-amber-500",
     initials: "AG",
   },
@@ -447,10 +449,10 @@ function InfoTooltip() {
       </button>
       {open && (
         <span className="absolute z-30 left-1/2 -translate-x-1/2 top-6 w-72 rounded-xl bg-slate-900 text-white text-[12.5px] leading-relaxed p-3 shadow-xl">
-          We first pull every organization already registered under your email domain, then score each one purely on
-          how closely its name resembles the organization name on your invitation. Nothing else moves the
-          percentage. Pick the top match if it looks right. If none of them is your firm, the only other option is
-          to submit a new organization for review.
+          We pull organizations registered under your email domain, plus any elsewhere on RoundTables whose name
+          closely resembles the organization name on your invitation. Either way, each one is scored purely on that
+          name similarity &mdash; nothing else moves the percentage. Pick the top match if it looks right. If none
+          of them is your firm, the only other option is to submit a new organization for review.
         </span>
       )}
     </span>
@@ -491,11 +493,12 @@ function StepOrganization({ onNext }: { onNext: (choice: { name: string; created
       <InvitedOrgHeader />
 
       <p className="text-[13px] text-slate-600 leading-relaxed mt-5 mb-3">
-        These are the organizations already registered under your email domain{" "}
-        <span className="font-semibold text-slate-800">{INVITED_CONTACT.emailDomain}</span>. Each percentage is
+        These organizations are registered under your email domain{" "}
+        <span className="font-semibold text-slate-800">{INVITED_CONTACT.emailDomain}</span>, or carry a name close
+        enough to your invitation to be worth showing even though they sit outside your domain. Each percentage is
         based solely on how closely that organization&rsquo;s name matches{" "}
         <span className="font-semibold text-slate-800">{INVITED_CONTACT.invitedOrgName}</span>, the name you were
-        invited as &mdash; no other signal affects the score. This is the complete list for your domain.
+        invited as &mdash; no other signal affects the score.
       </p>
 
       <div className="space-y-2.5 pt-2">
