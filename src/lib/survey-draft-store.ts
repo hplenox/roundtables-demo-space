@@ -523,8 +523,12 @@ function basicsComplete(basics: DraftBasics): boolean {
   return basicsRequiredFields().every((field) => basics[field].trim().length > 0);
 }
 
+// A new draft pre-selects an organization, so "has any value" would report a
+// brand-new survey as already in progress. Progress means the admin changed
+// something, not that a default is sitting there.
 function basicsAnyFilled(basics: DraftBasics): boolean {
-  return basicsRequiredFields().some((field) => basics[field].trim().length > 0);
+  const defaults = defaultBasics();
+  return basicsRequiredFields().some((field) => basics[field].trim() !== defaults[field].trim());
 }
 
 export function computeSectionStatus(draft: SurveyDraft, section: SectionKey): SectionStatus {
@@ -563,10 +567,40 @@ export function sectionProgressLabel(draft: SurveyDraft, section: SectionKey): s
   return count === 0 ? "None added" : `${count} custom section${count === 1 ? "" : "s"}`;
 }
 
-export function computeOverallProgress(draft: SurveyDraft): { completed: number; total: number; percent: number } {
-  const total = REQUIRED_SECTIONS.length;
-  const completed = REQUIRED_SECTIONS.filter((s) => computeSectionStatus(draft, s) === "complete").length;
-  return { completed, total, percent: total === 0 ? 0 : Math.round((completed / total) * 100) };
+export interface SectionProgress {
+  completed: number;
+  total: number;
+  remaining: number;
+  percent: number;
+}
+
+function progressOver(draft: SurveyDraft, sections: SectionKey[]): SectionProgress {
+  const total = sections.length;
+  const completed = sections.filter((s) => computeSectionStatus(draft, s) === "complete").length;
+  return {
+    completed,
+    total,
+    remaining: total - completed,
+    percent: total === 0 ? 0 : Math.round((completed / total) * 100),
+  };
+}
+
+/**
+ * Progress across every section the hub stacks, so the header count and bar
+ * line up with the numbered steps on screen — including the optional one,
+ * which previously could never move the bar.
+ */
+export function computeOverallProgress(draft: SurveyDraft): SectionProgress {
+  return progressOver(draft, SECTION_ORDER);
+}
+
+/**
+ * Progress across only the sections that gate submission. This is a smaller
+ * set than the steps on screen, since Custom Questions never blocks filing,
+ * so the "Review & submit" countdown must use this rather than the overall.
+ */
+export function computeRequiredProgress(draft: SurveyDraft): SectionProgress {
+  return progressOver(draft, REQUIRED_SECTIONS);
 }
 
 export function isReadyToSubmit(draft: SurveyDraft): boolean {

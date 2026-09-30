@@ -3,7 +3,13 @@
 import { useEffect } from "react";
 import Link from "next/link";
 import { Building2, ChevronRight, LayoutDashboard, Lock, X } from "lucide-react";
-import { computeOverallProgress, ensureDraft, useDraft } from "@/lib/survey-draft-store";
+import {
+  SECTION_ORDER,
+  computeOverallProgress,
+  computeRequiredProgress,
+  ensureDraft,
+  useDraft,
+} from "@/lib/survey-draft-store";
 import { LIFECYCLE_CONFIG } from "@/lib/cycle-survey-link";
 
 export default function NewSurveyLayout({ children }: { children: React.ReactNode }) {
@@ -13,7 +19,11 @@ export default function NewSurveyLayout({ children }: { children: React.ReactNod
     ensureDraft();
   }, []);
 
-  const progress = draft ? computeOverallProgress(draft) : { completed: 0, total: 4, percent: 0 };
+  // Totals come from the section list itself so the header can't drift out of
+  // step with the numbered sections the hub renders.
+  const emptyProgress = { completed: 0, total: SECTION_ORDER.length, remaining: SECTION_ORDER.length, percent: 0 };
+  const progress = draft ? computeOverallProgress(draft) : emptyProgress;
+  const required = draft ? computeRequiredProgress(draft) : emptyProgress;
   const draftLabel = draft?.basics.name?.trim() || "Untitled survey";
 
   // A draft opened from the Client CRM belongs to a specific survey cycle —
@@ -88,12 +98,24 @@ export default function NewSurveyLayout({ children }: { children: React.ReactNod
               <p className="text-[12px] font-semibold text-slate-700 tabular-nums">
                 {progress.completed} of {progress.total} sections complete
               </p>
-              <div className="w-40 h-1.5 bg-slate-100 rounded-full overflow-hidden mt-1.5">
+              <div
+                className="w-40 h-1.5 bg-slate-100 rounded-full overflow-hidden mt-1.5"
+                role="progressbar"
+                aria-valuemin={0}
+                aria-valuemax={progress.total}
+                aria-valuenow={progress.completed}
+                aria-label="Survey sections complete"
+              >
                 <div
                   className="h-full bg-[#00b8a9] rounded-full transition-all duration-500"
                   style={{ width: `${progress.percent}%` }}
                 />
               </div>
+              <p className="text-[11px] text-slate-400 mt-1 tabular-nums">
+                {required.remaining === 0
+                  ? "All required sections complete"
+                  : `${required.remaining} required section${required.remaining === 1 ? "" : "s"} left`}
+              </p>
             </div>
           </div>
         </div>
