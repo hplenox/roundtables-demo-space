@@ -3,7 +3,9 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { ArrowLeft, Building2, CheckCircle2, Clock, Info, Check } from "lucide-react";
+import { ArrowLeft, Building2, CheckCircle2, Clock, Info, Check, FileText, ExternalLink } from "lucide-react";
+import { getAdminTwoPager } from "@/lib/admin-two-pager";
+import { formatShortDate } from "@/lib/format-date";
 import { getOrgById } from "@/lib/mock-org-associations";
 import { ORG_REGISTRY } from "@/lib/mock-organizations";
 import {
@@ -13,9 +15,7 @@ import {
 } from "@/lib/mock-org-survey-history";
 import { useCustomOrgRecords } from "@/lib/org-registry-store";
 
-function formatDate(iso: string) {
-  return new Date(iso).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
-}
+const formatDate = formatShortDate;
 
 function StatusBadge({ status }: { status: OrgSurveyHistoryEntry["status"] }) {
   if (status === "submitted") {
@@ -52,6 +52,7 @@ export default function OrgDetailPage() {
         }
       : undefined);
   const history = getSurveyHistoryForOrg(orgId);
+  const twoPager = getAdminTwoPager(orgId);
   const [selectedSourceId, setSelectedSourceId] = useState<string | null>(() => getDefaultPrefillSourceId(orgId));
   const [savedSourceId, setSavedSourceId] = useState<string | null>(() => getDefaultPrefillSourceId(orgId));
   const [toast, setToast] = useState<string | null>(null);
@@ -111,15 +112,28 @@ export default function OrgDetailPage() {
               )}
             </div>
           </div>
-          <span
-            className={`shrink-0 inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-semibold border ${
-              registryRow?.status === "Archived"
-                ? "bg-gray-100 text-gray-500 border-gray-200"
-                : "bg-emerald-50 text-emerald-700 border-emerald-200"
-            }`}
-          >
-            {registryRow?.status ?? "Active"}
-          </span>
+          <div className="shrink-0 flex items-center gap-2">
+            {twoPager?.org && (
+              <Link
+                href={`/admin/two-pagers/${orgId}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                title={`Open ${org.name}'s 2-pager in a new tab`}
+                className="flex items-center gap-1.5 px-2.5 py-1 rounded-md border border-blue-200 bg-blue-50 text-[11.5px] font-semibold text-blue-700 hover:bg-blue-100 transition-colors"
+              >
+                <FileText size={11} /> View 2-Pager <ExternalLink size={10} />
+              </Link>
+            )}
+            <span
+              className={`inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-semibold border ${
+                registryRow?.status === "Archived"
+                  ? "bg-gray-100 text-gray-500 border-gray-200"
+                  : "bg-emerald-50 text-emerald-700 border-emerald-200"
+              }`}
+            >
+              {registryRow?.status ?? "Active"}
+            </span>
+          </div>
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-5 pt-4 border-t border-gray-100">

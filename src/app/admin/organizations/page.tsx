@@ -4,9 +4,11 @@ import { useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import {
   Search, X, ChevronDown, SlidersHorizontal, Plus, CheckCircle2, Copy, Building2,
-  AlertTriangle, Loader2, Check, Info,
+  AlertTriangle, Loader2, Check, Info, FileText, ExternalLink,
 } from "lucide-react";
 import { ORG_REGISTRY, OrgRegistryRow } from "@/lib/mock-organizations";
+import { hasTwoPager } from "@/lib/admin-two-pager";
+import { formatShortDate } from "@/lib/format-date";
 import { PlatformOrg } from "@/lib/mock-org-associations";
 import {
   createOrganization,
@@ -15,9 +17,7 @@ import {
   getKnownDomainOwners,
 } from "@/lib/org-registry-store";
 
-function formatDate(iso: string) {
-  return new Date(iso).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
-}
+const formatDate = formatShortDate;
 
 // ─── Filter dropdown ────────────────────────────────────────────────────────
 
@@ -474,13 +474,21 @@ export default function AdminOrganizationsPage() {
             and its current LPI score.
           </p>
         </div>
-        <button
-          type="button"
-          onClick={() => setCreateModalOpen(true)}
-          className="shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-blue-600 text-white text-[12.5px] font-semibold hover:bg-blue-700 transition-colors"
-        >
-          <Plus size={13} /> Create Organization
-        </button>
+        <div className="shrink-0 flex items-center gap-2">
+          <Link
+            href="/admin/two-pagers"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-md border border-gray-300 bg-white text-[12.5px] font-semibold text-gray-700 hover:border-gray-400 transition-colors"
+          >
+            <FileText size={13} className="text-gray-400" /> Browse 2-Pagers
+          </Link>
+          <button
+            type="button"
+            onClick={() => setCreateModalOpen(true)}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-blue-600 text-white text-[12.5px] font-semibold hover:bg-blue-700 transition-colors"
+          >
+            <Plus size={13} /> Create Organization
+          </button>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_280px] gap-4 items-start">
@@ -525,7 +533,7 @@ export default function AdminOrganizationsPage() {
           </div>
 
           <div className="overflow-x-auto">
-            <div className="min-w-[600px]">
+            <div className="min-w-[720px]">
               <div className="flex items-center gap-2 px-4 py-2.5 border-b border-gray-200 bg-gray-50/60 text-[13px] font-semibold text-gray-900">
                 <div className="w-14 shrink-0">ID</div>
                 <div className="flex-1 min-w-[140px]">Name</div>
@@ -534,6 +542,7 @@ export default function AdminOrganizationsPage() {
                 <div className="w-28 shrink-0">Last Updated</div>
                 <div className="w-24 shrink-0">Total Users</div>
                 <div className="w-20 shrink-0">Status</div>
+                <div className="w-24 shrink-0 text-right">2-Pager</div>
               </div>
 
               {filtered.length === 0 ? (
@@ -542,11 +551,18 @@ export default function AdminOrganizationsPage() {
                 </div>
               ) : (
                 filtered.map((row) => (
-                  <Link
+                  // The row stays click-through to the org record via an
+                  // overlay link, so the 2-pager action can be its own link
+                  // rather than a nested (invalid) anchor.
+                  <div
                     key={row.orgId}
-                    href={`/admin/organizations/${row.orgId}`}
-                    className="flex items-center gap-2 px-4 py-2.5 border-b border-gray-100 last:border-0 hover:bg-gray-50/70 transition-colors text-[13px]"
+                    className="relative flex items-center gap-2 px-4 py-2.5 border-b border-gray-100 last:border-0 hover:bg-gray-50/70 transition-colors text-[13px]"
                   >
+                    <Link
+                      href={`/admin/organizations/${row.orgId}`}
+                      className="absolute inset-0"
+                      aria-label={`Open ${row.name}`}
+                    />
                     <div className="w-14 shrink-0 text-gray-400 tabular-nums">{row.displayId}</div>
                     <div className="flex-1 min-w-[140px] text-blue-600 font-medium truncate" title={row.name}>
                       {row.name}
@@ -562,7 +578,24 @@ export default function AdminOrganizationsPage() {
                     <div className="w-28 shrink-0 text-gray-400">{formatDate(row.lastUpdated)}</div>
                     <div className="w-24 shrink-0 text-gray-700 tabular-nums">{row.totalUsers}</div>
                     <div className="w-20 shrink-0 text-gray-600">{row.status}</div>
-                  </Link>
+                    <div className="w-24 shrink-0 flex justify-end">
+                      {hasTwoPager(row.orgId) ? (
+                        <Link
+                          href={`/admin/two-pagers/${row.orgId}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          title={`Open ${row.name}'s 2-pager in a new tab`}
+                          className="relative z-10 flex items-center gap-1 px-2 py-1 rounded-md border border-blue-200 bg-blue-50 text-[11.5px] font-semibold text-blue-700 hover:bg-blue-100 transition-colors"
+                        >
+                          <FileText size={10} /> View <ExternalLink size={9} />
+                        </Link>
+                      ) : (
+                        <span className="text-[11.5px] text-gray-300" title="No survey submission on record">
+                          —
+                        </span>
+                      )}
+                    </div>
+                  </div>
                 ))
               )}
             </div>

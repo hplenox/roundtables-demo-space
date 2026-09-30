@@ -7,6 +7,7 @@ import { LayoutGrid } from "lucide-react";
 const TABS = [
   { key: "overview",     label: "Overview",             href: "/admin" },
   { key: "organizations",label: "Organizations",        href: "/admin/organizations" },
+  { key: "two-pagers",   label: "2-Pagers",             href: "/admin/two-pagers" },
   { key: "org-codes",    label: "Organization Codes",   href: "/admin/organization-codes" },
   { key: "users",        label: "Users",                href: "/admin/users" },
   { key: "contacts",     label: "Contacts Management",  href: "/admin/contacts-management" },
@@ -19,6 +20,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const pathname = usePathname();
 
   const activeTab = (() => {
+    if (pathname.startsWith("/admin/two-pagers"))        return "two-pagers";
     if (pathname.startsWith("/admin/organizations"))     return "organizations";
     if (pathname.startsWith("/admin/organization-codes")) return "org-codes";
     if (pathname.startsWith("/admin/users"))             return "users";
@@ -30,6 +32,14 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   })();
 
   const activeLabel = TABS.find((t) => t.key === activeTab)?.label ?? "Administrator";
+
+  // The 2-pager viewer is meant to be opened in its own tab and read (or
+  // printed) as a report, so it gets the full frame — no admin breadcrumb,
+  // title, or tab strip competing with its own sticky toggle bar.
+  const isBareReport = /^\/admin\/two-pagers\/[^/]+/.test(pathname);
+  if (isBareReport) {
+    return <div className="min-h-full bg-slate-50">{children}</div>;
+  }
 
   return (
     <div className="min-h-full bg-gray-50">
