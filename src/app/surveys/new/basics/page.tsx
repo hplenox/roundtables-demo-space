@@ -39,6 +39,13 @@ export default function BasicsPage() {
   if (!draft) return null;
   const basics = draft.basics;
 
+  // A draft started from the Client CRM prefills the client it belongs to,
+  // which won't always be one of the canned host organizations — widen the
+  // list rather than silently snapping the select back to a different client.
+  const clientOptions = HOST_ORGANIZATIONS.includes(basics.organization)
+    ? HOST_ORGANIZATIONS
+    : [basics.organization, ...HOST_ORGANIZATIONS];
+
   function set<K extends keyof DraftBasics>(key: K, value: DraftBasics[K]) {
     updateBasics({ [key]: value } as Partial<DraftBasics>);
   }
@@ -55,7 +62,7 @@ export default function BasicsPage() {
             value={basics.organization}
             onChange={(e) => set("organization", e.target.value)}
           >
-            {HOST_ORGANIZATIONS.map((org) => (
+            {clientOptions.map((org) => (
               <option key={org} value={org}>
                 {org}
               </option>

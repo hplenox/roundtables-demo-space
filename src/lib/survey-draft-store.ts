@@ -2,11 +2,22 @@
 //
 // Powers /surveys/new/*, a TurboTax-style hub-and-spoke replacement for the
 // old linear "Create Request" wizard. There's no backend, so — same pattern
-// as org-registry-store.ts — the in-progress draft persists to localStorage
-// (autosaved on every change, unlike the old flow's "Auto-save is disabled"
-// warning) and a submitted survey is appended to a small overlay list that
-// merges with MOCK_SURVEYS at read time, so a filed draft actually shows up
-// back on the Survey Dashboard.
+// as org-registry-store.ts — drafts persist to localStorage (autosaved on
+// every change, unlike the old flow's "Auto-save is disabled" warning) and a
+// submitted survey is appended to a small overlay list that merges with
+// MOCK_SURVEYS at read time, so a filed draft actually shows up back on the
+// Survey Dashboard.
+//
+// Drafts are stored as a keyed collection with an `activeId` pointer rather
+// than a single blob, because the Client CRM's onboarding tab owns a draft
+// *per survey cycle* (see DraftCycleContext). An admin can have one cycle's
+// draft parked mid-build while starting an unrelated ad-hoc one, and the
+// onboarding tab needs to read a specific cycle's draft without disturbing
+// whatever the creation flow currently has open.
+//
+// A cycle-bound draft also outlives submission: it stays in the collection as
+// the editable source of truth for its linked Survey until that survey
+// launches, which is what closes the loop on onboarding step 1.
 
 import { useSyncExternalStore } from "react";
 import { Survey } from "@/types/survey";
@@ -14,6 +25,7 @@ import {
   CustomQuestion,
   CustomSection,
   DraftBasics,
+  DraftCycleContext,
   LpiSettingsState,
   PracticesState,
   SectionKey,
@@ -25,8 +37,18 @@ import { MOCK_SURVEYS } from "@/lib/mock-data";
 import { LPI_SETTINGS_CONFIG, PRACTICES_CONFIG, STANDARD_QUESTIONS_CONFIG } from "@/lib/survey-draft-config";
 import { SUBMITTED_SURVEYS_KEY } from "@/lib/survey-draft-keys";
 
-const DRAFT_KEY = "rt_survey_draft_v1";
+const DRAFTS_KEY = "rt_survey_drafts_v2";
+/** Pre-multi-draft key — migrated into the collection on first read. */
+const LEGACY_DRAFT_KEY = "rt_survey_draft_v1";
 const SUBMITTED_KEY = SUBMITTED_SURVEYS_KEY;
+
+interface DraftCollection {
+  /** The draft the /surveys/new flow currently has open. */
+  activeId: string | null;
+  drafts: SurveyDraft[];
+}
+
+const EMPTY_COLLECTION: DraftCollection = { activeId: null, drafts: [] };
 
 export const SECTION_ORDER: SectionKey[] = [
   "basics",
@@ -80,13 +102,22 @@ function defaultStandardQuestions(): StandardQuestionsState {
   return state;
 }
 
-function newDraft(): SurveyDraft {
+function newDraft(
+  context: DraftCycleContext | null = null,
+  basicsPrefill: Partial<DraftBasics> = {}
+): SurveyDraft {
   const now = new Date().toISOString();
   return {
-    id: `draft-${Date.now()}`,
+    id: `draft-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
     createdAt: now,
     updatedAt: now,
-    basics: defaultBasics(),
+    context,
+    lifecycle: "configuring",
+    surveyId: null,
+    submittedAt: null,
+    approvedAt: null,
+    lockedAt: null,
+    basics: { ...defaultBasics(), ...basicsPrefill },
     lpiSettings: defaultLpiSettings(),
     practices: defaultPractices(),
     standardQuestions: defaultStandardQuestions(),
@@ -96,13 +127,14 @@ function newDraft(): SurveyDraft {
 }
 
 let cachedRaw: string | null = null;
-let cachedDraft: SurveyDraft | null = null;
+let cachedCollection: DraftCollection = EMPTY_COLLECTION;
 const listeners = new Set<() => void>();
 
 // A draft saved before the question set changed still carries the old keys.
 // Rebuild the toggle maps from the current config — keeping any answer the
 // admin already gave — so counts like "3 of 37 enabled" can't drift and stale
-// keys don't linger in "Enable All".
+// keys don't linger in "Enable All". Also backfills the fields added when
+// drafts gained a cycle context and a lifecycle.
 function reconcile(draft: SurveyDraft): SurveyDraft {
   const lpiSettings: LpiSettingsState = {};
   LPI_SETTINGS_CONFIG.forEach((row) => {
@@ -130,36 +162,83 @@ function reconcile(draft: SurveyDraft): SurveyDraft {
     };
   });
 
-  return { ...draft, lpiSettings, practices, standardQuestions };
+  return {
+    ...draft,
+    context: draft.context ?? null,
+    lifecycle: draft.lifecycle ?? "configuring",
+    surveyId: draft.surveyId ?? null,
+    submittedAt: draft.submittedAt ?? null,
+    approvedAt: draft.approvedAt ?? null,
+    lockedAt: draft.lockedAt ?? null,
+    customSections: draft.customSections ?? [],
+    touched: draft.touched ?? {},
+    lpiSettings,
+    practices,
+    standardQuestions,
+  };
 }
 
-function parseDraft(raw: string | null): SurveyDraft | null {
-  if (!raw) return null;
+function parseCollection(raw: string | null): DraftCollection {
+  if (!raw) return EMPTY_COLLECTION;
   try {
-    return reconcile(JSON.parse(raw) as SurveyDraft);
+    const parsed = JSON.parse(raw) as DraftCollection;
+    if (!parsed || !Array.isArray(parsed.drafts)) return EMPTY_COLLECTION;
+    return { activeId: parsed.activeId ?? null, drafts: parsed.drafts.map(reconcile) };
   } catch {
-    return null;
+    return EMPTY_COLLECTION;
   }
 }
 
-function getSnapshot(): SurveyDraft | null {
-  if (typeof window === "undefined") return null;
-  const raw = window.localStorage.getItem(DRAFT_KEY);
+let migrated = false;
+
+/** One-time lift of the old single-draft key into the collection. */
+function migrateLegacy(): void {
+  const legacy = window.localStorage.getItem(LEGACY_DRAFT_KEY);
+  if (!legacy) return;
+  window.localStorage.removeItem(LEGACY_DRAFT_KEY);
+  try {
+    const draft = reconcile(JSON.parse(legacy) as SurveyDraft);
+    const existing = parseCollection(window.localStorage.getItem(DRAFTS_KEY));
+    write({ activeId: draft.id, drafts: [...existing.drafts, draft] });
+  } catch {
+    // Unparseable legacy draft — dropping it is the right call.
+  }
+}
+
+function getCollection(): DraftCollection {
+  if (typeof window === "undefined") return EMPTY_COLLECTION;
+  if (!migrated) {
+    migrated = true;
+    migrateLegacy();
+  }
+  const raw = window.localStorage.getItem(DRAFTS_KEY);
   if (raw !== cachedRaw) {
     cachedRaw = raw;
-    cachedDraft = parseDraft(raw);
+    cachedCollection = parseCollection(raw);
   }
-  return cachedDraft;
+  return cachedCollection;
 }
 
-function getServerSnapshot(): SurveyDraft | null {
+function write(next: DraftCollection): void {
+  window.localStorage.setItem(DRAFTS_KEY, JSON.stringify(next));
+  cachedRaw = null;
+  listeners.forEach((cb) => cb());
+}
+
+function getActiveSnapshot(): SurveyDraft | null {
+  const { activeId, drafts } = getCollection();
+  if (!activeId) return null;
+  return drafts.find((d) => d.id === activeId) ?? null;
+}
+
+function nullSnapshot(): null {
   return null;
 }
 
 function subscribe(callback: () => void): () => void {
   listeners.add(callback);
   function onStorage(e: StorageEvent) {
-    if (e.key === DRAFT_KEY || e.key === SUBMITTED_KEY) callback();
+    if (e.key === DRAFTS_KEY || e.key === SUBMITTED_KEY) callback();
   }
   window.addEventListener("storage", onStorage);
   return () => {
@@ -168,38 +247,115 @@ function subscribe(callback: () => void): () => void {
   };
 }
 
-function persistDraft(draft: SurveyDraft | null) {
-  if (draft) {
-    window.localStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
-  } else {
-    window.localStorage.removeItem(DRAFT_KEY);
-  }
-  cachedRaw = null;
-  listeners.forEach((cb) => cb());
-}
+// ── Reads ──────────────────────────────────────────────────────────────────
 
-/** The in-progress draft, or null if none exists / it was submitted or discarded. */
+/** The draft the creation flow currently has open, or null if there is none. */
 export function useDraft(): SurveyDraft | null {
-  return useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
-}
-
-/** Returns the current draft, creating one if none exists yet. */
-export function ensureDraft(): SurveyDraft {
-  const existing = getSnapshot();
-  if (existing) return existing;
-  const draft = newDraft();
-  persistDraft(draft);
-  return draft;
+  return useSyncExternalStore(subscribe, getActiveSnapshot, nullSnapshot);
 }
 
 export function getDraft(): SurveyDraft | null {
-  return getSnapshot();
+  return getActiveSnapshot();
 }
 
+export function getCycleDraft(cycleId: string): SurveyDraft | null {
+  return getCollection().drafts.find((d) => d.context?.cycleId === cycleId) ?? null;
+}
+
+/** The draft owned by a client CRM survey cycle, at any point in its lifecycle. */
+export function useCycleDraft(cycleId: string | null): SurveyDraft | null {
+  return useSyncExternalStore(
+    subscribe,
+    () => (cycleId ? getCycleDraft(cycleId) : null),
+    nullSnapshot
+  );
+}
+
+/** A locked draft's question set is frozen — its survey has already launched. */
+export function isDraftEditable(draft: SurveyDraft): boolean {
+  return draft.lifecycle !== "locked";
+}
+
+// ── Writes ─────────────────────────────────────────────────────────────────
+
+/** Returns the active draft, creating an unbound one if the flow was opened cold. */
+export function ensureDraft(): SurveyDraft {
+  const existing = getActiveSnapshot();
+  if (existing) return existing;
+  const draft = newDraft();
+  const { drafts } = getCollection();
+  write({ activeId: draft.id, drafts: [...drafts, draft] });
+  return draft;
+}
+
+/**
+ * Entry point for onboarding step 1: opens the cycle's draft in the creation
+ * flow, creating it (prefilled from the client record) the first time. Always
+ * resolves to the same draft for a given cycle, so the step is a closed loop
+ * rather than a button that spawns a new survey on every click.
+ */
+export function beginCycleDraft(
+  context: DraftCycleContext,
+  basicsPrefill: Partial<DraftBasics> = {}
+): SurveyDraft {
+  const { drafts } = getCollection();
+  const existing = drafts.find((d) => d.context?.cycleId === context.cycleId);
+  if (existing) {
+    // Refresh the context in case the client or cycle was renamed since.
+    const next = { ...existing, context };
+    write({ activeId: next.id, drafts: drafts.map((d) => (d.id === next.id ? next : d)) });
+    return next;
+  }
+  const draft = newDraft(context, basicsPrefill);
+  write({ activeId: draft.id, drafts: [...drafts, draft] });
+  return draft;
+}
+
+/**
+ * Entry point for the Survey Dashboard's "New Survey" button. Resumes the
+ * unfinished ad-hoc draft if there is one, but never adopts a draft that
+ * belongs to a client's onboarding cycle — those are reachable only from the
+ * CRM, so starting a survey here can't silently hijack a client's buildout.
+ */
+export function beginAdHocDraft(): SurveyDraft {
+  const { drafts } = getCollection();
+  const existing = drafts.find((d) => !d.context && d.lifecycle === "configuring");
+  if (existing) {
+    write({ activeId: existing.id, drafts });
+    return existing;
+  }
+  const draft = newDraft();
+  write({ activeId: draft.id, drafts: [...drafts, draft] });
+  return draft;
+}
+
+/** The resumable ad-hoc draft, for the dashboard's "continue where you left off" card. */
+export function useAdHocDraft(): SurveyDraft | null {
+  return useSyncExternalStore(
+    subscribe,
+    () => getCollection().drafts.find((d) => !d.context && d.lifecycle === "configuring") ?? null,
+    nullSnapshot
+  );
+}
+
+export function setActiveDraft(draftId: string | null): void {
+  const { drafts } = getCollection();
+  write({ activeId: draftId, drafts });
+}
+
+function updateDraft(draftId: string, updater: (draft: SurveyDraft) => SurveyDraft): void {
+  const { activeId, drafts } = getCollection();
+  const target = drafts.find((d) => d.id === draftId);
+  if (!target) return;
+  const next = { ...updater(target), updatedAt: new Date().toISOString() };
+  write({ activeId, drafts: drafts.map((d) => (d.id === draftId ? next : d)) });
+}
+
+/** Edits the active draft. A no-op once its survey has launched. */
 function saveDraft(updater: (draft: SurveyDraft) => SurveyDraft): void {
-  const current = getSnapshot() ?? newDraft();
-  const next = { ...updater(current), updatedAt: new Date().toISOString() };
-  persistDraft(next);
+  const current = getActiveSnapshot() ?? ensureDraft();
+  if (!isDraftEditable(current)) return;
+  updateDraft(current.id, updater);
 }
 
 export function updateBasics(patch: Partial<DraftBasics>): void {
@@ -340,8 +496,21 @@ export function markTouched(section: SectionKey): void {
   saveDraft((draft) => ({ ...draft, touched: { ...draft.touched, [section]: true } }));
 }
 
+/** Drops a draft entirely. For a submitted cycle draft this also unfiles its survey. */
+export function discardDraftById(draftId: string): void {
+  const { activeId, drafts } = getCollection();
+  const target = drafts.find((d) => d.id === draftId);
+  if (target?.surveyId) unfileSurvey(target.surveyId);
+  write({
+    activeId: activeId === draftId ? null : activeId,
+    drafts: drafts.filter((d) => d.id !== draftId),
+  });
+}
+
+/** Discards whatever the creation flow currently has open. */
 export function discardDraft(): void {
-  persistDraft(null);
+  const active = getActiveSnapshot();
+  if (active) discardDraftById(active.id);
 }
 
 // ── Section status / progress ───────────────────────────────────────────────
@@ -404,6 +573,23 @@ export function isReadyToSubmit(draft: SurveyDraft): boolean {
   return REQUIRED_SECTIONS.every((s) => computeSectionStatus(draft, s) === "complete");
 }
 
+/** Headline counts for the survey summary shown on the CRM onboarding tab. */
+export function draftContentSummary(draft: SurveyDraft): {
+  lpiGroups: number;
+  practices: number;
+  standardQuestions: number;
+  customSections: number;
+  customQuestions: number;
+} {
+  return {
+    lpiGroups: Object.values(draft.lpiSettings).filter((r) => r.enabled).length,
+    practices: Object.values(draft.practices).filter((p) => p.enabled).length,
+    standardQuestions: Object.values(draft.standardQuestions).filter((q) => q.enabled).length,
+    customSections: draft.customSections.length,
+    customQuestions: draft.customSections.reduce((sum, s) => sum + s.questions.length, 0),
+  };
+}
+
 // ── Submission → merges into the Survey Dashboard list ─────────────────────
 
 function parseSubmitted(raw: string | null): Survey[] {
@@ -432,6 +618,12 @@ function getSubmittedServerSnapshot(): Survey[] {
   return EMPTY_SURVEYS;
 }
 
+function writeSubmitted(surveys: Survey[]): void {
+  window.localStorage.setItem(SUBMITTED_KEY, JSON.stringify(surveys));
+  cachedSubmittedRaw = null;
+  listeners.forEach((cb) => cb());
+}
+
 export function useCustomSurveys(): Survey[] {
   return useSyncExternalStore(subscribe, getSubmittedSnapshot, getSubmittedServerSnapshot);
 }
@@ -448,32 +640,106 @@ function formatDisplayDate(isoDate: string): string {
   return new Date(year, month - 1, day).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
 }
 
-/** Files the draft: appends it to the dashboard's survey list and clears the draft. Returns the new survey's id. */
-export function submitDraft(draft: SurveyDraft): string {
+/** The Survey record a draft describes — recomputed on every save so an edit to a linked draft can't leave the dashboard stale. */
+function surveyFromDraft(draft: SurveyDraft, id: string, previous?: Survey): Survey {
   const { basics } = draft;
-  const year = basics.startDate ? new Date(basics.startDate).getFullYear() || new Date().getFullYear() : new Date().getFullYear();
-  const id = `survey-custom-${Date.now()}`;
-  const survey: Survey = {
+  const year =
+    (basics.startDate ? new Date(basics.startDate).getFullYear() : NaN) || previous?.year || new Date().getFullYear();
+  return {
+    ...(previous ?? {
+      status: "upcoming" as const,
+      assetClasses: [],
+      privacyLevel: "No information" as const,
+      totalInvited: 0,
+      submitted: 0,
+      inProgress: 0,
+      notStarted: 0,
+      lastSubmission: null,
+      daysRemaining: null,
+      weeklyReportUrl: "#",
+    }),
     id,
-    name: basics.requestType || basics.name || "New Survey",
+    name: basics.name || basics.requestType || "New Survey",
     year,
     hostOrg: basics.organization,
     hostContact: basics.primaryContact,
     startDate: basics.startDate ? formatDisplayDate(basics.startDate) : "TBD",
     targetCloseDate: basics.dueDate ? formatDisplayDate(basics.dueDate) : "TBD",
-    status: "upcoming",
-    assetClasses: [],
-    privacyLevel: "No information",
-    totalInvited: 0,
-    submitted: 0,
-    inProgress: 0,
-    notStarted: 0,
-    lastSubmission: null,
-    daysRemaining: null,
-    weeklyReportUrl: "#",
   };
+}
+
+function unfileSurvey(surveyId: string): void {
   const existing = getSubmittedSnapshot();
-  window.localStorage.setItem(SUBMITTED_KEY, JSON.stringify([...existing, survey]));
-  persistDraft(null);
+  if (!existing.some((s) => s.id === surveyId)) return;
+  writeSubmitted(existing.filter((s) => s.id !== surveyId));
+}
+
+/**
+ * Files the draft as a real Survey.
+ *
+ * An ad-hoc draft is consumed — it disappears once filed, same as before. A
+ * cycle-bound draft instead moves to `submitted` and stays put: the CRM's
+ * onboarding step keeps showing it, and the admin can keep editing the
+ * question set (re-filing through `saveLinkedSurvey`) right up until launch.
+ */
+export function submitDraft(draft: SurveyDraft): string {
+  const id = draft.surveyId ?? `survey-custom-${Date.now()}`;
+  const existing = getSubmittedSnapshot();
+  const previous = existing.find((s) => s.id === id);
+  const survey = surveyFromDraft(draft, id, previous);
+  writeSubmitted(previous ? existing.map((s) => (s.id === id ? survey : s)) : [...existing, survey]);
+
+  if (draft.context) {
+    updateDraft(draft.id, (d) => ({
+      ...d,
+      lifecycle: d.lifecycle === "locked" ? "locked" : "submitted",
+      surveyId: id,
+      submittedAt: d.submittedAt ?? new Date().toISOString(),
+    }));
+  } else {
+    discardDraftById(draft.id);
+  }
   return id;
+}
+
+/** Pushes edits from an already-filed cycle draft back onto its Survey record. */
+export function saveLinkedSurvey(draft: SurveyDraft): string | null {
+  if (!draft.surveyId) return null;
+  return submitDraft(draft);
+}
+
+/**
+ * Records the client's sign-off on the question set, which is what completes
+ * onboarding step 1. Deliberately does *not* freeze the draft — the survey
+ * stays editable right up until the cycle launches, so a late correction
+ * doesn't require unwinding the whole step.
+ */
+export function approveDraftQuestions(draftId: string): void {
+  updateDraft(draftId, (d) => (d.approvedAt ? d : { ...d, approvedAt: new Date().toISOString() }));
+}
+
+/** Pulls sign-off back so the question set can be reworked before launch. */
+export function reopenDraftQuestions(draftId: string): void {
+  updateDraft(draftId, (d) => (d.approvedAt ? { ...d, approvedAt: null } : d));
+}
+
+/**
+ * Freezes the question set because the cycle launched, and flips the linked
+ * Survey to active on the dashboard. After this the CRM shows the survey
+ * read-only and the creation flow refuses edits (see `saveDraft`).
+ */
+export function lockDraft(draftId: string): void {
+  const draft = getCollection().drafts.find((d) => d.id === draftId);
+  if (!draft || draft.lifecycle === "locked") return;
+  // Make sure the dashboard reflects the final state before it's frozen.
+  const surveyId = draft.surveyId ?? submitDraft(draft);
+  const existing = getSubmittedSnapshot();
+  writeSubmitted(existing.map((s) => (s.id === surveyId ? { ...s, status: "active" } : s)));
+  updateDraft(draftId, (d) => ({
+    ...d,
+    lifecycle: "locked",
+    surveyId,
+    approvedAt: d.approvedAt ?? new Date().toISOString(),
+    lockedAt: new Date().toISOString(),
+  }));
 }
