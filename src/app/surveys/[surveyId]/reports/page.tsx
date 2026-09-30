@@ -30,27 +30,15 @@ const REPORT_TYPES = [
   },
   {
     key: "staff",
-    icon: Users,
-    label: "Investment Staff Committee",
-    description: "Race & gender breakdowns across ownership, leadership, and workforce.",
+    icon: BarChart2,
+    label: "Investment Committee Report",
+    description: "One sheet: race & gender percentages for investment professionals, the investment committee, and all employees.",
     color: "text-violet-700",
     bg: "bg-violet-50",
     border: "border-violet-200",
     hoverBorder: "hover:border-violet-400",
     href: (surveyId: string, orgId: string) =>
       `/surveys/${surveyId}/organizations/${orgId}/staff-report`,
-  },
-  {
-    key: "demographics",
-    icon: BarChart2,
-    label: "Investment Committee Report",
-    description: "Race & gender percentages for investment professionals, the investment committee, and all employees, by U.S. and global.",
-    color: "text-sky-700",
-    bg: "bg-sky-50",
-    border: "border-sky-200",
-    hoverBorder: "hover:border-sky-400",
-    href: (surveyId: string, orgId: string) =>
-      `/surveys/${surveyId}/organizations/${orgId}/demographics-report`,
   },
 ];
 
@@ -86,7 +74,7 @@ export default function ReportsPage() {
         </div>
         <div className="flex items-center gap-5 shrink-0">
           {[
-            { label: "Reports ready", value: submitted.length * 3, color: "text-[#00b8a9]" },
+            { label: "Reports ready", value: submitted.length * REPORT_TYPES.length, color: "text-[#00b8a9]" },
             { label: "Awaiting data", value: pending.length, color: "text-white/40" },
           ].map(({ label, value, color }) => (
             <div key={label} className="text-right">
@@ -161,7 +149,7 @@ export default function ReportsPage() {
               </div>
 
               {/* Report type buttons */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x divide-slate-100">
+              <div className="grid grid-cols-1 sm:grid-cols-2 divide-y sm:divide-y-0 sm:divide-x divide-slate-100">
                 {REPORT_TYPES.map((rt) => {
                   const Icon = rt.icon;
                   const disabled =
