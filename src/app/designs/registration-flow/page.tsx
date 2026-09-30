@@ -1,15 +1,14 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import Link from "next/link";
 import {
   ArrowLeft,
+  Building2,
   Check,
   ChevronDown,
   Info,
   Mail,
-  Search,
-  ShieldCheck,
   Sparkles,
   Tag,
   X,
@@ -34,6 +33,10 @@ const SURVEY = {
 const INVITED_CONTACT = {
   firstName: "Priya",
   email: "priya.nandakumar@arctosllc.com",
+  // The organization name typed on the invitation by the survey sender. This
+  // is the ONLY string the match percentages below are measured against.
+  invitedOrgName: "Arctos LLC",
+  emailDomain: "arctosllc.com",
 };
 
 type Step = 0 | 1 | 2 | 3;
@@ -62,11 +65,12 @@ const INTEREST_OPTIONS = [
 
 // ─── Step 3 organization matching fixture data ──────────────────────────
 //
-// Confidence is illustrative of the *kind* of signals a real matcher would
-// blend — exact domain match, fuzzy name/domain similarity, weak secondary
-// signals — not a specific scoring formula. The goal of showing the number
-// and the reason together is to make the recommendation legible enough
-// that a contact trusts it instead of reflexively hitting "Create New."
+// Every candidate below is an organization already registered under the
+// contact's email domain. The percentage is a NAME-SIMILARITY score and
+// nothing else: how closely each registered organization's name resembles
+// the organization name on the invitation ("Arctos LLC"). Keeping the score
+// to one comparison is what makes it explainable on screen — the contact can
+// read the two names side by side and see why the number is what it is.
 
 type OrgSuggestion = {
   id: string;
@@ -83,8 +87,9 @@ const SUGGESTED_MATCHES: OrgSuggestion[] = [
     id: "org-arctos-capital",
     name: "Arctos Capital Partners",
     members: 34,
-    confidence: 96,
-    reason: "Your email domain (arctosllc.com) exactly matches this organization's verified domain.",
+    confidence: 92,
+    reason:
+      "Shares the distinctive word \u201cArctos\u201d with your invitation name and is the only registered match using it as the leading word.",
     logoTint: "bg-emerald-600",
     initials: "AC",
   },
@@ -92,9 +97,9 @@ const SUGGESTED_MATCHES: OrgSuggestion[] = [
     id: "org-arctos-global",
     name: "Arctos Global Partners",
     members: 61,
-    confidence: 58,
+    confidence: 54,
     reason:
-      "Similar organization name, but its verified domain (arctosglobal.com) differs from yours — confirm before joining.",
+      "Also leads with \u201cArctos,\u201d but the qualifier \u201cGlobal\u201d is a different entity name than the one on your invitation.",
     logoTint: "bg-amber-500",
     initials: "AG",
   },
@@ -102,14 +107,18 @@ const SUGGESTED_MATCHES: OrgSuggestion[] = [
     id: "org-arctos-spv",
     name: "Arctos SPV Holdings",
     members: 4,
-    confidence: 21,
+    confidence: 23,
     reason:
-      "One existing member listed arctosllc.com as a secondary contact domain. Low confidence — verify before joining.",
+      "Only the word \u201cArctos\u201d overlaps \u2014 \u201cSPV Holdings\u201d reads as a separate vehicle, not the firm you were invited as.",
     logoTint: "bg-slate-400",
     initials: "AS",
   },
 ];
 
+// Every other organization registered on RoundTables. These are not scored,
+// because they have no relationship to the invitation name or email domain —
+// they exist only so a contact whose firm was mis-typed on the invitation can
+// still find it.
 const OTHER_ORGS: OrgSuggestion[] = [
   { id: "org-kkr", name: "KKR", members: 212, confidence: 0, reason: "", logoTint: "bg-slate-700", initials: "KK" },
   { id: "org-apollo", name: "Apollo Global Management", members: 188, confidence: 0, reason: "", logoTint: "bg-indigo-600", initials: "AG" },
@@ -373,7 +382,7 @@ function ConfidenceBadge({ value }: { value: number }) {
       : "bg-slate-100 text-slate-500 border-slate-200";
   return (
     <span className={`shrink-0 text-[12px] font-bold px-2 py-0.5 rounded-full border ${tone}`}>
-      {value}% match
+      {value}% name match
     </span>
   );
 }
@@ -406,7 +415,8 @@ function SuggestionCard({
           <span className="font-semibold text-slate-900 text-[14.5px]">{org.name}</span>
           <ConfidenceBadge value={org.confidence} />
         </div>
-        <p className="text-[12.5px] text-slate-500 mt-0.5">{org.members} members &middot; {org.reason}</p>
+        <p className="text-[12.5px] text-slate-500 mt-0.5 leading-relaxed">{org.reason}</p>
+        <p className="text-[11.5px] text-slate-400 mt-0.5">{org.members} members</p>
       </div>
       <button
         type="button"
@@ -434,107 +444,96 @@ function InfoTooltip() {
       </button>
       {open && (
         <span className="absolute z-30 left-1/2 -translate-x-1/2 top-6 w-72 rounded-xl bg-slate-900 text-white text-[12.5px] leading-relaxed p-3 shadow-xl">
-          We rank organizations by how likely they are to be yours — starting with an exact match on your email
-          domain, then name similarity and other members already registered nearby. Pick the top match if it looks
-          right. Only create a new organization if you&rsquo;ve checked the list and yours truly isn&rsquo;t there.
+          We first pull every organization already registered under your email domain, then score each one purely on
+          how closely its name resembles the organization name on your invitation. Nothing else moves the
+          percentage. Pick the top match if it looks right, and only create a new organization if none of these is
+          your firm.
         </span>
       )}
     </span>
   );
 }
 
+function InvitedOrgHeader() {
+  return (
+    <div className="rounded-2xl border border-indigo-100 bg-indigo-50/70 px-4 py-3.5 flex items-start gap-3">
+      <div className="w-9 h-9 rounded-lg bg-[#4361ee] flex items-center justify-center shrink-0">
+        <Building2 size={17} className="text-white" strokeWidth={1.9} />
+      </div>
+      <div className="min-w-0">
+        <p className="text-[11px] font-bold uppercase tracking-wide text-indigo-500">You were invited as</p>
+        <p className="text-[17px] font-bold text-slate-900 leading-snug truncate">{INVITED_CONTACT.invitedOrgName}</p>
+        <p className="text-[12px] text-indigo-900/60 mt-0.5 truncate">
+          {SURVEY.senderName} of {SURVEY.senderOrg} listed this organization on your invitation.
+        </p>
+      </div>
+    </div>
+  );
+}
+
 function StepOrganization({ onNext }: { onNext: (choice: { name: string; created: boolean }) => void }) {
-  const [query, setQuery] = useState("");
-  const [howOpen, setHowOpen] = useState(false);
+  const [browseOpen, setBrowseOpen] = useState(false);
   const [createOpen, setCreateOpen] = useState(false);
   const [newOrgName, setNewOrgName] = useState("");
-
-  const filteredOthers = useMemo(() => {
-    if (!query.trim()) return OTHER_ORGS;
-    const q = query.toLowerCase();
-    return OTHER_ORGS.filter((o) => o.name.toLowerCase().includes(q));
-  }, [query]);
 
   return (
     <div>
       <h1 className="text-[26px] font-bold text-slate-900 leading-tight">
-        Choose your organization on RoundTables
+        Confirm your organization
         <InfoTooltip />
       </h1>
-      <p className="text-slate-400 text-[15px] mt-1 mb-4">
-        Join your organization below, or create a new one only as a last resort.
+      <p className="text-slate-400 text-[15px] mt-1 mb-5">
+        Join the organization you were invited as, or create a new one only as a last resort.
       </p>
 
-      <button
-        type="button"
-        onClick={() => setHowOpen((o) => !o)}
-        className="w-full text-left flex items-start gap-2.5 rounded-xl border border-indigo-100 bg-indigo-50/60 px-4 py-3 mb-5 hover:bg-indigo-50 transition-colors duration-150"
-      >
-        <ShieldCheck size={17} className="text-indigo-500 shrink-0 mt-0.5" />
-        <span className="min-w-0">
-          <span className="block text-[13px] font-semibold text-indigo-900">How organization matching works</span>
-          {howOpen && (
-            <span className="block text-[12.5px] text-indigo-800/80 leading-relaxed mt-1">
-              Because you signed up with <span className="font-medium">{INVITED_CONTACT.email}</span>, we checked
-              which registered organizations share that email domain, have similar names, or already have members
-              associated with it. Each suggestion below shows a confidence percentage and the reason we surfaced it
-              — the highest-confidence match is recommended first. Choosing an existing organization keeps your
-              firm&rsquo;s survey history and benchmarking scores in one place, so please confirm a match here
-              before creating a new organization from scratch.
-            </span>
-          )}
-        </span>
-        <ChevronDown size={15} className={`text-indigo-400 shrink-0 ml-auto mt-0.5 transition-transform duration-150 ${howOpen ? "rotate-180" : ""}`} />
-      </button>
+      <InvitedOrgHeader />
 
-      <div className="border border-slate-200 rounded-2xl p-4 bg-white">
-        <p className="text-[12.5px] text-slate-500 mb-3">
-          Suggested matches for <span className="font-semibold text-slate-700">{INVITED_CONTACT.email}</span>
-        </p>
-        <div className="space-y-2.5">
-          {SUGGESTED_MATCHES.map((org, i) => (
-            <SuggestionCard key={org.id} org={org} recommended={i === 0} onJoin={(o) => onNext({ name: o.name, created: false })} />
-          ))}
-        </div>
+      <p className="text-[13px] text-slate-600 leading-relaxed mt-5 mb-3">
+        These are the organizations already registered under your email domain{" "}
+        <span className="font-semibold text-slate-800">{INVITED_CONTACT.emailDomain}</span>. Each percentage is
+        based solely on how closely that organization&rsquo;s name matches{" "}
+        <span className="font-semibold text-slate-800">{INVITED_CONTACT.invitedOrgName}</span>, the name you were
+        invited as &mdash; no other signal affects the score.
+      </p>
+
+      <div className="space-y-2.5 pt-2">
+        {SUGGESTED_MATCHES.map((org, i) => (
+          <SuggestionCard key={org.id} org={org} recommended={i === 0} onJoin={(o) => onNext({ name: o.name, created: false })} />
+        ))}
       </div>
 
-      <div className="mt-6">
-        <p className="text-[12.5px] font-semibold text-slate-500 uppercase tracking-wide mb-2">Not one of these? Search all organizations</p>
-        <div className="relative mb-2.5">
-          <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-          <input
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search by organization name"
-            className="w-full rounded-xl border border-slate-300 pl-9 pr-3 py-2.5 text-[13.5px] focus:border-[#4361ee] focus:outline-none focus:ring-2 focus:ring-[#4361ee]/20 transition-shadow duration-150"
-          />
-        </div>
-        <div className="max-h-52 overflow-y-auto rounded-xl border border-slate-200 divide-y divide-slate-100">
-          {filteredOthers.length === 0 && (
-            <p className="px-4 py-6 text-center text-[13px] text-slate-400">No organizations match &ldquo;{query}&rdquo;</p>
-          )}
-          {filteredOthers.map((org) => (
-            <div key={org.id} className="flex items-center gap-3 px-4 py-2.5 hover:bg-slate-50 transition-colors duration-100">
-              <div className={`w-8 h-8 rounded-lg ${org.logoTint} flex items-center justify-center shrink-0 text-white text-[11px] font-bold`}>
-                {org.initials}
+      <div className="mt-6 pt-5 border-t border-dashed border-slate-200 space-y-3">
+        <button
+          type="button"
+          onClick={() => setBrowseOpen((o) => !o)}
+          className="flex items-center gap-1.5 text-[12.5px] font-medium text-slate-500 hover:text-slate-700 transition-colors duration-150"
+        >
+          <ChevronDown size={14} className={`transition-transform duration-150 ${browseOpen ? "rotate-180" : ""}`} />
+          None of these? Browse every organization on RoundTables
+        </button>
+        {browseOpen && (
+          <div className="max-h-52 overflow-y-auto rounded-xl border border-slate-200 divide-y divide-slate-100">
+            {OTHER_ORGS.map((org) => (
+              <div key={org.id} className="flex items-center gap-3 px-4 py-2.5 hover:bg-slate-50 transition-colors duration-100">
+                <div className={`w-8 h-8 rounded-lg ${org.logoTint} flex items-center justify-center shrink-0 text-white text-[11px] font-bold`}>
+                  {org.initials}
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="text-[13.5px] font-medium text-slate-800 truncate">{org.name}</p>
+                  <p className="text-[11.5px] text-slate-400">{org.members} members</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => onNext({ name: org.name, created: false })}
+                  className="shrink-0 rounded-lg border border-slate-300 hover:border-[#4361ee] hover:text-[#4361ee] text-slate-600 text-[12.5px] font-semibold px-3 py-1.5 transition-colors duration-150"
+                >
+                  Join
+                </button>
               </div>
-              <div className="min-w-0 flex-1">
-                <p className="text-[13.5px] font-medium text-slate-800 truncate">{org.name}</p>
-                <p className="text-[11.5px] text-slate-400">{org.members} members</p>
-              </div>
-              <button
-                type="button"
-                onClick={() => onNext({ name: org.name, created: false })}
-                className="shrink-0 rounded-lg border border-slate-300 hover:border-[#4361ee] hover:text-[#4361ee] text-slate-600 text-[12.5px] font-semibold px-3 py-1.5 transition-colors duration-150"
-              >
-                Join
-              </button>
-            </div>
-          ))}
-        </div>
-      </div>
+            ))}
+          </div>
+        )}
 
-      <div className="mt-6 pt-5 border-t border-dashed border-slate-200">
         <button
           type="button"
           onClick={() => setCreateOpen((o) => !o)}
@@ -544,9 +543,9 @@ function StepOrganization({ onNext }: { onNext: (choice: { name: string; created
           Can&rsquo;t find your organization anywhere above?
         </button>
         {createOpen && (
-          <div className="mt-3 rounded-xl border border-slate-200 bg-slate-50 p-4">
+          <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
             <p className="text-[12px] text-slate-500 mb-3 leading-relaxed">
-              This should be rare — most contacts belong to an organization that&rsquo;s already registered.
+              This should be rare &mdash; most contacts belong to an organization that&rsquo;s already registered.
               Creating a new one starts your firm&rsquo;s survey history from scratch and goes to RoundTables staff
               for review before it&rsquo;s active.
             </p>
@@ -554,7 +553,7 @@ function StepOrganization({ onNext }: { onNext: (choice: { name: string; created
             <input
               value={newOrgName}
               onChange={(e) => setNewOrgName(e.target.value)}
-              placeholder="e.g. Arctos Capital Partners"
+              placeholder={INVITED_CONTACT.invitedOrgName}
               className="w-full rounded-lg border border-slate-300 px-3 py-2 text-[13.5px] mb-3 focus:border-slate-400 focus:outline-none"
             />
             <button
