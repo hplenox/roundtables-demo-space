@@ -126,6 +126,7 @@ export default function SurveysPage() {
   // Only ad-hoc drafts surface here — a client's onboarding draft belongs to
   // their CRM record and is resumed from there.
   const draft = useAdHocDraft();
+  const draftProgress = draft ? computeOverallProgress(draft) : null;
   const filtered = surveys.filter((s) => s.status === activeTab);
   const router = useRouter();
 
@@ -178,7 +179,7 @@ export default function SurveysPage() {
           </div>
 
           {/* Continue where you left off */}
-          {draft && (
+          {draft && draftProgress && (
             <button
               onClick={() => resumeDraft(draft.id)}
               className="group w-full text-left flex items-center justify-between gap-4 mb-5 px-4 py-3 rounded-xl border border-[#00b8a9]/30 bg-[#00b8a9]/6 hover:bg-[#00b8a9]/10 transition-colors"
@@ -191,9 +192,15 @@ export default function SurveysPage() {
                   <p className="text-[13px] font-semibold text-slate-800 truncate">
                     Continue where you left off — {draft.basics.name?.trim() || "Untitled survey"}
                   </p>
-                  <p className="text-[11.5px] text-slate-500">
-                    {computeOverallProgress(draft).completed} of {computeOverallProgress(draft).total} sections complete
+                  <p className="text-[11.5px] text-slate-500 tabular-nums">
+                    {draftProgress.completed} of {draftProgress.total} sections complete
                   </p>
+                  <div className="w-44 h-1 bg-white/70 rounded-full overflow-hidden mt-1.5">
+                    <div
+                      className="h-full bg-[#00b8a9] rounded-full transition-all duration-500"
+                      style={{ width: `${draftProgress.percent}%` }}
+                    />
+                  </div>
                 </div>
               </div>
               <span className="shrink-0 inline-flex items-center gap-1 text-[12px] font-semibold text-[#00897b] group-hover:gap-1.5 transition-all">

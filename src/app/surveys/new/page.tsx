@@ -17,7 +17,7 @@ import {
   Link2,
 } from "lucide-react";
 import {
-  computeOverallProgress,
+  computeRequiredProgress,
   computeSectionStatus,
   discardDraft,
   isReadyToSubmit,
@@ -87,9 +87,11 @@ export default function NewSurveyHubPage() {
     return <p className="text-[13px] text-slate-400">Setting up your draft…</p>;
   }
 
-  const progress = computeOverallProgress(draft);
+  // Only the required sections gate submission — counting the optional one
+  // here would overstate what's left before the survey can be filed.
+  const required = computeRequiredProgress(draft);
   const ready = isReadyToSubmit(draft);
-  const remaining = progress.total - progress.completed;
+  const remaining = required.remaining;
   const context = draft.context;
   const filed = draft.lifecycle !== "configuring";
   const locked = draft.lifecycle === "locked";
